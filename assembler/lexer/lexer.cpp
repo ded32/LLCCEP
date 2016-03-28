@@ -28,7 +28,7 @@ namespace LLCCEP_ASM {
 					i++;
 				}
 			} else if (data[i] == '$') {
-				curr.type = LEX_T_ADDR;
+				curr.type = LEX_T_MEM;
 				i++;
 
 				while (isdigit(data[i])) {
@@ -43,14 +43,14 @@ namespace LLCCEP_ASM {
 					i++;
 				}
 			} else if (isdigit(data[i])) {
-				curr.type = LEX_T_NUM;
+				curr.type = LEX_T_VAL;
 
 				while (isdigit(data[i]) || data[i] == '.') {
 					curr.val += data[i];
 					i++;
 				}	
-			} else if (isspace(data[i])) {
-				while (isspace(data[i]) && data[i])
+			} else if (isspace(data[i]) || data[i] == ',') {
+				while ((isspace(data[i]) || data[i] == ',') && data[i])
 					i++;
 
 				continue;

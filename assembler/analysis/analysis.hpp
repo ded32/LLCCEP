@@ -5,6 +5,9 @@
 #include "../lexer/lexer.hpp"
 
 namespace LLCCEP_ASM {
+	int64_t is_cond(std::string str);
+	int64_t is_inst(std::string str);
+
 	bool Analyze(std::vector <lexem> lex);
 }
 
