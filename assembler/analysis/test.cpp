@@ -2,7 +2,8 @@
 #include <iostream>
 #include <vector>
 
-#include "lexer.hpp"
+#include "../lexer/lexer.hpp"
+#include "analysis.hpp"
 
 int main()
 {
@@ -15,9 +16,9 @@ int main()
 	
 		std::getline(std::cin, str);
 		LLCCEP_ASM::ToLexems(str, lex, "stdin", 0);
-
-		for (size_t i = 0; i < lex.size(); i++)
-			std::cout << lex[i].type << " " << lex[i].val << "\n";	
+		
+		if (lex.size())
+			LLCCEP_ASM::Analyze(lex);
 	} while ((lex.size())?(lex[0].val != "exit"):(1));
 
 	return 0;

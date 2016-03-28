@@ -38,7 +38,7 @@ namespace LLCCEP_ASM {
 			} else if (isalpha(data[i])) {
 				curr.type = LEX_T_NAME;
 
-				while (data[i] && !isspace(data[i])) {
+				while (isalnum(data[i])) {
 					curr.val += data[i];
 					i++;
 				}
@@ -77,3 +77,5 @@ namespace LLCCEP_ASM {
 		return true;
 	}
 }
+
+#undef PARSE_ISSUE
