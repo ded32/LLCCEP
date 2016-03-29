@@ -13,8 +13,8 @@ namespace LLCCEP_ASM {
 	};
 
 	struct op {
-		int64_t instruction;
-		int64_t condition;
+		int8_t instruction;
+		int8_t condition;
 		arg args[3];
 	};
 
@@ -23,7 +23,6 @@ namespace LLCCEP_ASM {
 		double real;
 	};
 
-	std::bitset <64> double_to_bitset(double val);
 	op *prepare_op(std::vector <lexem> lex);
 	void dump_bitset(std::ofstream& out, op *addr);
 }

@@ -40,8 +40,11 @@ int main(int argn, char * const *argv)
 			if (!LLCCEP_ASM::ToLexems(str, lex, argv[i], line))
 				break;
 
-			LLCCEP_ASM::op *prep = LLCCEP_ASM::prepare_op(lex);
-			LLCCEP_ASM::dump_bitset(out, prep);
+			if (lex.size()) {
+				LLCCEP_ASM::op *prep = LLCCEP_ASM::prepare_op(lex);
+				LLCCEP_ASM::dump_bitset(out, prep);
+			}
+
 			line++;
 		}
 

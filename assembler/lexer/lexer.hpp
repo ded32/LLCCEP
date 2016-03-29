@@ -5,7 +5,7 @@
 #include <vector>
 
 namespace LLCCEP_ASM {
-	enum lex_t: short { 
+	enum lex_t: uint8_t { 
 		LEX_T_REG     = 0,
 		LEX_T_MEM     = 1,
 		LEX_T_VAL     = 2,

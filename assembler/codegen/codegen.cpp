@@ -1,4 +1,3 @@
-#include <bitset>
 #include <vector>
 #include <cassert>
 #include <iostream>
@@ -8,12 +7,22 @@
 #include "../analysis/analysis.hpp"
 
 namespace LLCCEP_ASM {
-	std::bitset <64> double_to_bitset(double val)
+	uint64_t double2ull(double val)
 	{
 		Convert cv = {};
 		cv.real = val;
+		return cv.integer;
+	}
 
-		return std::bitset <64>(cv.integer);
+	void dump_ull_bitset(std::ofstream& out, uint64_t val)
+	{
+		assert(!out.fail());
+
+		uint64_t mask = 0xFF00000000000000;
+		for (size_t i = 0; i < 8; i++) {
+			out << static_cast <char>((val & mask) >> 8 * (7 - i));
+			mask >>= 8;
+		}
 	}
 
 	op *prepare_op(std::vector <lexem> lex)
@@ -40,15 +49,14 @@ namespace LLCCEP_ASM {
 	void dump_bitset(std::ofstream& out, op *addr)
 	{
 		assert(addr);
+		assert(!out.fail());
 
-		out << std::bitset <4>(addr->condition)
-		    << std::bitset <8>(addr->instruction);
+		out << static_cast <char>(addr->condition)
+		    << static_cast <char>(addr->instruction);
 
 		for (size_t i = 0; i < 3; i++) {
-			out << std::bitset <4>(addr->args[i].type)
-			    << double_to_bitset(addr->args[i].value);
+			out << addr->args[i].type;
+			dump_ull_bitset(out, double2ull(addr->args[i].value));
 		}
-
-		out << "\n";
 	}
 }
