@@ -37,7 +37,7 @@ namespace LLCCEP_ASM {
 		return res;
 	}
 
-	void dump_bitset(std::ostream& out, op *addr)
+	void dump_bitset(std::ofstream& out, op *addr)
 	{
 		assert(addr);
 

@@ -7,8 +7,7 @@ namespace LLCCEP_ASM {
         lex_t types[3];
 	};
 
-	static const int INST_NUM = 17;
-
+	static const int INST_NUM = 19;
 	static const inst INSTRUCTIONS[] = {{"mov",  {LEX_T_MEM, LEX_T_VAL, LEX_T_NO}},
 	                                    {"mva",  {LEX_T_VAL, LEX_T_VAL, LEX_T_NO}},
 	                                    {"push", {LEX_T_VAL, LEX_T_NO,  LEX_T_NO}},
@@ -25,7 +24,9 @@ namespace LLCCEP_ASM {
 	                                    {"roff", {LEX_T_MEM, LEX_T_VAL, LEX_T_VAL}},
 	                                    {"nop",  {LEX_T_NO,  LEX_T_NO,  LEX_T_NO}},
 	                                    {"swi",  {LEX_T_VAL, LEX_T_NO,  LEX_T_NO}},
-	                                    {"cmp",  {LEX_T_VAL, LEX_T_VAL, LEX_T_NO}}};
+	                                    {"cmp",  {LEX_T_VAL, LEX_T_VAL, LEX_T_NO}},
+	                                    {"inc",  {LEX_T_MEM, LEX_T_NO,  LEX_T_NO}},
+	                                    {"dec",  {LEX_T_MEM, LEX_T_NO,  LEX_T_NO}}};
 }
 
 #endif // DEF_INST_HPP
