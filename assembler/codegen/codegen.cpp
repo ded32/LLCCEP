@@ -51,12 +51,12 @@ namespace LLCCEP_ASM {
 		assert(addr);
 		assert(!out.fail());
 
-		out << static_cast <char>(addr->condition)
-		    << static_cast <char>(addr->instruction);
+		out << static_cast <char>(addr->condition)    // 1 byte
+		    << static_cast <char>(addr->instruction); // 1 byte
 
 		for (size_t i = 0; i < 3; i++) {
-			out << addr->args[i].type;
-			dump_ull_bitset(out, double2ull(addr->args[i].value));
+			out << static_cast <char>(addr->args[i].type); // 1 byte
+			dump_ull_bitset(out, double2ull(addr->args[i].value)); // 8 bytes
 		}
 	}
 }
