@@ -13,14 +13,9 @@ namespace LLCCEP_ASM {
 	};
 
 	struct op {
-		int8_t instruction;
-		int8_t condition;
+		uint8_t instruction;
+		uint8_t condition;
 		arg args[3];
-	};
-
-	union Convert {
-		uint64_t integer;
-		double real;
 	};
 
 	op *prepare_op(std::vector <lexem> lex);

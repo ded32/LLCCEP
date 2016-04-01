@@ -7,24 +7,6 @@
 #include "../analysis/analysis.hpp"
 
 namespace LLCCEP_ASM {
-	uint64_t double2ull(double val)
-	{
-		Convert cv = {};
-		cv.real = val;
-		return cv.integer;
-	}
-
-	void dump_ull_bitset(std::ofstream& out, uint64_t val)
-	{
-		assert(!out.fail());
-
-		uint64_t mask = 0xFF00000000000000;
-		for (size_t i = 0; i < 8; i++) {
-			out << static_cast <char>((val & mask) >> 8 * (7 - i));
-			mask >>= 8;
-		}
-	}
-
 	op *prepare_op(std::vector <lexem> lex)
 	{
 		if (!Analyze(lex))
@@ -51,12 +33,12 @@ namespace LLCCEP_ASM {
 		assert(addr);
 		assert(!out.fail());
 
-		out << static_cast <char>(addr->condition)    // 1 byte
-		    << static_cast <char>(addr->instruction); // 1 byte
+		out << addr->condition << " "
+		    << addr->instruction << " ";
 
 		for (size_t i = 0; i < 3; i++) {
-			out << static_cast <char>(addr->args[i].type); // 1 byte
-			dump_ull_bitset(out, double2ull(addr->args[i].value)); // 8 bytes
+			out << addr->args[i].type << " "
+		            << addr->args[i].value << " ";  
 		}
 	}
 }
