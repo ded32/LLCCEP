@@ -16,32 +16,28 @@
                                                   << "--------------------------------------------------"\
                                                   << "--------------------------------------------------\n";
 
-static long long is_in(const std::string *arr, std::string str, long long size)
-{
-	for (long long i = 0; i < size; i++)
-		if (arr[i] == str)
-			return i;
-
-	return -1;
-}
-
-static const std::string mnemonics[6] = {"register",
-                                         "memory address",
-                                         "number",
-                                         "none",
-                                         "name",
-                                         "invalid"};
+static const std::string mnemonics[6] = {
+	"register",
+	"memory address",
+	"value",
+	"name",
+	"none",
+	"invalid"
+};
 
 namespace LLCCEP_ASM {
 	int64_t is_cond(std::string str)
 	{
-		return is_in(LLCCEP_ASM::CONDS, str, LLCCEP_ASM::CONDS_NUM);
+		if (CONDS.find(str) == CONDS.end())
+			return -1;
+		
+		return CONDS.at(str);
 	}
 
 	int64_t is_inst(std::string str)
 	{
-		for (long long i = 0; i < LLCCEP_ASM::INST_NUM; i++)
-			if (LLCCEP_ASM::INSTRUCTIONS[i].name == str)
+		for (int64_t i = 0; i < INST_NUM; i++)
+			if (INSTRUCTIONS[i].name == str)
 				return i;
 
 		return -1;

@@ -12,6 +12,7 @@ namespace LLCCEP_ASM {
 		{"ae", 0b0101},
 		{"le", 0b0110},
 		{"ls", 0b0010}
+	};
 }
 
 #endif // DEF_COND_HPP

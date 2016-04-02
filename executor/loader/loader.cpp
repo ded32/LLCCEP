@@ -17,10 +17,14 @@ namespace LLCCEP {
 
 		while (!input.eof()) {
 			inst temp = {};
-		
-			input >> temp.cond >> temp.opcode;
-			for (unsigned i = 0; i < 3; i++)
-				input >> temp.args[i].type >> temp.args[i].value;
+			int8_t tmp = 0;
+	
+			input >> tmp >> temp.opcode; temp.cond = tmp;
+
+			for (unsigned i = 0; i < 3; i++) {
+				input >> tmp >> temp.args[i].value;
+				temp.args[i].type = static_cast<arg_t>(tmp);
+			}
 
 			program.push_back(temp);
 		}

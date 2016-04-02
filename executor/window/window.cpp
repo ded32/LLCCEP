@@ -1,5 +1,7 @@
 #include <SDL.h>
 #include <cstdint>
+#include <iostream>
+#include <cassert>
 
 #include "window.hpp"
 
@@ -11,7 +13,7 @@ namespace LLCCEP {
 
 	bool init_sdl()
 	{
-		if (!SDL_Init(SDL_INIT_EVERYTHING)) {
+		if (SDL_Init(SDL_INIT_EVERYTHING)) {
 			std::cerr << "Error!\n" << "Can't init SDL: " << SDL_GetError() << "!\n";
 			return false;
 		}
@@ -22,7 +24,7 @@ namespace LLCCEP {
 	bool init_window()
 	{
 		SYS::wnd = SDL_CreateWindow("Emulation", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-		                            get_screen_width(), get_screen_height(), SDL_WINDOW_SHOWN);
+		                            get_screen_width(), get_screen_height(), SDL_WINDOW_SHOWN | SDL_WINDOW_FULLSCREEN);
 		if (!SYS::wnd) {
 			std::cerr << "Error!\n" << "Can't init window: " << SDL_GetError() << "!\n";
 			return false;
@@ -38,7 +40,8 @@ namespace LLCCEP {
 			std::cerr << "Error!\n" << "Can't init renderer: " << SDL_GetError() << "!\n";
 			return false;
 		}
-	
+
+		SDL_RenderClear(SYS::rnd);
 		return true;
 	}
 
@@ -68,5 +71,17 @@ namespace LLCCEP {
 		SDL_GetCurrentDisplayMode(0, &mode);
 
 		return mode.h;
+	}
+
+	void Delay(uint64_t time)
+	{
+		clock_t begin = clock();
+		while ((begin + time * 1000 / CLOCKS_PER_SEC) > clock());
+	}
+
+	void PresentSurface()
+	{
+		SDL_RenderPresent(SYS::rnd);
+		SDL_UpdateWindowSurface(SYS::wnd);
 	}
 }

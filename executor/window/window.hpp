@@ -19,6 +19,9 @@ namespace LLCCEP {
 
 	int get_screen_width();
 	int get_screen_height();
+
+	void Delay(uint64_t time);
+	void PresentSurface();
 }
 
 #endif // WINDOW_HPP

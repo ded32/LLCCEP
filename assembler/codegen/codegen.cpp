@@ -37,7 +37,7 @@ namespace LLCCEP_ASM {
 		    << addr->instruction << " ";
 
 		for (size_t i = 0; i < 3; i++) {
-			out << addr->args[i].type << " "
+			out << static_cast<char>(addr->args[i].type) << " "
 		            << addr->args[i].value << " ";  
 		}
 	}
