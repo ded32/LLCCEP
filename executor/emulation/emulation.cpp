@@ -98,6 +98,7 @@ namespace LLCCEP {
 	void Quit()
 	{
 		std::cout << "Emulation ended!\nTime is: " << static_cast<double>(clock() - began) / CLOCKS_PER_SEC << "!\n";
+                free((void *)mem);
 	}
 }
 
@@ -262,15 +263,15 @@ emufunc set(LLCCEP::arg& data, double value)
 {
 	switch (data.type) {
 		case LLCCEP::ARG_T_MEM:
-			set_mem(static_cast<size_t>(data.value), value);
+			set_mem(static_cast<int64_t>(data.value), value);
 			break;
 
 		case LLCCEP::ARG_T_REG:
-			if (static_cast<size_t>(data.value) > 31 || static_cast<size_t>(data.value) < 0) {
+			if (static_cast<int64_t>(data.value) > 31 || static_cast<int64_t>(data.value) < 0) {
 				std::cerr << "An attempt to move data to unexisting register!\n";
 				raise(SIGSEGV);
 			} else
-				LLCCEP::reg[static_cast<size_t>(data.value)] = value;
+				LLCCEP::reg[static_cast<int64_t>(data.value)] = value;
 			break;
 	
 		default:
@@ -287,7 +288,7 @@ static double get(LLCCEP::arg& data)
 			break;
 
 		case LLCCEP::ARG_T_REG:
-			if (static_cast<size_t>(data.value) > 31 || static_cast<size_t>(data.value) < 0) {
+			if (static_cast<int64_t>(data.value) > 31 || static_cast<int64_t>(data.value) < 0) {
 				std::cerr << "Error!\nAn attempt to get data from unexisting register!\n";
 				raise(SIGSEGV);
 			} else

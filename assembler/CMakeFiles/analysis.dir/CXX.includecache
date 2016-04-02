@@ -1,0 +1,42 @@
+#IncludeRegexLine: ^[ 	]*#[ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/media/psf/Home/Documents/projects/LLCCEP/assembler/analysis/analysis.cpp
+string
+-
+vector
+-
+iostream
+-
+../lexer/lexer.hpp
+/media/psf/Home/Documents/projects/LLCCEP/assembler/lexer/lexer.hpp
+analysis.hpp
+/media/psf/Home/Documents/projects/LLCCEP/assembler/analysis/analysis.hpp
+../def/def_inst.hpp
+/media/psf/Home/Documents/projects/LLCCEP/assembler/def/def_inst.hpp
+../def/def_cond.hpp
+/media/psf/Home/Documents/projects/LLCCEP/assembler/def/def_cond.hpp
+
+/media/psf/Home/Documents/projects/LLCCEP/assembler/analysis/analysis.hpp
+vector
+-
+../lexer/lexer.hpp
+/media/psf/Home/Documents/projects/LLCCEP/assembler/lexer/lexer.hpp
+
+/media/psf/Home/Documents/projects/LLCCEP/assembler/def/def_cond.hpp
+map
+-
+
+/media/psf/Home/Documents/projects/LLCCEP/assembler/def/def_inst.hpp
+
+/media/psf/Home/Documents/projects/LLCCEP/assembler/lexer/lexer.hpp
+string
+-
+vector
+-
+
