@@ -48,11 +48,7 @@ namespace LLCCEP_SiPy {
 	}
 
 	Exception::~Exception()
-	{
-		file.~basic_string();
-		func.~basic_string();
-		msg.~basic_string();
-	}
+	{}
 
 	SyntaxException::SyntaxException(std::string msg_):
 		Exception(msg_)

@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 2.6)
 project(SiPyLexer)
 
+set(CMAKE_CXX_FLAGS "-g -O0 -std=c++11")
+
 add_library(lexer lexer.cpp)
 add_library(errors ../errors/errors.cpp)
 
