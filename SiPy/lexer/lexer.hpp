@@ -14,8 +14,8 @@ namespace LLCCEP_SiPy {
 	};
 
 	enum decl_t: int {
-		DECL_T_PROTO = 4,
-		DECL_T_DEF   = 5
+		DECL_T_EXTERN = 4,
+		DECL_T_DEF    = 5
 	};
 
 	enum op_t: int {

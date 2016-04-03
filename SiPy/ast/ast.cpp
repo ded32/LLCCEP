@@ -2,15 +2,11 @@
 #include <memory>
 #include <vector>
 
+#include <STLExtras.hpp>
+
 #include "ast.hpp"
 
 namespace LLCCEP_SiPy {	
-	template <class TYPE, class... args>
-	typename std::enable_if<!std::is_array<TYPE>::value, std::unique_ptr<TYPE>>::type make_unique(args &&... params)
-	{
-		return std::unique_ptr<TYPE>(new TYPE(std::forward<args>(params)...));
-	}
-
 	astNode::~astNode()
 	{}
 

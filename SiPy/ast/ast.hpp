@@ -6,9 +6,6 @@
 #include <vector>
 
 namespace LLCCEP_SiPy {	
-	template <class TYPE, class... args>
-	typename std::enable_if<!std::is_array<TYPE>::value, std::unique_ptr<TYPE>>::type make_unique(args &&... params);
-
 	class astNode {
 	public:
 		virtual ~astNode();
@@ -24,7 +21,7 @@ namespace LLCCEP_SiPy {
 		std::string name;
 	public:
 		astVariableNode(const std::string &str);;
-	}
+	};
 
 	class astBinaryExprNode: public astNode {
 		std::unique_ptr<astNode> left, right;
@@ -52,7 +49,7 @@ namespace LLCCEP_SiPy {
 		std::unique_ptr<astNode> body;
 	public:
 		astFunc(std::unique_ptr<astProto> prototype, std::unique_ptr<astNode> Body);
-	}
+	};
 }
 
 #endif // SIPY_AST_HPP

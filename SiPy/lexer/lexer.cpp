@@ -12,11 +12,10 @@ static const char OP_RESERVED[] = {
 #define OP_RESERVED_NUM 8
 
 static const std::string MNEMONICS[] = {
-	"(", ")", "+", "-", "*", "/" , "**",
-	"+=", "-=", "*=", "/=", "**=",
-	"and", "or", "xor", "not",
-	"==", "!=", ">=", "<=", ">", "<",
-	"="
+	"extern", "def", "(", ")", "+", "-", 
+	"*", "/" , "**", "+=", "-=", "*=", 
+	"/=", "**=", "and", "or", "xor", "not",
+	"==", "!=", ">=", "<=", ">", "<", "="
 };
 #define MNEMONICS_NUM 23
 
@@ -81,7 +80,7 @@ namespace LLCCEP_SiPy {
 					tmp.type = LEX_T_ID;
 					tmp.value = temp;
 				} else {
-					tmp.type = pos + 6;
+					tmp.type = pos + 4;
 					tmp.value = "";
 				}
 			} else if (is_op(str[i]) != -1) {
@@ -97,7 +96,7 @@ namespace LLCCEP_SiPy {
 					msg += temp; msg += "\"!\n";
 					throw SyntaxException(error_notify(file, line, msg));
 				} else {
-					tmp.type = pos + 6;
+					tmp.type = pos + 4;
 					tmp.value = "";
 				}
 			} else if (isdigit(str[i]) || str[i] == '.') {
