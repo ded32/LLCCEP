@@ -1,11 +1,13 @@
 #include <string>
+#include <memory>
 #include <cstdint>
 #include <cstdarg>
 
 #include "errors.hpp"
 
 namespace LLCCEP_SiPy {
-	Exception::Exception(std::string file_, std::string func_, size_t line_, std::string msg_):
+	Exception::Exception(std::string file_, std::string func_, size_t line_, std::string msg_, Exception *cause_):
+		cause(std::move(cause_)),
 		file(file_),
 		func(func_),
 		line(line_),
@@ -40,9 +42,11 @@ namespace LLCCEP_SiPy {
 			res += "Function: "; res += func;
 		}
 
-		if (msg_only & 0b10) {
+		if (msg_only & 0b10)
 			res += msg;
-		}
+
+		if (cause)
+			((res += "\n") += cause->what());
 
 		return res;
 	}

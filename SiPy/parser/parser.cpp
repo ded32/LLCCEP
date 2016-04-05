@@ -1,4 +1,5 @@
 #include <memory>
+#include <string>
 #include <STLExtras.hpp>
 
 #include "../ast/ast.hpp"
@@ -9,23 +10,34 @@
 #define ALERT(str) throw Exception(__FILE__, __PRETTY_FUNCTION__, __LINE__, str);
 #define REMOVE_HEAD(vec) vec.erase(vec.begin());
 #define ALERT_LESS(vec) if (!vec.size()) ALERT("To less elements!\n");
+#define ALERT_CAUSE(str, exc) throw Exception(__FILE__, __PRETTY_FUNCTION__, __LINE__, str, std::move(&exc));
 
 namespace LLCCEP_SiPy {
 	std::unique_ptr<astNode> ParseExpr(std::vector<lexem> &lex)
 	{
-		auto Left = ParsePrime(lex);
-		if (!Left)
-			return nullptr;
+		std::unique_ptr<astNode> res = nullptr;
+		std::unique_ptr<astNode> Left = nullptr;
 
-		return ParseBinOp(lex, 0, std::move(Left));
+		try {
+			Left = ParsePrime(lex);
+			if (!Left)
+				return nullptr;
+		} catch (LLCCEP_SiPy::Exception &data) {
+			ALERT_CAUSE("Parse expr fails!\n", data)
+			return nullptr;
+		}
+
+		try {
+			res = ParseBinOp(lex, 0, std::move(Left));
+		} catch (LLCCEP_SiPy::Exception &data) {
+			ALERT_CAUSE("Parse expr fails!\n", data);
+			return nullptr;
+		}
 	}
 
 	std::unique_ptr<astNode> ParsePrime(std::vector<lexem> &lex)
 	{
 		ALERT_LESS(lex)
-
-		lexem tmp = lex[0];
-		REMOVE_HEAD(lex)
 
 		switch (lex[0].type) {
 			case OP_T_OB:
@@ -53,7 +65,7 @@ namespace LLCCEP_SiPy {
 		lexem tmp = lex[0];
 		REMOVE_HEAD(lex)
 
-		return LLCCEP::make_unique<astNumberNode>(tmp);
+		return LLCCEP::make_unique<astNumberNode>(stod(tmp.value));
 	}
 
 	std::unique_ptr<astNode> ParseParen(std::vector<lexem> &lex)
@@ -95,7 +107,7 @@ namespace LLCCEP_SiPy {
 		std::vector<std::unique_ptr<astNode> > args;
 		while (lex[0].type != OP_T_CB) {
 			if (auto arg = ParseExpr(lex))
-				args.push_back(LLCCEP::make_unique<astNode>(arg));
+				args.push_back(std::move(arg));
 			else
 				return nullptr;
 		}
@@ -129,7 +141,7 @@ namespace LLCCEP_SiPy {
 					return nullptr;
 			}
 
-			left = LLCCEP::make_unique<astNode>(op, std::move(left), std::move(right));
+			left = LLCCEP::make_unique<astBinaryExprNode>(op, std::move(left), std::move(right));
 		}
 	}
 

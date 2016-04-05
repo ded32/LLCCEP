@@ -9,10 +9,11 @@ namespace LLCCEP_SiPy {
 	enum msg_flg {
 		MSG_FLG_ONLY = 0b10,
 		MSG_FLG_ALL  = 0b11,
-		MSG_FLG_NO   = 0b01,
+		MSG_FLG_NO   = 0b01
 	};
 
 	class Exception {
+		Exception *cause;
 		std::string file;
 		std::string func;
 		size_t line;
@@ -20,12 +21,12 @@ namespace LLCCEP_SiPy {
 		msg_flg msg_only;	
 
 	public:
-		Exception(std::string file_, std::string func_, size_t line_, std::string msg_);
+		Exception(std::string file_, std::string func_, size_t line_, std::string msg_, Exception *cause_ = 0);
 		Exception(std::string msg_);
 		Exception(std::string file_, std::string func_, size_t line_);
 
 		virtual std::string what();
-		virtual ~Exception();	
+		virtual ~Exception();
 	};
 
 	class SyntaxException: public Exception {

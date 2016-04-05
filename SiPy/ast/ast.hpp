@@ -8,7 +8,8 @@
 namespace LLCCEP_SiPy {	
 	class astNode {
 	public:
-		virtual ~astNode();
+		virtual ~astNode()
+		{}
 	};
 
 	class astNumberNode: public astNode {
@@ -25,9 +26,9 @@ namespace LLCCEP_SiPy {
 
 	class astBinaryExprNode: public astNode {
 		std::unique_ptr<astNode> left, right;
-		char op;
+		std::string op;
 	public:
-		astBinaryExprNode(char op_, std::unique_ptr<astNode> pL, std::unique_ptr<astNode> pR);
+		astBinaryExprNode(std::string op_, std::unique_ptr<astNode> pL, std::unique_ptr<astNode> pR);
 	};
 
 	class astInvokeExprNode: public astNode {

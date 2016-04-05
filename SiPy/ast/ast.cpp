@@ -6,25 +6,22 @@
 
 #include "ast.hpp"
 
-namespace LLCCEP_SiPy {	
-	astNode::~astNode()
-	{}
-
+namespace LLCCEP_SiPy {
 	astNumberNode::astNumberNode(double val):
 		value(val)
 	{}
 
-	astVariableNode(const std::string& str):
+	astVariableNode::astVariableNode(const std::string &str):
 		name(str)
 	{}
 
-	astBinaryExprNode::astBinaryExprNode(char op_, std::unique_ptr<astNode> pL, std::unique_ptr<astNode> pR):
+	astBinaryExprNode::astBinaryExprNode(std::string op_, std::unique_ptr<astNode> pL, std::unique_ptr<astNode> pR):
 		left(std::move(pL)),
 		right(std::move(pR)),
 		op(op_)
 	{}
 
-	astInvokeExprNode::astInvokeExprNode(const std::string& str, std::vector<std::unique_ptr<astNode> > args):
+	astInvokeExprNode::astInvokeExprNode(const std::string &str, std::vector<std::unique_ptr<astNode> > args):
 		name(str),
 		params(std::move(args))
 	{}
@@ -36,6 +33,6 @@ namespace LLCCEP_SiPy {
 
 	astFunc::astFunc(std::unique_ptr<astProto> prototype, std::unique_ptr<astNode> Body):
 		proto(std::move(prototype)),
-		Body(std::move(Body))
+		body(std::move(Body))
 	{}	
 }
