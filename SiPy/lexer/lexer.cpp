@@ -7,15 +7,17 @@
 
 static const char OP_RESERVED[] = {
 	'+', '-', '*', '/',
-	'!', '>', '<', '='
+	'!', '>', '<', '=',
+	'(', ')', '!', ':'
 };
-#define OP_RESERVED_NUM 8
+#define OP_RESERVED_NUM 12 
 
 static const std::string MNEMONICS[] = {
 	"extern", "def", "(", ")", "+", "-", 
 	"*", "/" , "**", "+=", "-=", "*=", 
 	"/=", "**=", "and", "or", "xor", "not",
-	"==", "!=", ">=", "<=", ">", "<", "="
+	"==", "!=", ">=", "<=", ">", "<", "=",
+	":"
 };
 #define MNEMONICS_NUM 23
 

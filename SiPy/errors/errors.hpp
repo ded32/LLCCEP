@@ -21,9 +21,11 @@ namespace LLCCEP_SiPy {
 		msg_flg msg_only;	
 
 	public:
-		Exception(std::string file_, std::string func_, size_t line_, std::string msg_, Exception *cause_ = 0);
+		Exception(std::string file_, std::string func_, size_t line_, std::string msg_);
+		Exception(std::string file_, std::string func_, size_t line_, std::string msg_, Exception cause_);
 		Exception(std::string msg_);
 		Exception(std::string file_, std::string func_, size_t line_);
+		Exception(Exception &src);
 
 		virtual std::string what();
 		virtual ~Exception();

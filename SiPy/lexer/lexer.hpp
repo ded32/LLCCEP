@@ -46,7 +46,8 @@ namespace LLCCEP_SiPy {
 		OP_T_MORE   = 26,
 		OP_T_LESS   = 27,
 
-		OP_T_SET = 28
+		OP_T_SET   = 28,
+		OP_T_COLON = 29
 	};
 
 	struct lexem {

@@ -19,21 +19,24 @@ int main()
 			std::getline(std::cin, tmp);
 
 			LLCCEP_SiPy::ToLexems(tmp, lex, "stdin", line);
-			ParseExpr(lex);
+			for (size_t i = 0; i < lex.size(); i++)
+				std::cout << lex[i].type << " " << lex[i].value << " \n";
+
+			LLCCEP_SiPy::GetNumber(lex);
 		} catch (LLCCEP_SiPy::Exception &data) {
-			std::cerr << data.what() << "\n";
+			std::cerr << "\n" << data.what() << "\n";
 			return 1;
 		} catch (std::exception &data) {
-			std::cerr << data.what() << "\n";
+			std::cerr << "\n" << data.what() << "\n";
 			return 1;
 		} catch (std::string &str) {
- 			std::cerr << str << "\n";
+ 			std::cerr << "\n" << str << "\n";
 			return 1;
 		} catch (int &code) {
-			std::cerr << code << " error!\n";
+			std::cerr << "\n" << code << " error!\n";
 			return 1;
 		} catch (...) {
-			std::cerr << "Unknown exception!\n";
+			std::cerr << "\eUnknown exception!\n";
 			return 1;
 		}
 	}

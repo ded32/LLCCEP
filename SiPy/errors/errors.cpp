@@ -6,8 +6,17 @@
 #include "errors.hpp"
 
 namespace LLCCEP_SiPy {
-	Exception::Exception(std::string file_, std::string func_, size_t line_, std::string msg_, Exception *cause_):
-		cause(std::move(cause_)),
+	Exception::Exception(std::string file_, std::string func_, size_t line_, std::string msg_):
+		cause(0),
+		file(file_),
+		func(func_),
+		line(line_),
+		msg(msg_),
+		msg_only(MSG_FLG_ALL)
+	{}
+
+	Exception::Exception(std::string file_, std::string func_, size_t line_, std::string msg_, Exception cause_):
+		cause(new Exception(cause_)),
 		file(file_),
 		func(func_),
 		line(line_),
@@ -16,6 +25,7 @@ namespace LLCCEP_SiPy {
 	{}
 
 	Exception::Exception(std::string msg_):
+		cause(0),
 		file(""),
 		func(""),
 		line(0),
@@ -24,12 +34,23 @@ namespace LLCCEP_SiPy {
 	{}
 
 	Exception::Exception(std::string file_, std::string func_, size_t line_):
+		cause(0),
 		file(file_),
 		func(func_),
 		line(line_),
 		msg(""),
 		msg_only(MSG_FLG_NO)
 	{}
+
+	Exception::Exception(Exception &src):
+		cause((src.cause)?(new Exception(*src.cause)):(0)),
+		file(src.file),
+		func(src.func),
+		line(src.line),
+		msg(src.msg),
+		msg_only(src.msg_only)
+	{}
+		
 
 	std::string Exception::what()
 	{
