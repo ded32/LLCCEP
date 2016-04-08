@@ -51,30 +51,6 @@ namespace LLCCEP_SiPy {
 		msg_only(src.msg_only)
 	{}
 		
-
-	std::string Exception::what()
-	{
-		std::string res = "";
-
-		if (msg_only & 0b01) {
-			res += "An exception occured:\nFile: \"";
-			res += file; res += "\"\nLine: ";
-			res += std::to_string(line); res += "\n";
-			res += "Function: "; res += func;
-		}
-
-		if (msg_only & 0b10)
-			res += msg;
-
-		if (cause)
-			((res += "\n") += cause->what());
-
-		return res;
-	}
-
-	Exception::~Exception()
-	{}
-
 	SyntaxException::SyntaxException(std::string msg_):
 		Exception(msg_)
 	{}
