@@ -1,5 +1,8 @@
 #include <cstdint>
+#include <cassert>
 #include <vector>
+
+#include "opcodes.hpp"
 
 namespace LLCCEP_JIT {
 	void AppendFINIT(std::vector<BYTE>& program)
@@ -42,8 +45,30 @@ namespace LLCCEP_JIT {
 	{
 		assert(val);
 
+		union {
+			uint8_t addr[sizeof(double *)];
+			double *ptr;
+		} ptr;
+
+		ptr.ptr = val;
+
 		APPEND_BYTE(program, 0xDD)
-		APPEND_BYTE(program, val)
+		
+		for (unsigned i = 0; i < sizeof(double *); i++)
+			APPEND_BYTE(program, ptr.addr[i]);
+
 		APPEND_BYTE(program, 0x24)
+	}
+
+	void AppendFPOP(std::vector<BYTE>& program, double *where)
+	{
+		assert(where);
+
+		union {
+			uint8_t addr[sizeof(double *)];
+			double *ptr;
+		} ptr;
+
+		ptr.ptr = where;
 	}
 }
