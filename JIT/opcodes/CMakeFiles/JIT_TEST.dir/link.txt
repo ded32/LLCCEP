@@ -1,1 +1,0 @@
-/usr/bin/c++   -g -std=c++11    CMakeFiles/JIT_TEST.dir/test.cpp.o  -o JIT_TEST -rdynamic libopcodes.a 
