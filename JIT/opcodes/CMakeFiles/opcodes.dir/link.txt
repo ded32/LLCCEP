@@ -1,0 +1,2 @@
+/usr/bin/ar cr libopcodes.a  CMakeFiles/opcodes.dir/opcodes.cpp.o
+/usr/bin/ranlib libopcodes.a

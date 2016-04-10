@@ -17,6 +17,7 @@ namespace LLCCEP_JIT {
 	void AppendFSEG(std::vector<BYTE>& program);
 	void AppendFPUSH(std::vector<BYTE>& program, double *val);
 	void AppendFPOP(std::vector<BYTE>& program, double *where);
+	void AppendRET(std::vector<BYTE>& program);
 }
 
 #endif // OPCODES_HPP

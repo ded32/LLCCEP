@@ -71,4 +71,9 @@ namespace LLCCEP_JIT {
 
 		ptr.ptr = where;
 	}
+
+	void AppendRET(std::vector<BYTE>& program)
+	{
+		APPEND_BYTE(program, 0xC3);
+	}
 }
