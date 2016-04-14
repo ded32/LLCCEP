@@ -71,20 +71,20 @@ namespace LLCCEP_JIT {
 	{
 		APPEND_BYTE(vec, 0xDD)
 		APPEND_BYTE(vec, 28)
-		FPU_STD_APEND(vec)
+		FPU_STD_APPEND(vec)
 	}
 
 	void append_push(bytevec &vec, double *val)
 	{
-		uint8_t *bytes = static_cast<uint8_t *>(val);
+		uint8_t *bytes = (uint8_t *)val;
 
 		append_imm32(vec);
 		for (unsigned i = 0; i < 4; i++)
-			APPEND_BYTE(bytes[i])
+			APPEND_BYTE(vec, bytes[i])
 
 		append_imm32(vec);
 		for (unsigned i = 4; i < 8; i++)
-			APPEND_BYTE(bytes[i])
+			APPEND_BYTE(vec, bytes[i])
 	}
 
 	void append_pop(bytevec &vec)

@@ -40,6 +40,12 @@ size_t align(size_t size, size_t boundary)
 int main()
 {
 	LLCCEP_JIT::bytevec vec;
+
+	double *val = new double;
+	*val = 23;
+
+	LLCCEP_JIT::append_finit(vec);
+	LLCCEP_JIT::append_fclex(vec);
 	LLCCEP_JIT::append_ret(vec);
 
 	uint8_t *memory = 0;
