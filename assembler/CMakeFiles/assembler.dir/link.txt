@@ -1,0 +1,1 @@
+/usr/bin/c++   -g -O0 -std=c++11    CMakeFiles/assembler.dir/main.cpp.o  -o assembler -rdynamic liblexer.a libanalysis.a libcodegen.a liblexer.a libanalysis.a 

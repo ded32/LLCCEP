@@ -41,11 +41,12 @@ int main()
 {
 	LLCCEP_JIT::bytevec vec;
 
-	double *val = new double;
-	*val = 23;
+	int32_t val = 43;
 
 	LLCCEP_JIT::append_finit(vec);
-	LLCCEP_JIT::append_fclex(vec);
+	LLCCEP_JIT::append_push(vec, &val);
+//	LLCCEP_JIT::append_pop(vec);
+//	LLCCEP_JIT::append_pop(vec);
 	LLCCEP_JIT::append_ret(vec);
 
 	uint8_t *memory = 0;

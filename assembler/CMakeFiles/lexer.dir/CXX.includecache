@@ -1,0 +1,30 @@
+#IncludeRegexLine: ^[ 	]*#[ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/media/psf/Home/Documents/projects/personal/LLCCEP/assembler/lexer/lexer.cpp
+string
+-
+vector
+-
+cctype
+-
+cstddef
+-
+new
+-
+iostream
+-
+lexer.hpp
+/media/psf/Home/Documents/projects/personal/LLCCEP/assembler/lexer/lexer.hpp
+
+/media/psf/Home/Documents/projects/personal/LLCCEP/assembler/lexer/lexer.hpp
+string
+-
+vector
+-
+

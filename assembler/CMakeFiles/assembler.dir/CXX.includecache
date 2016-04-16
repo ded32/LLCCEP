@@ -1,0 +1,46 @@
+#IncludeRegexLine: ^[ 	]*#[ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/media/psf/Home/Documents/projects/personal/LLCCEP/assembler/analysis/analysis.hpp
+vector
+-
+../lexer/lexer.hpp
+/media/psf/Home/Documents/projects/personal/LLCCEP/assembler/lexer/lexer.hpp
+
+/media/psf/Home/Documents/projects/personal/LLCCEP/assembler/codegen/codegen.hpp
+bitset
+-
+fstream
+-
+../lexer/lexer.hpp
+/media/psf/Home/Documents/projects/personal/LLCCEP/assembler/lexer/lexer.hpp
+
+/media/psf/Home/Documents/projects/personal/LLCCEP/assembler/lexer/lexer.hpp
+string
+-
+vector
+-
+
+/media/psf/Home/Documents/projects/personal/LLCCEP/assembler/main.cpp
+fstream
+-
+cerrno
+-
+iostream
+-
+cassert
+-
+cstring
+-
+lexer/lexer.hpp
+/media/psf/Home/Documents/projects/personal/LLCCEP/assembler/lexer/lexer.hpp
+analysis/analysis.hpp
+/media/psf/Home/Documents/projects/personal/LLCCEP/assembler/analysis/analysis.hpp
+codegen/codegen.hpp
+/media/psf/Home/Documents/projects/personal/LLCCEP/assembler/codegen/codegen.hpp
+

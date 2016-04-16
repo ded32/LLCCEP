@@ -1,5 +1,6 @@
 #include <vector>
 #include <cstdint>
+#include <cassert>
 
 #include "opcodes.hpp"
 
@@ -34,29 +35,29 @@ namespace LLCCEP_JIT {
 #define FPU_STD_APPEND(vec) APPEND_BYTE(vec, 0x24)
 	void append_fadd(bytevec &vec)
 	{
-		APPEND_BYTE(vec, 0xDC)
-		APPEND_BYTE(vec, 4)
+		APPEND_BYTE(vec, 0xD8)
+		APPEND_BYTE(vec, 0x4)
 		FPU_STD_APPEND(vec)
 	}
 
 	void append_fsub(bytevec &vec)
 	{
 		APPEND_BYTE(vec, 0xDC)
-		APPEND_BYTE(vec, 36)
+		APPEND_BYTE(vec, 0x24)
 		FPU_STD_APPEND(vec)
 	}
 
 	void append_fmul(bytevec &vec)
 	{
 		APPEND_BYTE(vec, 0xDC)
-		APPEND_BYTE(vec, 12)
+		APPEND_BYTE(vec, 0x0C)
 		FPU_STD_APPEND(vec)
 	}
 
 	void append_fseg(bytevec &vec)
 	{
 		APPEND_BYTE(vec, 0xDC)
-		APPEND_BYTE(vec, 52)
+		APPEND_BYTE(vec, 0x34)
 		FPU_STD_APPEND(vec)
 	}
 
@@ -74,16 +75,14 @@ namespace LLCCEP_JIT {
 		FPU_STD_APPEND(vec)
 	}
 
-	void append_push(bytevec &vec, double *val)
+	void append_push(bytevec &vec, int32_t *ptr)
 	{
-		uint8_t *bytes = (uint8_t *)val;
+		assert(ptr);
+
+		uint8_t *bytes = (uint8_t *)ptr;
 
 		append_imm32(vec);
 		for (unsigned i = 0; i < 4; i++)
-			APPEND_BYTE(vec, bytes[i])
-
-		append_imm32(vec);
-		for (unsigned i = 4; i < 8; i++)
 			APPEND_BYTE(vec, bytes[i])
 	}
 

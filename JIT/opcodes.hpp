@@ -20,7 +20,7 @@ namespace LLCCEP_JIT {
 	void append_fld(bytevec &vec);
 	void append_fstp(bytevec &vec);
 
-	void append_push(bytevec &vec, double *val);
+	void append_push(bytevec &vec, int32_t *val);
 	void append_pop(bytevec &vec);	
 }
 
