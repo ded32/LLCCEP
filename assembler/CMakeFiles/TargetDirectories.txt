@@ -1,4 +1,0 @@
-/media/psf/Home/Documents/projects/personal/LLCCEP/assembler/CMakeFiles/analysis.dir
-/media/psf/Home/Documents/projects/personal/LLCCEP/assembler/CMakeFiles/assembler.dir
-/media/psf/Home/Documents/projects/personal/LLCCEP/assembler/CMakeFiles/codegen.dir
-/media/psf/Home/Documents/projects/personal/LLCCEP/assembler/CMakeFiles/lexer.dir

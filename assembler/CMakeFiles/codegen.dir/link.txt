@@ -1,2 +1,0 @@
-/usr/bin/ar cr libcodegen.a  CMakeFiles/codegen.dir/codegen/codegen.cpp.o
-/usr/bin/ranlib libcodegen.a
