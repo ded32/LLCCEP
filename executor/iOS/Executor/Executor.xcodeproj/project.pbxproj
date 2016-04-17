@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		491F41A11CC38C7500DC78FB /* File.swift in Sources */ = {isa = PBXBuildFile; fileRef = 491F41A01CC38C7500DC78FB /* File.swift */; };
 		49E23E281CC3823B007353FF /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49E23E271CC3823B007353FF /* AppDelegate.swift */; };
 		49E23E2B1CC3823B007353FF /* Executor.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 49E23E291CC3823B007353FF /* Executor.xcdatamodeld */; };
 		49E23E2D1CC3823B007353FF /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49E23E2C1CC3823B007353FF /* ViewController.swift */; };
@@ -28,6 +29,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		491F41A01CC38C7500DC78FB /* File.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = File.swift; sourceTree = "<group>"; };
 		49E23E221CC3823B007353FF /* Executor.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Executor.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		49E23E261CC3823B007353FF /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		49E23E271CC3823B007353FF /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -81,6 +83,7 @@
 		49E23E241CC3823B007353FF /* Executor */ = {
 			isa = PBXGroup;
 			children = (
+				491F41A01CC38C7500DC78FB /* File.swift */,
 				49E23E271CC3823B007353FF /* AppDelegate.swift */,
 				49E23E2C1CC3823B007353FF /* ViewController.swift */,
 				49E23E4A1CC3836F007353FF /* Loader.swift */,
@@ -218,6 +221,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				491F41A11CC38C7500DC78FB /* File.swift in Sources */,
 				49E23E2D1CC3823B007353FF /* ViewController.swift in Sources */,
 				49E23E2B1CC3823B007353FF /* Executor.xcdatamodeld in Sources */,
 				49E23E4B1CC3836F007353FF /* Loader.swift in Sources */,

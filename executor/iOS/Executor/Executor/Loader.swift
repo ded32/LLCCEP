@@ -1,14 +1,16 @@
 import Foundation
 
 struct arg {
-        var type: Character
+        var type: UInt8
         var value: Double
 }
 
 struct op {
-        var cond_code: Character
-        var op_code: Character
+        var cond_code: UInt8
+        var op_code: UInt8
         var args:[arg]
 }
 
-func load()
+func load(var file:file_t) -> [op] {
+        
+}
