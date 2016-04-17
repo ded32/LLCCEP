@@ -4,12 +4,8 @@
 
 #include "opcodes.hpp"
 
-#define APPEND_BYTE(vec, byte) vec.push_back(byte);
-static void append_address(LLCCEP_JIT::bytevec &vec, char *addr)
-{
-	for (unsigned i = 0; i < 4; i++)
-		APPEND_BYTE(vec, addr[i]);
-}
+#define APPEND_BYTE(vec, byte) vec.push_back(static_cast<uint8_t>(byte));
+#define APPEND_BYTES(vec, arr, n) for (unsigned i = 0; i < n; i++) APPEND_BYTE(vec, ((uint8_t *)arr)[i])
 
 namespace LLCCEP_JIT {
 	void append_ret(bytevec &vec)
@@ -20,8 +16,7 @@ namespace LLCCEP_JIT {
 	void append_fstp(bytevec &vec, void *mem)
 	{
 		APPEND_BYTE(vec, 0x15)
-
-		append_address(vec, (char *)&mem);
+		APPEND_BYTES(vec, &mem, sizeof(mem));
 	}
 
 	void append_finit(bytevec &vec)
@@ -57,8 +52,7 @@ namespace LLCCEP_JIT {
 	{
 		APPEND_BYTE(vec, 0x8B)
 		APPEND_BYTE(vec, 0x0D)
-
-		append_address(vec, (char *)&mem);
+		APPEND_BYTES(vec, &mem, sizeof(mem))
 	}
 	
 	void append_push_reg(bytevec &vec, BYTE reg)
@@ -110,6 +104,6 @@ namespace LLCCEP_JIT {
 	void append_push_imm32(bytevec &vec, void *ptr)
 	{
 		APPEND_BYTE(vec, 0x68)
-		append_address(vec, (char *)ptr);
+		APPEND_BYTES(vec, ptr, sizeof(int32_t));
 	}
 }

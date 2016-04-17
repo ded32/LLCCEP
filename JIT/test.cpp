@@ -1,5 +1,6 @@
 #include <iostream>
 #include <vector>
+#include <fstream>
 #include <cstdlib>
 #include <cstring>
 
@@ -10,7 +11,7 @@
 #	include <windows.h>
 #endif
 
-#include "opcodes.cpp"
+#include "opcodes.hpp"
 
 #define $(cmd)                             \
 ({                                         \
@@ -27,7 +28,7 @@ __attribute__((__always_inline__)) inline int call(const uint8_t *memory)
 	asm __volatile__(
 		"call *%0"
 		:
-		:"r" (memory)
+		:"r"(memory)
 		:"eax", "ebx", "ecx", "edx"
 	);
 
@@ -37,7 +38,18 @@ __attribute__((__always_inline__)) inline int call(const uint8_t *memory)
 size_t align(size_t size, size_t boundary)
 {
 	return (size / boundary + (size % boundary > 0)) * boundary;
-}    
+}
+
+void dump(std::vector<LLCCEP_JIT::BYTE> &vec)
+{
+	std::ofstream out;
+	out.open("1.out");
+
+	for (unsigned i = 0; i < vec.size(); i++)
+		out << vec[i];
+
+	out.close();
+}
 
 int main()
 {
@@ -46,32 +58,27 @@ int main()
 	int32_t val = 43;
 
 	LLCCEP_JIT::append_finit(vec);
-	LLCCEP_JIT::append_push_imm32(vec, (void *)&val);
-	LLCCEP_JIT::append_fld_ptr32_esp(vec);
-	LLCCEP_JIT::append_fld_ptr32_esp(vec);
-	LLCCEP_JIT::append_fstp(vec, &val);
+	LLCCEP_JIT::append_fclex(vec);
+	LLCCEP_JIT::append_mov_eax_esp(vec);
+	LLCCEP_JIT::append_mov_ecx_ptr32(vec, &val);
 	LLCCEP_JIT::append_ret(vec);
+
+	dump(vec);
 
 	uint8_t *memory = 0;
 
-	size_t sz = align(vec.size(), getpagesize());
-	$(sz);
-
 #if defined(__linux__) || (defined(__APPLE__) && defined(__MACH__))
+	size_t sz = align(vec.size(), getpagesize());
 	$(memory = reinterpret_cast<uint8_t *>(mmap(0, sz, PROT_READ | PROT_WRITE | PROT_EXEC, MAP_PRIVATE | MAP_ANON, -1, 0)));
 	$(std::copy(vec.begin(), vec.end(), memory));
-
 	$(call(memory));
-
 	$(munmap(memory, sz));
 #elif defined(_WIN32)
-	$(memory = (uint8_t *)VirtualAlloc(0, sz, MEM_COMMIT | MEM_RESERVE, PAGE_EXECUTE_READWRITE);
+	$(memory = reinterpret_cast<uint8_t *>(VirtualAlloc(0, vec.size() + 1, MEM_COMMIT | MEM_RESERVE, PAGE_EXECUTE_READWRITE)));
+	$(std::copy(vec.begin(), vec.end(), memory));
 	$(call(memory));
-	$(VirtualFree(memory, sz, MEM_DECOMMIT));
+	$(VirtualFree(memory, vec.size() + 1, MEM_DECOMMIT));
 #endif
-
-	std::cout << val;
 
 	return 0;
 }
-
