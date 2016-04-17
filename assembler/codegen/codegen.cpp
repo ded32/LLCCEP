@@ -16,6 +16,9 @@ namespace LLCCEP_ASM {
 		assert(res);
 
 		*res = {};
+
+		for (unsigned i = 0; i < 3; i++)
+			res->args[i].type = LEX_T_INVALID;
 		
 		res->condition = is_cond(lex[0].val);
 		res->instruction = is_inst(lex[1].val);
