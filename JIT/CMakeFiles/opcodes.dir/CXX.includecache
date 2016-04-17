@@ -1,0 +1,24 @@
+#IncludeRegexLine: ^[ 	]*#[ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/Users/andrew/Documents/projects/personal/LLCCEP/JIT/opcodes.cpp
+vector
+-
+cstdint
+-
+cassert
+-
+opcodes.hpp
+/Users/andrew/Documents/projects/personal/LLCCEP/JIT/opcodes.hpp
+
+/Users/andrew/Documents/projects/personal/LLCCEP/JIT/opcodes.hpp
+vector
+-
+cstdint
+-
+

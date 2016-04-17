@@ -6,6 +6,8 @@
 #if defined(__linux__) || defined(__APPLE__)
 #	include <sys/mman.h>
 #	include <unistd.h>
+#elif defined(_WIN32)
+#	include <windows.h>
 #endif
 
 #include "opcodes.cpp"
@@ -44,9 +46,10 @@ int main()
 	int32_t val = 43;
 
 	LLCCEP_JIT::append_finit(vec);
-	LLCCEP_JIT::append_push(vec, &val);
-//	LLCCEP_JIT::append_pop(vec);
-//	LLCCEP_JIT::append_pop(vec);
+	LLCCEP_JIT::append_push_imm32(vec, (void *)&val);
+	LLCCEP_JIT::append_fld_ptr32_esp(vec);
+	LLCCEP_JIT::append_fld_ptr32_esp(vec);
+	LLCCEP_JIT::append_fstp(vec, &val);
 	LLCCEP_JIT::append_ret(vec);
 
 	uint8_t *memory = 0;
@@ -55,15 +58,19 @@ int main()
 	$(sz);
 
 #if defined(__linux__) || (defined(__APPLE__) && defined(__MACH__))
-	$(memory = (uint8_t *)mmap(0, sz, PROT_READ | PROT_WRITE | PROT_EXEC, MAP_PRIVATE | MAP_ANON, -1, 0));
+	$(memory = reinterpret_cast<uint8_t *>(mmap(0, sz, PROT_READ | PROT_WRITE | PROT_EXEC, MAP_PRIVATE | MAP_ANON, -1, 0)));
 	$(std::copy(vec.begin(), vec.end(), memory));
 
 	$(call(memory));
 
 	$(munmap(memory, sz));
 #elif defined(_WIN32)
-	$(call(&vec[0]));
+	$(memory = (uint8_t *)VirtualAlloc(0, sz, MEM_COMMIT | MEM_RESERVE, PAGE_EXECUTE_READWRITE);
+	$(call(memory));
+	$(VirtualFree(memory, sz, MEM_DECOMMIT));
 #endif
+
+	std::cout << val;
 
 	return 0;
 }
