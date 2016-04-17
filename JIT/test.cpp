@@ -40,17 +40,6 @@ size_t align(size_t size, size_t boundary)
 	return (size / boundary + (size % boundary > 0)) * boundary;
 }
 
-void dump(std::vector<LLCCEP_JIT::BYTE> &vec)
-{
-	std::ofstream out;
-	out.open("1.out");
-
-	for (unsigned i = 0; i < vec.size(); i++)
-		out << vec[i];
-
-	out.close();
-}
-
 int main()
 {
 	LLCCEP_JIT::bytevec vec;
@@ -62,8 +51,6 @@ int main()
 	LLCCEP_JIT::append_mov_eax_esp(vec);
 	LLCCEP_JIT::append_mov_ecx_ptr32(vec, &val);
 	LLCCEP_JIT::append_ret(vec);
-
-	dump(vec);
 
 	uint8_t *memory = 0;
 

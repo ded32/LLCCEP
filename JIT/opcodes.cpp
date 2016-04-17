@@ -5,7 +5,9 @@
 #include "opcodes.hpp"
 
 #define APPEND_BYTE(vec, byte) vec.push_back(static_cast<uint8_t>(byte));
-#define APPEND_BYTES(vec, arr, n) for (unsigned i = 0; i < n; i++) APPEND_BYTE(vec, ((uint8_t *)arr)[i])
+#define APPEND_BYTES(vec, arr, n) \
+for (unsigned i = 0; i < n; i++) \
+	APPEND_BYTE(vec, reinterpret_cast<uint8_t *>(arr)[i])
 
 namespace LLCCEP_JIT {
 	void append_ret(bytevec &vec)
