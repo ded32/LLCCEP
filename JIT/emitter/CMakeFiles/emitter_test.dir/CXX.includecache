@@ -1,0 +1,32 @@
+#IncludeRegexLine: ^[ 	]*#[ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+../../include/STLExtras.hpp
+vector
+-
+initializer_list
+-
+cstddef
+-
+
+/Users/andrew/Documents/projects/personal/LLCCEP/JIT/emitter/emitter.hpp
+vector
+-
+initializer_list
+-
+cstdint
+-
+cstddef
+-
+STLExtras.hpp
+-
+
+/Users/andrew/Documents/projects/personal/LLCCEP/JIT/emitter/test.cpp
+emitter.hpp
+/Users/andrew/Documents/projects/personal/LLCCEP/JIT/emitter/emitter.hpp
+

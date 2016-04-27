@@ -1,36 +1,54 @@
 #ifndef EMITTER_HPP
 #define EMITTER_HPP
 
+#include <vector>
+#include <initializer_list>
 #include <cstdint>
+#include <cstddef>
 
-#include "../instruction/instruction.hpp"
-
-#define EAX (static_cast<uint8_t>(0))
-#define EBX (static_cast<uint8_t>(3))
-#define ECX (static_cast<uint8_t>(1))
-#define EDX (static_cast<uint8_t>(2))
-
-#define ESP (static_cast<uint8_t>(4))
+#include <STLExtras.hpp>
 
 namespace LLCCEP_JIT {
+	typedef std::initializer_list<uint8_t> opcode;
 	typedef uint8_t regID;
 
-	class program {
-		std::vector<instruction> program_data;
+	class emitter {
+		std::vector<uint8_t> program;
 	public:
-		program();
-		program(std::vector<instruction> program_data);
-		program(const program &data);
+		emitter();
+		emitter(std::initializer_list<uint8_t> src);
+		emitter(emitter &src);
+		~emitter();
 
-		void emit_mov(regID dst, regID src);
-		void emit_mov(regID dst, uint32_t val);
+		void emit_byte(uint8_t byte);
 
-		void emit_push(regID dst);
-		void emit_push(uint32_t val);
+		template<typename TYPE>
+		void emit_data(TYPE val)
+		{
+			for (size_t i = 0; i < sizeof(TYPE); i++)
+				emit_byte((reinterpret_cast<uint8_t *>(&val))[i]);
+		}
 
-		void emit_finit();
-		void emit_fclex();
-	}
+		void emit(std::initializer_list<uint8_t> data);
+		void emit(opcode op, regID dst, regID src);
+
+		template<typename TYPE>
+		void emit(opcode op, regID dst, TYPE val)
+		{
+			std::vector<uint8_t> opcode_data(init2vec(op));
+
+			for (size_t i = 0; i < opcode_data.size(); i++) {
+				if (i == opcode_data.size() - 1)
+					emit_byte(opcode_data[i] + dst);
+				else
+					emit_byte(opcode_data[i]);				
+			}
+
+			emit_data(val);
+		}
+
+		void dump();
+	};
 }
 
 #endif // EMITTER_HPP
