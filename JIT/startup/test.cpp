@@ -30,9 +30,9 @@ int main()
 
 	emit.dump();
 
-	LLCCEP_JIT::program prog = make_program(emit);
-	call(prog);
-	delete_program(prog);
+	LLCCEP_JIT::sys::program prog = LLCCEP_JIT::make_program(emit);
+	LLCCEP_JIT::call(prog);
+	LLCCEP_JIT::delete_program(prog);
 
 	return 0;
 }

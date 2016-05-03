@@ -8,9 +8,9 @@
 #include "program.hpp"
 
 namespace LLCCEP_JIT {
-	program make_program(emitter emit);
-	void call(program data);
-	void delete_program(program data);
+	sys::program make_program(emitter emit);
+	void call(sys::program data);
+	void delete_program(sys::program data);
 }
 
 #endif // STARTUP_HPP

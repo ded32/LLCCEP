@@ -41,22 +41,22 @@ static inline void *allocate_exec(size_t size)
 
 
 namespace LLCCEP_JIT {
-	program make_program(emitter emit)
+	sys::program make_program(emitter emit)
 	{
-		program res = {};
-		res.mem = allocate_exec(emit.program_.size());
+		sys::program res = {};
+		res.mem = allocate_exec(emit.program.size());
 #if defined(__linux__) || defined(__MACH__) || defined(__UNIX__)
-		res.sz = align(emit.program_.size(), getpagesize());
+		res.sz = align(emit.program.size(), getpagesize());
 #elif defined(_WIN32)
-		res.sz = emit.program_.size() + 1;
+		res.sz = emit.program.size() + 1;
 #endif // platform-dependent code
 
-		std::copy(emit.program_.begin(), emit.program_.end(), static_cast<uint8_t *>(res.mem));
+		std::copy(emit.program.begin(), emit.program.end(), static_cast<uint8_t *>(res.mem));
 
 		return res;
 	}
 
-	void call(program data)
+	void call(sys::program data)
 	{
 		asm __volatile__(
 			"call *%0"
@@ -66,7 +66,7 @@ namespace LLCCEP_JIT {
 		);
 	}
 
-	void delete_program(program data)
+	void delete_program(sys::program data)
 	{
 #if defined(__linux__) || defined(__MACH__) || defined(__UNIX__)
 		munmap(data.mem, data.sz);
