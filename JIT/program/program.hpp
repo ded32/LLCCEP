@@ -9,8 +9,6 @@ namespace LLCCEP_JIT {
 	class program: private emitter {
 	public:
 		program();
-		program(std::initilizer_list<uint8_t> data);
-		program(const emitter &src);
 		program(const program &src);
 		~program();
 
