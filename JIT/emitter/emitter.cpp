@@ -11,15 +11,15 @@
 
 namespace LLCCEP_JIT {
 	emitter::emitter():
-		program_()
+		program()
 	{ }
 
 	emitter::emitter(std::initializer_list<uint8_t> src):
-		program_(src.begin(), src.end())
+		program(src.begin(), src.end())
 	{ }
-
+	
 	emitter::emitter(emitter &src):
-		program_(src.program_)
+		program(src.program)
 	{ }
 
 	emitter::~emitter()
@@ -27,12 +27,12 @@ namespace LLCCEP_JIT {
 
 	void emitter::emit_byte(uint8_t byte)
 	{
-		program_.push_back(byte);
+		program.push_back(byte);
 	}
 
 	void emitter::emit(std::initializer_list<uint8_t> data)
 	{
-		append_init(program_, data);
+		append_init(program, data);
 	}
 
 	void emitter::emit(opcode op, regID dst, regID src)
@@ -48,9 +48,11 @@ namespace LLCCEP_JIT {
 
 	void emitter::dump()
 	{
-		for (auto byte: program_)
-			std::cout << std::hex << static_cast<int>(byte) << " ";
+		std::cout << std::hex;
 
-		std::cout << "\n";
+		for (auto byte: program)
+			std::cout << static_cast<int>(byte) << " ";
+
+		std::cout << std::dec <<"\n";
 	}
 }

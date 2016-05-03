@@ -20,7 +20,7 @@ namespace LLCCEP_JIT {
 	            ESP = 4;
 
 	class emitter {
-		std::vector<uint8_t> program_;
+		std::vector<uint8_t> program;
 	public:
 		emitter();
 		emitter(std::initializer_list<uint8_t> src);
@@ -41,7 +41,7 @@ namespace LLCCEP_JIT {
 
 		void dump();
 
-		friend program make_program(emitter emit);
+		friend sys::program make_program(emitter emit);
 	};
 }
 
