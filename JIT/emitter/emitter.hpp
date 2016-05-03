@@ -5,6 +5,7 @@
 #include <initializer_list>
 #include <cstdint>
 #include <cstddef>
+#include "../startup/program.hpp"
 
 #include <STLExtras.hpp>
 
@@ -12,8 +13,14 @@ namespace LLCCEP_JIT {
 	typedef std::initializer_list<uint8_t> opcode;
 	typedef uint8_t regID;
 
+	const regID EAX = 0,
+	            ECX = 1,
+	            EDX = 2,
+	            EBX = 3,
+	            ESP = 4;
+
 	class emitter {
-		std::vector<uint8_t> program;
+		std::vector<uint8_t> program_;
 	public:
 		emitter();
 		emitter(std::initializer_list<uint8_t> src);
@@ -32,22 +39,9 @@ namespace LLCCEP_JIT {
 		void emit(std::initializer_list<uint8_t> data);
 		void emit(opcode op, regID dst, regID src);
 
-		template<typename TYPE>
-		void emit(opcode op, regID dst, TYPE val)
-		{
-			std::vector<uint8_t> opcode_data(init2vec(op));
-
-			for (size_t i = 0; i < opcode_data.size(); i++) {
-				if (i == opcode_data.size() - 1)
-					emit_byte(opcode_data[i] + dst);
-				else
-					emit_byte(opcode_data[i]);				
-			}
-
-			emit_data(val);
-		}
-
 		void dump();
+
+		friend program make_program(emitter emit);
 	};
 }
 
