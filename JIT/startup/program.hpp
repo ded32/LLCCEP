@@ -4,12 +4,10 @@
 #include <cstddef>
 
 namespace LLCCEP_JIT {
-	namespace sys {
-		struct program {
+	struct program_exec_data {
 			void *mem;
 			size_t sz;
-		};
-	}
+	};
 }
 
 #endif // PROGRAM_HPP

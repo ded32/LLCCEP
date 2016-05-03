@@ -41,9 +41,9 @@ static inline void *allocate_exec(size_t size)
 
 
 namespace LLCCEP_JIT {
-	sys::program make_program(emitter emit)
+	program_exec_data make_program(emitter emit)
 	{
-		sys::program res = {};
+		program_exec_data res = {};
 		res.mem = allocate_exec(emit.program.size());
 #if defined(__linux__) || defined(__MACH__) || defined(__UNIX__)
 		res.sz = align(emit.program.size(), getpagesize());
@@ -56,7 +56,7 @@ namespace LLCCEP_JIT {
 		return res;
 	}
 
-	void call(sys::program data)
+	void call(program_exec_data data)
 	{
 		asm __volatile__(
 			"call *%0"
@@ -66,7 +66,7 @@ namespace LLCCEP_JIT {
 		);
 	}
 
-	void delete_program(sys::program data)
+	void delete_program(program_exec_data data)
 	{
 #if defined(__linux__) || defined(__MACH__) || defined(__UNIX__)
 		munmap(data.mem, data.sz);

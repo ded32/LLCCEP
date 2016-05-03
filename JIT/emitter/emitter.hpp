@@ -41,7 +41,7 @@ namespace LLCCEP_JIT {
 
 		void dump();
 
-		friend sys::program make_program(emitter emit);
+		friend program_exec_data make_program(emitter emit);
 	};
 }
 
