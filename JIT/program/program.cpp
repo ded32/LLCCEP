@@ -26,4 +26,20 @@ namespace LLCCEP_JIT {
 		emit_byte(0xB8 + dst);
 		emit_data<uint32_t>(src);
 	}
+
+	void program::emit_push(regID src)
+	{
+		emit_byte(0x50 + src);
+	}
+
+	void program::emit_push_imm32(uint32_t src)
+	{
+		emit_byte(0x68);
+		emit_data<uint32_t>(src);
+	}
+
+	void program::emit_pop(regID dst)
+	{
+		emit_byte(0x58 + dst);
+	}
 }
