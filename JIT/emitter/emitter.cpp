@@ -18,7 +18,7 @@ namespace LLCCEP_JIT {
 		program(src.begin(), src.end())
 	{ }
 	
-	emitter::emitter(emitter &src):
+	emitter::emitter(const emitter &src):
 		program(src.program)
 	{ }
 
@@ -54,5 +54,30 @@ namespace LLCCEP_JIT {
 			std::cout << static_cast<int>(byte) << " ";
 
 		std::cout << std::dec <<"\n";
+	}
+
+	std::vector<uint8_t>::const_iterator emitter::begin() const
+	{
+		return program.begin();
+	}
+
+	std::vector<uint8_t>::iterator emitter::begin()
+	{
+		return program.begin();
+	}
+
+	std::vector<uint8_t>::const_iterator emitter::end() const
+	{
+		return program.end();
+	}
+
+	std::vector<uint8_t>::iterator emitter::end()
+	{
+		return program.end();
+	}
+
+	size_t emitter::size() const
+	{
+		return program.size();
 	}
 }

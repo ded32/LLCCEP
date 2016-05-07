@@ -1,6 +1,5 @@
 #include <initializer_list>
 
-#include "../emitter/emitter.hpp"
 #include "program.hpp"
 
 namespace LLCCEP_JIT {
@@ -9,13 +8,8 @@ namespace LLCCEP_JIT {
 	{ }
 
 	program::program(const program &src):
-		emitter(src.emitter)
+		emitter(src)
 	{ }
-
-	program::~program()
-	{
-		~emitter();
-	}
 
 	void program::emit_ret()
 	{
@@ -30,6 +24,6 @@ namespace LLCCEP_JIT {
 	void program::emit_mov(regID dst, uint32_t src)
 	{
 		emit_byte(0xB8 + dst);
-		emit_data<uint32_t>(val);
+		emit_data<uint32_t>(src);
 	}
 }

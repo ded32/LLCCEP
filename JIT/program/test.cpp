@@ -1,6 +1,6 @@
-#include "../emitter/emitter.hpp"
 #include "program.hpp"
 #include "../startup/startup.hpp"
+#include "../emitter/emitter.hpp"
 
 int main()
 {
@@ -9,9 +9,9 @@ int main()
 	prog.emit_mov(LLCCEP_JIT::EAX, LLCCEP_JIT::EBX);
 	prog.emit_ret();
 
-	LLCCEP_JIT::sys::program = LLCCEP_JIT::make_program(prog);
-	call(prog);
-	delete_program(prog);
+	auto data = LLCCEP_JIT::make_program(prog);
+	call(data);
+	delete_program(data);
 
 	return 0;
 }

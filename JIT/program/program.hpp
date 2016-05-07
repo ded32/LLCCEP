@@ -1,16 +1,15 @@
-#ifndef PROGRAM_HPP
-#define PROGRAM_HPP
+#ifndef PROGRAM_MANAGER_HPP
+#define PROGRAM_MANAGER_HPP
 
 #include <initializer_list>
 
 #include "../emitter/emitter.hpp"
 
 namespace LLCCEP_JIT {
-	class program: private emitter {
+	class program: public emitter {
 	public:
 		program();
 		program(const program &src);
-		~program();
 
 		void emit_ret();
 		
@@ -19,4 +18,4 @@ namespace LLCCEP_JIT {
 	};
 }
 
-#endif // PROGRAM_HPP
+#endif // PROGRAM_MANAGER_HPP

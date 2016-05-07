@@ -10,4 +10,5 @@ add_library(program program.cpp)
 
 add_executable(program_unit_test test.cpp)
 
+target_link_libraries(program emitter)
 target_link_libraries(program_unit_test emitter startup program)

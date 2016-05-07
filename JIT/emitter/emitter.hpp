@@ -24,8 +24,8 @@ namespace LLCCEP_JIT {
 	public:
 		emitter();
 		emitter(std::initializer_list<uint8_t> src);
-		emitter(emitter &src);
-		~emitter();
+		emitter(const emitter &src);
+		virtual ~emitter();
 
 		void emit_byte(uint8_t byte);
 
@@ -41,7 +41,13 @@ namespace LLCCEP_JIT {
 
 		void dump();
 
-		friend program_exec_data make_program(emitter emit);
+		std::vector<uint8_t>::const_iterator begin() const;
+		std::vector<uint8_t>::iterator begin();
+
+		std::vector<uint8_t>::const_iterator end() const;
+		std::vector<uint8_t>::iterator end();
+
+		size_t size() const;
 	};
 }
 

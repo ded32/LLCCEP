@@ -44,14 +44,14 @@ namespace LLCCEP_JIT {
 	program_exec_data make_program(emitter emit)
 	{
 		program_exec_data res = {};
-		res.mem = allocate_exec(emit.program.size());
+		res.mem = allocate_exec(emit.size());
 #if defined(__linux__) || defined(__MACH__) || defined(__UNIX__)
-		res.sz = align(emit.program.size(), getpagesize());
+		res.sz = align(emit.size(), getpagesize());
 #elif defined(_WIN32)
-		res.sz = emit.program.size() + 1;
+		res.sz = emit.size() + 1;
 #endif // platform-dependent code
 
-		std::copy(emit.program.begin(), emit.program.end(), static_cast<uint8_t *>(res.mem));
+		std::copy(emit.begin(), emit.end(), static_cast<uint8_t *>(res.mem));
 
 		return res;
 	}

@@ -4,8 +4,8 @@
 #include <vector>
 #include <cstdint>
 
-#include "../emitter/emitter.hpp"
 #include "program.hpp"
+#include "../emitter/emitter.hpp"
 
 namespace LLCCEP_JIT {
 	program_exec_data make_program(emitter emit);
