@@ -8,9 +8,8 @@ int main()
 	prog.emit_mov(LLCCEP_JIT::EBX, 0xFFFFFFFF);
 	prog.emit_mov(LLCCEP_JIT::EAX, LLCCEP_JIT::EBX);
 
-	prog.emit_push_imm32(0xFF);
+//	prog.emit_push_imm32(0xFF);
 	prog.emit_push(LLCCEP_JIT::EAX);
-
 	prog.emit_ret();
 
 	prog.dump();
