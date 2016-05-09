@@ -1,2 +1,0 @@
-/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ar qc libstartup.a  CMakeFiles/startup.dir/Users/andrew/Documents/projects/personal/LLCCEP/JIT/startup/startup.cpp.o
-/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ranlib libstartup.a
