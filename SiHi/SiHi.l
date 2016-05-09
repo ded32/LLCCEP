@@ -1,49 +1,56 @@
 digit [0-9]
 alpha [a-zA-Z]
 
+%{
+#include <stdio.h>
+%}
+
 %%
-void return VOID;
-real return REAL;
+void printf("VOID");
+real printf("REAL");
 
-loop return LOOP
-do   return DO;
-if   return IF;
-else return IF;
+loop printf("LOOP");
+do   printf("DO");
+if   printf("IF");
+else printf("ELSE");
 
-{digit}*'.'{digit}+          return NUM;
-{alpha}({alpha}|{digit}|"_") return ID;
+import printf("IMPORT");
 
-import return IMPORT;
+var  printf("VAR");
+func printf("FUNC");
 
-"{" return OBB;
-"}" return CBB:
+and  printf("AND");
+or   printf("OR");
+xor  printf("XOR");
 
-"[" return OAB;
-"]" return CAB;
-"(" return OSB;
-")" return CSB;
+{digit}+("."{digit}+)?              printf("NUM");
+({alpha}|"_")({alpha}|{digit}|"_")* printf("ID");
 
-"," return COMMA;
-";" return SEMICOLON;
-":" return COLON;
+"{" printf("OBB");
+"}" printf("CBB");
 
-var  return VAR;
-func return FUNC;
+"[" printf("OAB");
+"]" printf("CAB");
+"(" printf("OSB");
+")" printf("CSB");
 
-"="  return EQ;
-and  return AND;
-or   return OR;
-xor  return XOR;
-"**" return POW;
-"+"  return PLUS;
-"-"  return MINUS;
-"*"  return ASTERISK;
-"/"  return SLASH;
+"," printf("COMMA");
+";" printf("SEMICOLON");
+":" printf("COLON");
 
-"<" return LESS;
-"<=" return LESSEQ;
-">" return MORE;
-">=" return MORERQ;
-"==" return EQEQ;
-"!=" return NOTEQ;
+"="  printf("EQ");
+"**" printf("POW");
+"+"  printf("PLUS");
+"-"  printf("MINUS");
+"*"  printf("ASTERISK");
+"/"  printf("SLASH");
+
+"<" printf("LESS");
+"<=" printf("LESSEQ");
+">" printf("MORE");
+">=" printf("MORERQ");
+"==" printf("EQEQ");
+"!=" printf("NOTEQ");
+
+"\n" yylineno++;
 %%
