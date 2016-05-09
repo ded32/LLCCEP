@@ -1,1 +1,11 @@
 *.DS_Store
+
+*.cmake
+
+*.bin
+
+*.out
+
+*.check_cache
+
+JIT/program/CMakeFiles/CMakeOutput.log
