@@ -14,6 +14,7 @@ enum comment_type {
 
 unsigned posX = 0;
 
+void forbidden_char(void);
 void update_pos(void);
 void skip_comment(enum comment_type type);
 int yywarp(void);
@@ -88,7 +89,17 @@ enum   RET(ENUM);
 {digit}+(.{digit}+)? RET(VAL);
 ({alpha}|"_")({alpha}|{digit}|"_")* RET(ID);
 \"(\\.|[^\\"])*\" RET(LITERAL);
+
+. forbidden_char();
 %%
+
+void forbidden_char(void)
+{
+	char str[32] = "";
+	sprintf(str, "Forbidden character \'%c\'", *yytext);
+
+	yyerror(str);
+}
 
 void update_pos(void)
 {
