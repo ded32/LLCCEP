@@ -8,3 +8,6 @@ The changes between ARM and LLCCEP assembly:
 - Register's indication begins with '&' character, not 'r'
 - There are only 7 conditions
 - There are no branches.
+
+Report about bugs here:
+<a href=https://github.com/Andrew-Bezzubtsev/LLCCEP/issues/new>THE BUGTRACKER</a>
