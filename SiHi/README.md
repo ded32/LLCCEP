@@ -1,6 +1,6 @@
 # SiHi language compiler
 This directory contains the SiHi grammar description
-due yacc & flex. SiHi is a wide subset of famous ANSI C
+due yacc & flex. SiHi is a wide subset of famous ANSI C89
 programming language:
 - there is no 'register' memory class
 - there are only two types: real & void
