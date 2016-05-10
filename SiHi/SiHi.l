@@ -3,6 +3,7 @@ alpha [a-zA-Z]
 
 %{
 #include <stdio.h>
+#include "y.tab.c"
 
 #define RET(VAL)  {update_pos(); return VAL;};
 
@@ -14,12 +15,18 @@ enum comment_type {
 unsigned posX = 0;
 
 void update_pos(void);
-void skip_comment(comment_type type);
+void skip_comment(enum comment_type type);
 int yywarp(void);
 %}
 
 %%
 "\n" yylineno++;
+
+"{" RET('{');
+"}" RET('}');
+"(" RET('(');
+")" RET(')');
+";" RET(';');
 
 switch   RET(SWITCH);
 case     RET(CASE);
@@ -34,13 +41,19 @@ else     RET(ELSE);
 goto     RET(GOTO);
 return   RET(RETURN);
 
+void  RET(VOID);
+real  RET(REAL);
+bool  RET(BOOL);
+true  RET(TRUE);
+false RET(FALSE);
+
 "<=" RET(OP_CMP_LE);
 ">=" RET(OP_CMP_AE);
 "==" RET(OP_CMP_EQ);
 "!=" RET(OP_CMP_NE);
 
 "++" RET(OP_INC);
-"--" RET(DEC);
+"--" RET(OP_DEC);
 
 "<<"  RET(OP_OFFSET_L);
 ">>"  RET(OP_OFFSET_R);
@@ -90,13 +103,13 @@ void update_pos(void)
 	}
 }
 
-void skip_comment(comment_type type)
+void skip_comment(enum comment_type type)
 {
 	char chr = 0;
 	char chr1 = 0;
 
 	if (type == COMMENT_T_SINGLELINE)
-		while (chr = input() && chr != '\n');
+		while ((chr = input()) && chr != '\n');
 	else if (type == COMMENT_T_MULTILINE) {
 		while (chr = input() && chr != '*') {
 			if (!(chr1 = input()))
