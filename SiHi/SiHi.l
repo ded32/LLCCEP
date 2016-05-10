@@ -3,6 +3,8 @@ alpha [a-zA-Z]
 
 %{
 #include <stdio.h>
+#include <stdlib.h>
+
 #include "y.tab.c"
 
 #define RET(VAL)  {update_pos(); return VAL;};
@@ -12,8 +14,6 @@ enum comment_type {
         COMMENT_T_MULTILINE
 };
 
-unsigned posX = 0;
-
 void forbidden_char(void);
 void update_pos(void);
 void skip_comment(enum comment_type type);
@@ -22,12 +22,14 @@ int yywarp(void);
 
 %%
 "\n" yylineno++;
+"#force_compiler_exit" exit(EXIT_SUCCESS);
 
 "{" RET('{');
 "}" RET('}');
 "(" RET('(');
 ")" RET(')');
 ";" RET(';');
+":" RET(':');
 
 "+" RET('+');
 "-" RET('-');
@@ -116,28 +118,28 @@ void update_pos(void)
 	unsigned i;
 	for (i = 0; yytext[i]; i++) {
 		if (yytext[i] == '\n')
-			posX = 0;
+			pos_x = 0;
 		else if (yytext[i] == '\t')
-			posX += 8;
+			pos_x += 8;
 		else
-			posX++;
+			pos_x++;
 	}
 }
 
 void skip_comment(enum comment_type type)
 {
-	char chr = 0;
-	char chr1 = 0;
+	char tmp = 0;
+	char tmp1 = 0;
 
-	if (type == COMMENT_T_SINGLELINE)
-		while ((chr = input()) && chr != '\n');
-	else if (type == COMMENT_T_MULTILINE) {
-		while (chr = input() && chr != '*') {
-			if (!(chr1 = input()))
-				yyerror("sudden end after comment");
-			else if (chr1 == '/')
-				break;
-		}
+	if (type == COMMENT_T_SINGLELINE) {
+		do
+			tmp = input();
+		while (tmp && tmp != '\n');
+	} else if (type == COMMENT_T_MULTILINE) {
+		do {
+			tmp = input();
+			tmp1 = input();
+		} while (tmp && tmp1 && (tmp != '*' || tmp1 != '/'));
 	}
 }
 

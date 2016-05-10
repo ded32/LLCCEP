@@ -1,6 +1,13 @@
 %{
 #include <stdio.h>
 #include <stdlib.h>
+
+//#define YYSTYPE ast_node *
+
+int yylex();
+int yyerror(char *str);
+
+int pos_x;
 %}
 
 %token VAL ID LITERAL 
@@ -341,5 +348,8 @@ FUNC_DEF:
 
 int yyerror(char *str)
 {
-	fprintf(stderr, "%s:%d: %s\n", "here should be path", yylineno, str);
+	fprintf(stderr, "%s:%d:%d: %s:\n"
+	                "%s\n", "here should be path", yylineno, pos_x, str, yytext);
+
+	return 0;
 }
