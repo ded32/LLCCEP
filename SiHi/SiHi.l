@@ -29,6 +29,16 @@ int yywarp(void);
 ")" RET(')');
 ";" RET(';');
 
+"+" RET('+');
+"-" RET('-');
+"*" RET('*');
+"/" RET('/');
+"%" RET('%');
+"=" RET('=');
+"!" RET('!');
+"~" RET('~');
+"&" RET('&');
+
 switch   RET(SWITCH);
 case     RET(CASE);
 default  RET(DEFAULT);
