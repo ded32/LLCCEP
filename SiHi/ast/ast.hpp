@@ -17,7 +17,7 @@ namespace LLCCEP_SiHi {
 	public:
 		ast();
 		ast(const ast &src);
-		ast(std::initializer_list<ast *> children, int lex_t, ::std::string lex_val);
+		ast(::std::initializer_list<ast *> children, int lex_t, ::std::string lex_val);
 		~ast();
 
 		inline bool OK() const;
