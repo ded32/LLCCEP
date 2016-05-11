@@ -36,101 +36,105 @@ int pos_x;
 %token VOID REAL BOOL TRUE FALSE
 %token OP_LOGIC_AND OP_LOGIC_OR
 
-%start MAIN_PARSING_UNIT
+%start main_parsing_unit
 
 %%
-PRIME: 
+primary_expression: 
 	ID
 	| VAL
-     	| LITERAL
-     	| '(' EXPR ')';
+	| LITERAL
+	| '(' expression ')';
 
-POSTFIX_EXPR: 
-	PRIME
-	| POSTFIX_EXPR OP_INC
-	| POSTFIX_EXPR OP_DEC
-	| POSTFIX_EXPR '(' ')'
-	| POSTFIX_EXPR '(' ARGS_LIST ')'
-	| POSTFIX_EXPR PTR_ACS ID;
+postfix_expression: 
+	primary_expression
+	| postfix_expression '[' expression ']'
+	| postfix_expression '(' ')'
+	| postfix_expression '(' argument_expression_list ')'
+	| postfix_expression '.' ID
+	| postfix_expression PTR_ACS ID
+	| postfix_expression OP_INC
+	| postfix_expression OP_DEC;
 
-ARGS_LIST:
-	ASSIGNMENT_EXPR
-	| ARGS_LIST ',' ASSIGNMENT_EXPR;
+argument_expression_list: 
+	assignment_expression
+	| argument_expression_list ',' assignment_expression;
 
-UNARY_EXPR: 
-	POSTFIX_EXPR
-	| OP_INC UNARY_EXPR
-	| OP_DEC UNARY_EXPR
-	| UNARY_OP REINTERPRET_EXPR;
+unary_expression: 
+	postfix_expression
+	| OP_INC unary_expression
+	| OP_DEC unary_expression
+	| unary_operator cast_expression;
 
-UNARY_OP:
+unary_operator: 
 	'&'
 	| '*'
 	| '+'
-	| '-';
+	| '-'
+	| '~'
+	| '!';
 
-REINTERPRET_EXPR: 
-	TYPE_NAME '(' REINTERPRET_EXPR ')'
-	| '(' TYPE_NAME ')' REINTERPRET_EXPR
-	| UNARY_EXPR;
+cast_expression: 
+	unary_expression
+	| '(' type_name ')' cast_expression
+	| type_name '(' cast_expression ')';
 
-TOP_LEVEL_EXPR: 
-	REINTERPRET_EXPR
-	| TOP_LEVEL_EXPR '*' REINTERPRET_EXPR
-	| TOP_LEVEL_EXPR '/' REINTERPRET_EXPR
-	| TOP_LEVEL_EXPR '%' REINTERPRET_EXPR;
+multiplicative_expression: 
+	cast_expression
+	| multiplicative_expression '*' cast_expression
+	| multiplicative_expression '/' cast_expression
+	| multiplicative_expression '%' cast_expression;
 
-LOW_LEVEL_EXPR: 
-	TOP_LEVEL_EXPR
-	| LOW_LEVEL_EXPR '+' TOP_LEVEL_EXPR
-	| LOW_LEVEL_EXPR '-' TOP_LEVEL_EXPR;
+additive_expression: 
+	multiplicative_expression
+	| additive_expression '+' multiplicative_expression
+	| additive_expression '-' multiplicative_expression;
 
-OFFSET_EXPR: 
-	LOW_LEVEL_EXPR /* Zero offset */
-	| OFFSET_EXPR OP_OFFSET_L LOW_LEVEL_EXPR
-	| OFFSET_EXPR OP_OFFSET_R LOW_LEVEL_EXPR;
+shift_expression: 
+	additive_expression
+	| shift_expression OP_OFFSET_L additive_expression
+	| shift_expression OP_OFFSET_R additive_expression;
 
-COMPARISION_EXPR: 
-	OFFSET_EXPR /*to_unsigned > 0*/
-	| COMPARISION_EXPR '>' OFFSET_EXPR
-	| COMPARISION_EXPR '<' OFFSET_EXPR
-	| COMPARISION_EXPR OP_CMP_LE OFFSET_EXPR
-	| COMPARISION_EXPR OP_CMP_AE OFFSET_EXPR;
+relational_expression: 
+	shift_expression
+	| relational_expression '<' shift_expression
+	| relational_expression '>' shift_expression
+	| relational_expression OP_CMP_LE shift_expression
+	| relational_expression OP_CMP_AE shift_expression;
 
-EQUIVALENCY_EXPR: 
-	COMPARISION_EXPR
-	| EQUIVALENCY_EXPR OP_CMP_EQ COMPARISION_EXPR
-	| EQUIVALENCY_EXPR OP_CMP_NE COMPARISION_EXPR;
+equality_expression: 
+	relational_expression
+	| equality_expression OP_CMP_EQ relational_expression
+	| equality_expression OP_CMP_NE relational_expression;
 
-AND_EXPR: 
-	EQUIVALENCY_EXPR
-	| AND_EXPR '&' EQUIVALENCY_EXPR;
+and_expression: 
+	equality_expression
+	| and_expression '&' equality_expression;
 
-XOR_EXPR: 
-	AND_EXPR
-	| XOR_EXPR '^' AND_EXPR;
+exclusive_or_expression: 
+	and_expression
+	| exclusive_or_expression '^' and_expression;
 
-OR_EXPR: 
-	XOR_EXPR
-	| OR_EXPR '|' XOR_EXPR;
+inclusive_or_expression: 
+	exclusive_or_expression
+	| inclusive_or_expression '|' exclusive_or_expression;
 
-LOGIC_AND_EXPR: 
-	OR_EXPR
-	| LOGIC_AND_EXPR OP_LOGIC_AND OR_EXPR;
+logical_and_expression: 
+	inclusive_or_expression
+	| logical_and_expression OP_LOGIC_AND inclusive_or_expression;
 
-LOGIC_OR_EXPR:
-	LOGIC_AND_EXPR
-        | LOGIC_OR_EXPR OP_LOGIC_OR LOGIC_AND_EXPR;
+logical_or_expression: 
+	logical_and_expression
+	| logical_or_expression OP_LOGIC_OR logical_and_expression;
 
-COND_EXPR:
-	LOGIC_OR_EXPR
-	| LOGIC_OR_EXPR '?' EXPR ':' COND_EXPR;
+conditional_expression: 
+	logical_or_expression
+	| logical_or_expression '?' expression ':' conditional_expression;
 
-ASSIGNMENT_EXPR:
-	COND_EXPR
-	| UNARY_EXPR ASSIGNMENT_OP ASSIGNMENT_EXPR;
+assignment_expression: 
+	conditional_expression
+	| unary_expression assignment_operator assignment_expression;
 
-ASSIGNMENT_OP:
+assignment_operator: 
 	'='
 	| OP_MUL_EQ
 	| OP_DIV_EQ
@@ -143,207 +147,211 @@ ASSIGNMENT_OP:
 	| OP_XOR_EQ
 	| OP_OR_EQ;
 
-EXPR:
-	ASSIGNMENT_EXPR
-	| EXPR ',' ASSIGNMENT_EXPR;
+expression: 
+	assignment_expression
+	| expression ',' assignment_expression;
 
-CONST_EXPR:
-	COND_EXPR;
+constant_expression: 
+	conditional_expression;
 
-DECL_EXPR:
-	DECLSPEC ';'
-	| DECLSPEC DECL_LIST ';';
+declaration: 
+declaration_specifiers ';'
+	| declaration_specifiers init_declarator_list ';';
 
-DECLSPEC:
-	STORE_CLASS
-	| STORE_CLASS DECLSPEC
-	| TYPESPEC
-	| TYPESPEC DECLSPEC;
+declaration_specifiers: 
+	storage_class_specifier
+	| storage_class_specifier declaration_specifiers
+	| type_specifier
+	| type_specifier declaration_specifiers;
 
-DECL_LIST_INIT:
-	DECL_INIT
-	| DECL_LIST ',' DECL_INIT;
+init_declarator_list: 
+	init_declarator
+	| init_declarator_list ',' init_declarator;
 
-DECL_INIT:
-	DECLARATOR
-	| DECLARATOR '=' INIT;
+init_declarator: 
+	declarator
+	| declarator '=' initializer;
 
-STORE_CLASS:
+storage_class_specifier: 
 	TYPEDEF
 	| EXTERN
 	| STATIC
 	| AUTO;
 
-TYPESPEC:
+type_specifier: 
 	VOID
 	| REAL
 	| BOOL
-	| STRUCT_UNION_SPEC
-	| ENUM_SPEC
-	| TYPE_NAME;
+	| struct_or_union_specifier
+	| enum_specifier;
 
-STRUCT_UNION_SPEC:
-	STRUCT_UNION ID '{' STRUCT_UNION_DECL_LIST '}'
-	| STRUCT_UNION '{' STRUCT_UNION_DECL_LIST '}'
-	| STRUCT_UNION ID;
+struct_or_union_specifier: 
+	struct_or_union ID '{' struct_declaration_list '}'
+	| struct_or_union '{' struct_declaration_list '}'
+	| struct_or_union ID;
 
-STRUCT_UNION:
+struct_or_union: 
 	STRUCT
 	| UNION;
 
-STRUCT_UNION_DECL_LIST:
-	STRUCT_UNION_DECL
-	| STRUCT_UNION_DECL_LIST STRUCT_UNION;
+struct_declaration_list: 
+	struct_declaration
+	| struct_declaration_list struct_declaration;
 
-STRUCT_UNION_DECL:
-	TYPESPEC STRUCT_UNION_DECLARATOR_LIST ';';
+struct_declaration: 
+	specifier_list struct_declarator_list ';';
 
-STRUCT_UNION_DECLARATOR_LIST:
-	STRUCT_UNION_DECLARATOR
-	| STRUCT_UNION_DECLARATOR_LIST STRUCT_UNION_DECLARATOR;
+specifier_list: 
+	type_specifier specifier_list
+	| type_specifier;
 
-STRUCT_UNION_DECLARATOR:
-	DECLARATOR
-	| ':' CONST_EXPR
-	| DECLARATOR ':' CONST_EXPR;
+struct_declarator_list: 
+	struct_declarator
+	| struct_declarator_list ',' struct_declarator;
 
-ENUM_SPEC:
-	ENUM '{' ENUMERATOR_LIST '}'
-	| ENUM ID '{' ENUMERATOR_LIST '}'
+struct_declarator: 
+	declarator
+	| ':' constant_expression
+	| declarator ':' constant_expression;
+
+enum_specifier: 
+	ENUM '{' enumerator_list '}'
+	| ENUM ID '{' enumerator_list '}'
 	| ENUM ID;
 
-ENUMERATOR_LIST:
-	ENUMERATOR
-	| ENUMERATOR_LIST ',' ENUMERATOR;
+enumerator_list:
+	enumerator
+	| enumerator_list ',' enumerator;
 
-ENUMERATOR:
+enumerator: 
 	ID
-	| ID '=' CONST_EXPR;
+	| ID '=' constant_expression;
 
-DECLARATOR:
-	PTR DIRECT_DECLARATOR
-	| DIRECT_DECLARATOR;
+declarator: 
+	pointer direct_declarator
+	| direct_declarator;
 
-DIRECT_DECLARATOR:
+direct_declarator: 
 	ID
-	| '(' DECLARATOR ')'
-	| DIRECT_DECLARATOR '(' ')'
-	| DIRECT_DECLARATOR '(' ID_LIST ')'
-	| DIRECT_DECLARATOR '(' PARAM_TYPE_LIST ')'
-	| DIRECT_DECLARATOR '[' ']'
-	| DIRECT_DECLARATOR '[' CONST_EXPR ']';
+	| '(' declarator ')'
+	| direct_declarator '[' constant_expression ']'
+	| direct_declarator '[' ']'
+	| direct_declarator '(' parameter_type_list ')'
+	| direct_declarator '(' identifier_list ')'
+	| direct_declarator '(' ')';
 
-PTR:
-	'*'
-	| '*' PTR;
+pointer
+	: '*'
+	| '*' pointer;
 
-ID_LIST:
+parameter_type_list: 
+	parameter_list
+	| parameter_list ',' MANY_DOTS;
+
+parameter_list: 
+	parameter_declaration
+	| parameter_list ',' parameter_declaration;
+
+parameter_declaration: 
+	declaration_specifiers declarator
+	| declaration_specifiers abstract_declarator
+	| declaration_specifiers;
+
+identifier_list: 
 	ID
-	| ID_LIST ',' ID;
+	| identifier_list ',' ID;
 
-PARAM_TYPE_LIST:
-	PARAM_LIST
-	| PARAM_LIST ',' MANY_DOTS;
+type_name: 
+	specifier_list
+	| specifier_list abstract_declarator;
 
-PARAM_LIST:
-	PARAM_DECL
-	| PARAM_LIST ',' PARAM_DECL;
+abstract_declarator: 
+	pointer
+	| direct_abstract_declarator
+	| pointer direct_abstract_declarator;
 
-PARAM_DECL:
-	DECLSPEC DECLARATOR
-	| DECLSPEC DECLARATOR_ABSTRACT
-	| DECLSPEC;	
-
-TYPE_NAME:
-	DECLSPEC DECLARATOR_ABSTRACT;
-
-DECLARATOR_ABSTRACT: 
-	PTR
-	| DIRECT_DECLARATOR_ABSTRACT
-	| PTR DIRECT_DECLARATOR_ABSTRACT;
-
-DIRECT_DECLARATOR_ABSTRACT: 
-	'(' DECLARATOR_ABSTRACT ')'
+direct_abstract_declarator: 
+	'(' abstract_declarator ')'
 	| '[' ']'
-	| '[' CONST_EXPR ']'
-	| DIRECT_DECLARATOR_ABSTRACT '[' ']'
-	| DIRECT_DECLARATOR_ABSTRACT '[' CONST_EXPR ']'
+	| '[' constant_expression ']'
+	| direct_abstract_declarator '[' ']'
+	| direct_abstract_declarator '[' constant_expression ']'
 	| '(' ')'
-	| '(' PARAM_TYPE_LIST ')'
-	| DIRECT_DECLARATOR_ABSTRACT '(' ')'
-	| DIRECT_DECLARATOR_ABSTRACT '(' PARAM_TYPE_LIST ')';
+	| '(' parameter_type_list ')'
+	| direct_abstract_declarator '(' ')'
+	| direct_abstract_declarator '(' parameter_type_list ')';
 
-INIT: 
-	ASSIGNMENT_EXPR
-	| '{' INIT_LIST '}'
-	| '{' INIT_LIST ',' '}';
+initializer: 
+	assignment_expression
+	| '{' initializer_list '}'
+	| '{' initializer_list ',' '}';
 
-INIT_LIST: 
-	INIT
-	| INIT_LIST ',' INIT;
+initializer_list: 
+	initializer
+	| initializer_list ',' initializer;
 
-STATEMENT: 
-	STATEMENT_LABELED
-	| STATEMENT_COMPOUND
-	| STATEMENT_EXPR
-	| STATEMENT_SELECTION
-	| STATEMENT_ITERATION
-	| STATEMENT_JUMP;
+statement: 
+	labeled_statement
+	| compound_statement
+	| expression_statement
+	| selection_statement
+	| iteration_statement
+	| jump_statement;
 
-STATEMENT_LABELED:
-	ID ':' STATEMENT
-	| CASE CONST_EXPR ':' STATEMENT
-	| DEFAULT ':' STATEMENT;
+labeled_statement: 
+	ID ':' statement
+	| CASE constant_expression ':' statement
+	| DEFAULT ':' statement;
 
-STATEMENT_COMPOUND: 
+compound_statement: 
 	'{' '}'
-	| '{' STATEMENT_LIST '}'
-	| '{' DECL_LIST '}'
-	| '{' DECL_LIST STATEMENT_LIST '}';
+	| '{' statement_list '}'
+	| '{' declaration_list '}'
+	| '{' declaration_list statement_list '}';
 
-DECL_LIST: 
-	DECLARATOR
-	| DECL_LIST DECLARATOR;
+declaration_list: 
+	declaration
+	| declaration_list declaration;
 
-STATEMENT_LIST:
-	STATEMENT
-	| STATEMENT_LIST STATEMENT
-	;
+statement_list: 
+	statement
+	| statement_list statement;
 
-STATEMENT_EXPR: 
+expression_statement: 
 	';'
-	| EXPR ';';
+	| expression ';';
 
-STATEMENT_SELECTION:
-	IF '(' EXPR ')' STATEMENT
-	| IF '(' EXPR ')' STATEMENT ELSE STATEMENT
-	| SWITCH '(' EXPR ')' STATEMENT;
+selection_statement: 
+	IF '(' expression ')' statement
+	| IF '(' expression ')' statement ELSE statement
+	| SWITCH '(' expression ')' statement;
 
-STATEMENT_ITERATION:
-	WHILE '(' EXPR ')' STATEMENT
-	| DO STATEMENT WHILE '(' EXPR ')' ';'
-	| FOR '(' STATEMENT_EXPR STATEMENT_EXPR STATEMENT_EXPR ')' STATEMENT;
+iteration_statement: 
+	WHILE '(' expression ')' statement
+	| DO statement WHILE '(' expression ')' ';'
+	| FOR '(' expression_statement expression_statement ')' statement
+	| FOR '(' expression_statement expression_statement expression ')' statement;
 
-STATEMENT_JUMP:
+jump_statement: 
 	GOTO ID ';'
 	| CONTINUE ';'
 	| BREAK ';'
 	| RETURN ';'
-	| RETURN EXPR ';';
+	| RETURN expression ';';
 
-MAIN_PARSING_UNIT: 
-	EXTERN_DECL
-	| MAIN_PARSING_UNIT EXTERN DECLARATOR;
+main_parsing_unit: 
+	external_declaration
+	| main_parsing_unit external_declaration;
 
-EXTERN_DECL: 
-	FUNC_DEF
-	| DECLARATOR;
+external_declaration: 
+	function_definition
+	| declaration;
 
-FUNC_DEF:
-	DECLSPEC DECLARATOR DECL_LIST STATEMENT_COMPOUND
-	| DECLSPEC DECLARATOR STATEMENT_COMPOUND
-	| DECLARATOR DECL_LIST STATEMENT_COMPOUND
-	| DECLARATOR STATEMENT_COMPOUND;
+function_definition: 
+	declaration_specifiers declarator declaration_list compound_statement
+	| declaration_specifiers declarator compound_statement
+	| declarator declaration_list compound_statement
+	| declarator compound_statement;
 %%
 
 int yyerror(char *str)

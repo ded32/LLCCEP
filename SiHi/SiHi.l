@@ -22,6 +22,8 @@ int yywarp(void);
 
 %%
 "\n" yylineno++;
+[ \t\n\r] update_pos();
+
 "#force_compiler_exit" exit(EXIT_SUCCESS);
 
 "{" RET('{');
