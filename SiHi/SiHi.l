@@ -5,7 +5,7 @@ alpha [a-zA-Z]
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "y.tab.c"
+#include "SiHi.tab.h"
 
 #define RET(VAL)  {update_pos(); return VAL;};
 
