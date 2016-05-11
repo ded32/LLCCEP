@@ -341,7 +341,8 @@ jump_statement:
 
 main_parsing_unit: 
 	external_declaration
-	| main_parsing_unit external_declaration;
+	| main_parsing_unit external_declaration
+	| {yyerror("syntax error");};
 
 external_declaration: 
 	function_definition
@@ -358,6 +359,15 @@ int yyerror(char *str)
 {
 	fprintf(stderr, "%s:%d:%d: %s:\n"
 	                "%s\n", "here should be path", yylineno, pos_x, str, yytext);
+
+	return 0;
+}
+
+int main(void)
+{
+	yyin = stdin;
+
+	yyparse();
 
 	return 0;
 }
