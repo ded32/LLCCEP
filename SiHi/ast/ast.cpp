@@ -6,6 +6,8 @@
 
 #include "ast.hpp"
 
+#define PANIC(type, fmt, ...) {fprintf(stderr, fmt, ##__VA_ARGS__); return type();}
+
 namespace LLCCEP_SiHi {
 	ast::ast():
 		__children__(),
@@ -31,5 +33,11 @@ namespace LLCCEP_SiHi {
 			for (size_t i = 0; i < __ancestor__->__children__.size(); i++)
 				if (__ancestor__->__children__[i] == this)
 					__ancestor__->__children__.erase(__ancestor__->__children__.begin() + i);
+	}
+
+	inline bool ast::OK() const
+	{
+		if (ancestor && !LLCCEP::vec_find(ancestor->children, this)) 
+			PANIC("Ancestor at %p has no child with %p address!\n", );
 	}
 }

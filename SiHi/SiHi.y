@@ -305,9 +305,15 @@ labeled_statement:
 
 compound_statement: 
 	'{' '}'
-	| '{' statement_list '}'
-	| '{' declaration_list '}'
-	| '{' declaration_list statement_list '}';
+	| '{' declaration_statement_list '}';
+
+declaration_statement_list:
+	declaration_statement
+	| declaration_statement_list declaration_statement;
+
+declaration_statement:
+	declaration
+	| statement;
 
 declaration_list: 
 	declaration
