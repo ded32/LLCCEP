@@ -3,6 +3,8 @@ project(ast_unit_test)
 
 set(CMAKE_CXX_FLAGS "-std=c++11 -g -O0")
 
+include_directories(../../include/)
+
 add_library(ast ast.cpp)
 
 add_executable(ast_unit_test test.cpp)

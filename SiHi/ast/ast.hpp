@@ -8,7 +8,7 @@
 namespace LLCCEP_SiHi {
 	class ast {
 		::std::vector<ast *> __children__;
-		ast *__anscestor__;
+		ast *__ancestor__;
 
 		struct {
 			int __type__;
@@ -22,7 +22,7 @@ namespace LLCCEP_SiHi {
 
 		inline bool OK() const;
 
-		void insert_child(const ast *src);
+		void insert_child(ast *src);
 		::std::vector<ast *> get_children() const;
 		ast *get_ancestor() const; 
 	};

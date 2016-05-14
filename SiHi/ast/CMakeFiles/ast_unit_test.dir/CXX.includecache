@@ -1,0 +1,20 @@
+#IncludeRegexLine: ^[ 	]*#[ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/Users/andrew/Documents/projects/personal/LLCCEP/SiHi/ast/ast.hpp
+initializer_list
+-
+vector
+-
+string
+-
+
+/Users/andrew/Documents/projects/personal/LLCCEP/SiHi/ast/test.cpp
+ast.hpp
+/Users/andrew/Documents/projects/personal/LLCCEP/SiHi/ast/ast.hpp
+
