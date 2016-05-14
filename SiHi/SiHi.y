@@ -155,7 +155,7 @@ constant_expression:
 	conditional_expression;
 
 declaration: 
-declaration_specifiers ';'
+	declaration_specifiers ';'
 	| declaration_specifiers init_declarator_list ';';
 
 declaration_specifiers: 

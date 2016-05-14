@@ -5,7 +5,7 @@ alpha [a-zA-Z]
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "SiHi.tab.h"
+#include "SiHi_parser.h"
 
 #define RET(VAL)  {update_pos(); return VAL;};
 
