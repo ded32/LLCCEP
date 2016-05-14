@@ -29,15 +29,22 @@ namespace LLCCEP_SiHi {
 
 	ast::~ast()
 	{
-		if (__ancestor__)
-			for (size_t i = 0; i < __ancestor__->__children__.size(); i++)
-				if (__ancestor__->__children__[i] == this)
-					__ancestor__->__children__.erase(__ancestor__->__children__.begin() + i);
+		for (const auto &child: children)
+			if (child)
+				child->~ast();
+
+		if (__ancestor__ && LLCCEP::vec_find(__ancestor__->children, ))
 	}
 
 	inline bool ast::OK() const
 	{
-		if (ancestor && !LLCCEP::vec_find(ancestor->children, this)) 
-			PANIC("Ancestor at %p has no child with %p address!\n", );
+		if (ancestor && !LLCCEP::vec_find(__ancestor__->__children__, this)) 
+			PANIC(bool, "Ancestor at %p has no child with %p address!\n", ancestor, this);
+
+		for (const auto &child: __children__)
+			if (child && !child->OK())
+				PANIC(bool, "My child at %p isn't ok!", child);
+
+		return true;
 	}
 }
