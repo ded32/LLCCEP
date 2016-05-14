@@ -2,12 +2,14 @@
 #include <vector>
 #include <string>
 #include <cassert>
+#include <memory>
 
 #include <STLExtras.hpp>
 
 #include "ast.hpp"
 
 #define PANIC(type, fmt, ...) {fprintf(stderr, fmt, ##__VA_ARGS__); return type();}
+#define CHECK_ME(type) if (!OK()) PANIC(type, "Tree's not ok. It's located here: [%p]!\n", this);
 
 namespace LLCCEP_SiHi {
 	ast::ast():
@@ -43,28 +45,36 @@ namespace LLCCEP_SiHi {
 	inline bool ast::OK() const
 	{
 		if (__ancestor__ && vec_find(__ancestor__->__children__, (ast *)this) == __ancestor__->__children__.end()) 
-			PANIC(bool, "Ancestor at %p has no child with %p address!\n", __ancestor__, this);
+			PANIC(bool, "Ancestor at %p has no child with %p address!\n", __ancestor__, this)
 
 		for (const auto &child: __children__)
 			if (child && !child->OK())
-				PANIC(bool, "My child at %p isn't ok!", child);
+				PANIC(bool, "My child at %p isn't ok!", child)
 
 		return true;
 	}
 
 	void ast::insert_child(ast *src)
 	{
+		CHECK_ME(void)
+
 		assert(src);
 		__children__.push_back(src);
+
+		CHECK_ME(void)
 	}
 
 	::std::vector<ast *> ast::get_children() const
 	{
+		CHECK_ME(::std::vector<ast *>)
+
 		return __children__;
 	}
 
-	ast *ast::get_ancestor() const
+	::std::auto_ptr<ast> ast::get_ancestor() const
 	{
-		return __ancestor__;
+		CHECK_ME(::std::auto_ptr<ast>)
+
+		return ::std::auto_ptr<ast>(__ancestor__);
 	}
 }

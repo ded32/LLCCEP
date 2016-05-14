@@ -4,6 +4,7 @@
 #include <initializer_list>
 #include <vector>
 #include <string>
+#include <memory>
 
 namespace LLCCEP_SiHi {
 	class ast {
@@ -24,7 +25,7 @@ namespace LLCCEP_SiHi {
 
 		void insert_child(ast *src);
 		::std::vector<ast *> get_children() const;
-		ast *get_ancestor() const; 
+		::std::auto_ptr<ast> get_ancestor() const; 
 	};
 }
 
