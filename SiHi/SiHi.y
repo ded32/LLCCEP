@@ -3,9 +3,10 @@
 #include <stdlib.h>
 
 //#define YYSTYPE ast_node *
+#define YY_(str) ((char const *)str)
 
 int yylex();
-int yyerror(char *str);
+int yyerror(char const *str);
 
 int pos_x;
 %}
@@ -33,7 +34,7 @@ int pos_x;
 
 %token PTR_ACS
 
-%token VOID REAL BOOL TRUE FALSE
+%token VOID REAL BOOL
 %token OP_LOGIC_AND OP_LOGIC_OR
 
 %start main_parsing_unit
@@ -361,7 +362,7 @@ function_definition:
 	| declarator compound_statement;
 %%
 
-int yyerror(char *str)
+int yyerror(char const *str)
 {
 	fprintf(stderr, "%s:%d:%d: %s:\n"
 	                "%s\n", "here should be path", yylineno, pos_x, str, yytext);
@@ -369,7 +370,7 @@ int yyerror(char *str)
 	return 0;
 }
 
-int main(void)
+int main()
 {
 	yyin = stdin;
 

@@ -5,7 +5,7 @@ alpha [a-zA-Z]
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "SiHi_parser.h"
+#include "SiHi_parser.hpp"
 
 #define RET(VAL)  {update_pos(); return VAL;};
 
@@ -59,8 +59,6 @@ return   RET(RETURN);
 void  RET(VOID);
 real  RET(REAL);
 bool  RET(BOOL);
-true  RET(TRUE);
-false RET(FALSE);
 
 "<=" RET(OP_CMP_LE);
 ">=" RET(OP_CMP_AE);
@@ -130,19 +128,19 @@ void update_pos(void)
 
 void skip_comment(enum comment_type type)
 {
+/*
 	char tmp = 0;
 	char tmp1 = 0;
 
 	if (type == COMMENT_T_SINGLELINE) {
-		do
-			tmp = input();
-		while (tmp && tmp != '\n');
+		return;
 	} else if (type == COMMENT_T_MULTILINE) {
 		do {
-			tmp = input();
-			tmp1 = input();
+			//tmp = ();
+			//tmp1 = input();
 		} while (tmp && tmp1 && (tmp != '*' || tmp1 != '/'));
 	}
+*/
 }
 
 int yywrap(void)
