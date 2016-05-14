@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <initializer_list>
+#include <algorithm>
 #include <cstddef>
 
 template<typename TYPE>
@@ -25,6 +26,12 @@ template<typename TYPE>
 void append_init(std::vector<TYPE> &dst, std::initializer_list<TYPE> src)
 {
 	dst.insert(dst.end(), src.begin(), src.end());
+}
+
+template<typename TYPE>
+typename std::vector<TYPE>::const_iterator vec_find(std::vector<TYPE> &vec, TYPE srch)
+{
+	return find(vec.begin(), vec.end(), srch);
 }
 
 #endif // STLEXTRAS_HPP
