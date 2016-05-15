@@ -6,12 +6,28 @@
 
 #include <STLExtras.hpp>
 
+#include "../../third-party/DotViz++.hpp"
+
 #include "ast.hpp"
 
 #define PANIC(type, fmt, ...) {fprintf(stderr, fmt, ##__VA_ARGS__); return type();}
 #define CHECK_ME(type) if (!OK()) PANIC(type, "Tree's not ok. It's located here: [%p]!\n", this);
 
 namespace LLCCEP_SiHi {
+	size_t ast::dump(size_t begin) const
+	{
+		DotViz::dvNode(begin, __lex_data__.__val__);
+		for (size_t i = 0; i < __children__.size(); i++) {
+			if (__children__[i]) {
+				__children__[i]->dump(begin + i + 1);
+				DotViz::dvLink(begin, begin + i + 1);
+			}
+		}
+			
+
+		return begin + __children__.size() + 1;
+	}
+
 	ast::ast():
 		__children__(),
 		__ancestor__(0),
@@ -76,5 +92,14 @@ namespace LLCCEP_SiHi {
 		CHECK_ME(::std::auto_ptr<ast>)
 
 		return ::std::auto_ptr<ast>(__ancestor__);
+	}
+
+	void ast::dump(::std::string path) const
+	{
+		CHECK_ME(void)
+
+		DotViz::dvBegin(path, "AstDump");
+		dump(0);
+		DotViz::dvEnd();
 	}
 }

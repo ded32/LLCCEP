@@ -3,9 +3,10 @@ project(ast_unit_test)
 
 set(CMAKE_CXX_FLAGS "-std=c++11 -g -O0")
 
-include_directories(../../include/)
+include_directories("${CMAKE_SOURCE_DIR}/../../include/")
 
 add_library(ast ast.cpp)
 
 add_executable(ast_unit_test test.cpp)
-target_link_libraries(ast_unit_test ast)
+target_link_libraries(ast "${CMAKE_SOURCE_DIR}/../../third-party/libDotViz++.a")
+target_link_libraries(ast_unit_test ast "${CMAKE_SOURCE_DIR}/../../third-party/libDotViz++.a")

@@ -15,6 +15,8 @@ namespace LLCCEP_SiHi {
 			int __type__;
 			::std::string __val__;
 		} __lex_data__;
+
+		size_t dump(size_t begin) const;
 	public:
 		ast();
 		ast(const ast &src);
@@ -26,6 +28,7 @@ namespace LLCCEP_SiHi {
 		void insert_child(ast *src);
 		::std::vector<ast *> get_children() const;
 		::std::auto_ptr<ast> get_ancestor() const; 
+		void dump(::std::string path) const;
 	};
 }
 

@@ -2,8 +2,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include <DotViz++.hpp>
-
 #include "ast/ast.hpp"
 #include "ast/node_types.hpp"
 
