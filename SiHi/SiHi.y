@@ -253,7 +253,7 @@ enumerator_list:
 
 enumerator:
 	ID {$$ = new LLCCEP_SiHi::ast({}, ID, $<str>1);}
-	| ID '=' constant_expression {$$ = new LLCCEP_SiHi::ast({new ast({}, ID, $<str>1), $<ast>3}, '=', "Numbered enumerator");};
+	| ID '=' constant_expression {$$ = new LLCCEP_SiHi::ast({new LLCCEP_SiHi::ast({}, ID, $<str>1), $<ast>3}, '=', "Numbered enumerator");};
 
 declarator: 
 	pointer direct_declarator {$$ = new LLCCEP_SiHi::ast({$<ast>1, $<ast>2}, DECLARATOR, "Ptr declarator");}
@@ -333,8 +333,8 @@ labeled_statement:
 compound_statement: 
 	'{' '}' {$$ = nullptr;}
 	| '{' declaration_list '}' {$$ = $<ast>2;}
-	| '{' declaration_list statement_list '}' {$$ = new LLCCEP_SiHi::ast({$<ast>2, %<ast>3}, DECL_STMT_LIST, "compound statement");}
-	| '{' statement_list '}' {$$ = $<ast>2};
+	| '{' declaration_list statement_list '}' {$$ = new LLCCEP_SiHi::ast({$<ast>2, $<ast>3}, DECL_STMT_LIST, "compound statement");}
+	| '{' statement_list '}' {$$ = $<ast>2;};
 
 declaration_list: 
 	declaration {$$ = $<ast>1;}

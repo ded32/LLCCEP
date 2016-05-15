@@ -6,7 +6,7 @@
 
 #include <STLExtras.hpp>
 
-#include "../../third-party/DotViz++.hpp"
+#include "../../third-party/DotViz/DotViz++.hpp"
 
 #include "ast.hpp"
 

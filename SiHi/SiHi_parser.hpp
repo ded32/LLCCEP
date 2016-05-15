@@ -2393,7 +2393,7 @@ yyreduce:
 
   case 115:
 #line 256 "SiHi.y" /* yacc.c:1646  */
-    {(yyval.ast) = new LLCCEP_SiHi::ast({new ast({}, ID, (yyvsp[-2].str)), (yyvsp[0].ast)}, '=', "Numbered enumerator");}
+    {(yyval.ast) = new LLCCEP_SiHi::ast({new LLCCEP_SiHi::ast({}, ID, (yyvsp[-2].str)), (yyvsp[0].ast)}, '=', "Numbered enumerator");}
 #line 2398 "SiHi_parser.hpp" /* yacc.c:1646  */
     break;
 
@@ -2675,13 +2675,13 @@ yyreduce:
 
   case 165:
 #line 336 "SiHi.y" /* yacc.c:1646  */
-    {(yyval.ast) = new LLCCEP_SiHi::ast({(yyvsp[-2].ast), %<ast>3}, DECL_STMT_LIST, "compound statement");}
+    {(yyval.ast) = new LLCCEP_SiHi::ast({(yyvsp[-2].ast), (yyvsp[-1].ast)}, DECL_STMT_LIST, "compound statement");}
 #line 2680 "SiHi_parser.hpp" /* yacc.c:1646  */
     break;
 
   case 166:
 #line 337 "SiHi.y" /* yacc.c:1646  */
-    {(yyval.ast) = (yyvsp[-1].ast)}
+    {(yyval.ast) = (yyvsp[-1].ast);}
 #line 2686 "SiHi_parser.hpp" /* yacc.c:1646  */
     break;
 

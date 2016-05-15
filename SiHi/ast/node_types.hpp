@@ -38,10 +38,11 @@
 #define FUNCTION_DECL            2082
 #define INITIALIZER_LIST         2083
 #define LABELED_STATEMENT        2084
-#define DECL_STMT_LIST           2085
+#define STMT_LIST                2085
 #define DECL_LIST                2086
 #define DO_WHILE                 2087
 #define MAIN                     2088
 #define FUNCTION_DEFINITION      2089
+#define DECL_STMT_LIST           2090
 
 #endif // NODE_TYPES_HPP

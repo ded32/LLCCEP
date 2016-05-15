@@ -8,7 +8,7 @@ generate: SiHi.l SiHi.y
 	yacc -o SiHi_parser.hpp SiHi.y
 
 create_ast_static:
-	c++ -std=c++11 -I../third-party/ -I../include/ -o ast.o -c ast/ast.cpp
+	c++ -std=c++11 -I../include/ ../third-party/DotViz/libDotViz++.a -o ast.o -c ast/ast.cpp
 	ar rcs libast.a ast.o
 	rm ast.o
 
