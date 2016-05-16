@@ -1,5 +1,6 @@
-#include "../../third-party/DotViz++.hpp"
+#include <DotViz/DotViz++.hpp>
 #include "ast.hpp"
+#include "dump.hpp"
 
 int main()
 {
@@ -10,7 +11,7 @@ int main()
 		syntaxTree.insert_child(ptr);
 	}
 
-	syntaxTree.dump("out.gv");
+	LLCCEP_SiHi::dump_tree("out.gv", syntaxTree);
 	DotViz::dvRender("pdf", "out.gv", "out.pdf");
 
 	return 0;

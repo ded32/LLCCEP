@@ -28,7 +28,9 @@ namespace LLCCEP_SiHi {
 		void insert_child(ast *src);
 		::std::vector<ast *> get_children() const;
 		::std::auto_ptr<ast> get_ancestor() const; 
-		void dump(::std::string path) const;
+
+		int get_type() const;
+		::std::string get_val() const;
 	};
 }
 

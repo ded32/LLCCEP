@@ -6,28 +6,12 @@
 
 #include <STLExtras.hpp>
 
-#include "../../third-party/DotViz/DotViz++.hpp"
-
 #include "ast.hpp"
 
 #define PANIC(type, fmt, ...) {fprintf(stderr, fmt, ##__VA_ARGS__); return type();}
 #define CHECK_ME(type) if (!OK()) PANIC(type, "Tree's not ok. It's located here: [%p]!\n", this);
 
 namespace LLCCEP_SiHi {
-	size_t ast::dump(size_t begin) const
-	{
-		DotViz::dvNode(begin, __lex_data__.__val__);
-		for (size_t i = 0; i < __children__.size(); i++) {
-			if (__children__[i]) {
-				__children__[i]->dump(begin + i + 1);
-				DotViz::dvLink(begin, begin + i + 1);
-			}
-		}
-			
-
-		return begin + __children__.size() + 1;
-	}
-
 	ast::ast():
 		__children__(),
 		__ancestor__(0),
@@ -83,23 +67,24 @@ namespace LLCCEP_SiHi {
 	::std::vector<ast *> ast::get_children() const
 	{
 		CHECK_ME(::std::vector<ast *>)
-
 		return __children__;
 	}
 
 	::std::auto_ptr<ast> ast::get_ancestor() const
 	{
 		CHECK_ME(::std::auto_ptr<ast>)
-
 		return ::std::auto_ptr<ast>(__ancestor__);
 	}
 
-	void ast::dump(::std::string path) const
+	int ast::get_type() const
 	{
-		CHECK_ME(void)
+		CHECK_ME(int)
+		return __lex_data__.__type__;
+	}
 
-		DotViz::dvBegin(path, "AstDump");
-		dump(0);
-		DotViz::dvEnd();
+	::std::string ast::get_val() const
+	{
+		CHECK_ME(::std::string)
+		return __lex_data__.__val__;
 	}
 }
