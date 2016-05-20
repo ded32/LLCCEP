@@ -1,2 +1,0 @@
-/usr/bin/ar cr libstartup.a  CMakeFiles/startup.dir/home/andrew/Documents/personal/projects/LLCCEP/JIT/startup/startup.cpp.o
-/usr/bin/ranlib libstartup.a

@@ -4,7 +4,7 @@
 
 int main()
 {
-	LLCCEP_JIT::program prog;
+/*	LLCCEP_JIT::program prog;
 	prog.emit_mov(LLCCEP_JIT::EBX, 0xFFFFFFFF);
 	prog.emit_mov(LLCCEP_JIT::EAX, LLCCEP_JIT::EBX);
 
@@ -18,5 +18,16 @@ int main()
 	call(data);
 	delete_program(data);
 
-	return 0;
+	return 0;*/
+
+	asm __volatile__(
+		"pushl %eax"
+		"pushl %ebx"
+		"pushl %ecx"
+		"pushl %edx"
+		"popl"
+		"popl"
+		"popl"
+		"popl"
+	);
 }
