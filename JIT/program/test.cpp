@@ -4,12 +4,12 @@
 
 int main()
 {
-/*	LLCCEP_JIT::program prog;
-	prog.emit_mov(LLCCEP_JIT::EBX, 0xFFFFFFFF);
-	prog.emit_mov(LLCCEP_JIT::EAX, LLCCEP_JIT::EBX);
+	LLCCEP_JIT::program prog;
+//	prog.emit_mov(LLCCEP_JIT::EBX, 0xFFFFFFFF);
+//	prog.emit_mov(LLCCEP_JIT::EAX, LLCCEP_JIT::EBX);
 
 //	prog.emit_push_imm32(0xFF);
-	prog.emit_push(LLCCEP_JIT::EAX);
+	prog.emit_push(LLCCEP_JIT::RAX);
 	prog.emit_ret();
 
 	prog.dump();
@@ -18,10 +18,10 @@ int main()
 	call(data);
 	delete_program(data);
 
-	return 0;*/
+	return 0;
 
 // TODO: do far ret, go 2 gdb, see disassembly
-	asm __volatile__(
+/*	asm __volatile__(
 		"pushq %rax\n"
 		"pushq %rbx\n"
 		"pushq %rcx\n"
@@ -33,4 +33,5 @@ int main()
 	);
 
 	return 0;
+*/
 }

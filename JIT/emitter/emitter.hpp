@@ -13,11 +13,11 @@ namespace LLCCEP_JIT {
 	typedef std::initializer_list<uint8_t> opcode;
 	typedef uint8_t regID;
 
-	const regID EAX = 0,
-	            ECX = 1,
-	            EDX = 2,
-	            EBX = 3,
-	            ESP = 4;
+	const regID RAX = 0,
+	            RCX = 1,
+	            RDX = 2,
+	            RBX = 3,
+	            RSP = 4;
 
 	class emitter {
 		std::vector<uint8_t> program;
