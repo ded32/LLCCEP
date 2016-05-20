@@ -10,6 +10,7 @@ int main()
 
 //	prog.emit_push_imm32(0xFF);
 	prog.emit_push(LLCCEP_JIT::RAX);
+	prog.emit_pop(LLCCEP_JIT::RAX);
 	prog.emit_ret();
 
 	prog.dump();
