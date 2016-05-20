@@ -9,5 +9,8 @@ The changes between ARM and LLCCEP assembly:
 - There are only 7 conditions
 - There are no branches.
 
+# TODO LIST
+Watch around difference between JIT execution on Linux and BSD-family OSs.
+
 Report about bugs here:
 <a href=https://github.com/Andrew-Bezzubtsev/LLCCEP/issues/new>THE BUGTRACKER</a>
