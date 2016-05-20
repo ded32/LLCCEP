@@ -20,14 +20,17 @@ int main()
 
 	return 0;*/
 
+// TODO: do far ret, go 2 gdb, see disassembly
 	asm __volatile__(
-		"pushl %eax"
-		"pushl %ebx"
-		"pushl %ecx"
-		"pushl %edx"
-		"popl"
-		"popl"
-		"popl"
-		"popl"
+		"pushq %rax\n"
+		"pushq %rbx\n"
+		"pushq %rcx\n"
+		"pushq %rdx\n"
+		"popq %rax\n"
+		"popq %rbx\n"
+		"popq %rcx\n"
+		"popq %rdx"
 	);
+
+	return 0;
 }
