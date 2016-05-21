@@ -4,15 +4,16 @@
 
 int main()
 {
+/*
 	LLCCEP_JIT::program prog;
-	prog.emit_mov(LLCCEP_JIT::RBX, 0xFFFFFFFF);
-	prog.emit_mov(LLCCEP_JIT::RAX, LLCCEP_JIT::RBX);
+	prog.emit_mov_reg_val(LLCCEP_JIT::RBX, 0xFFFFFFFF);
+	prog.emit_mov_reg_reg(LLCCEP_JIT::RAX, LLCCEP_JIT::RBX);
 
-	prog.emit_push_imm32(0xFF);
-	prog.emit_push(LLCCEP_JIT::RAX);
+	prog.emit_push_32(0xFF);
+	prog.emit_push_reg(LLCCEP_JIT::RAX);
 
-	prog.emit_pop(LLCCEP_JIT::RAX);
-	prog.emit_pop(LLCCEP_JIT::RBX);
+	prog.emit_pop_reg(LLCCEP_JIT::RAX);
+	prog.emit_pop_reg(LLCCEP_JIT::RBX);
 
 	prog.emit_ret();
 
@@ -23,18 +24,22 @@ int main()
 	delete_program(data);
 
 	return 0;
+*/
+	int res = 0;
 
-/*	asm __volatile__(
+	asm __volatile__(
 		"pushq $0xFF\n"
 		"pushq $0xFF\n"
 		"pushq $0xFF\n"
 		"pushq $0xFF\n"
-		"popq %rax\n"
-		"popq %rbx\n"
-		"popq %rcx\n"
-		"popq %rdx"
+		"popq %eax\n"
+		"popq %eax\n"
+		"popq %eax\n"
+		"popq %eax\n"
+		:
+		:
+		:"eax", "ebx", "ecx", "edx"
 	);
 
 	return 0;
-*/
 }

@@ -10,7 +10,7 @@
 
 uintptr_t __stack_chk_guard = STACK_CHECK_GUARD;
 
-attribute((__noreturn__)) void __stack_chk_fail(void)
+__attribute__((__noreturn__)) void __stack_chk_fail(void)
 {
 	printf("Error!\nStack smashed!\n");
 	abort();

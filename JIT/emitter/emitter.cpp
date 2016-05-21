@@ -46,6 +46,12 @@ namespace LLCCEP_JIT {
 		emit_byte(rm);
 	}
 
+	void emitter::emit(opcode op, regID src)
+	{
+		emit(op);
+		emit_byte(src);
+	}
+
 	void emitter::dump()
 	{
 		std::cout << std::hex;
