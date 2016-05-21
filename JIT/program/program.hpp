@@ -35,6 +35,19 @@ namespace LLCCEP_JIT {
 
 		void emit_fld_reg_mem(regID src);
 		void emit_fld_const(fld_const val);
+
+		void emit_fabs();
+
+		void emit_fadd();
+		void emit_fsub();
+		void emit_fmul();
+		void emit_fdiv();
+		void emit_fsqrt();
+
+		void emit_fsin();
+		void emit_fcos();
+		void emit_fptan();
+		void emit_fpatan();
 	};
 }
 

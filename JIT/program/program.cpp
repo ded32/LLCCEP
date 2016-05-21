@@ -62,4 +62,54 @@ namespace LLCCEP_JIT {
 	{
 		emit({0xD9, 0xE8 + val});
 	}
+
+	void emit_fabs()
+	{
+		emit({0xD9, 0xE1});
+	}
+
+	void emit_fadd()
+	{
+		emit({0xD8, 0xC0 + 1});
+	}
+
+	void emit_fsub()
+	{
+		emit({0xDC, 0xE8 + 1});
+	}
+
+	void emit_fmul()
+	{
+		emit({0xD8, 0xC8 + 1});
+	}
+
+	void emit_fdiv()
+	{
+		emit({0xDC, 0xF8 + 1});
+	}
+
+	void emit_fsqrt()
+	{
+		emit({0xD9, 0xFA});
+	}
+
+	void emit_fsin()
+	{
+		emit({0xD9, 0xFE});
+	}
+
+	void emit_fcos()
+	{
+		emit({0xD9, 0xFF});
+	}
+
+	void emit_fptan()
+	{
+		emit({0xD9, 0xF2});
+	}
+
+	void emit_fpatan()
+	{
+		emit({0xD9, 0xF3});
+	}
 }
