@@ -1,2 +1,0 @@
-/usr/bin/ar qc libstack_protector.a  CMakeFiles/stack_protector.dir/home/andrew/Desktop/personal/projects/LLCCEP/JIT/stack-protector/stack-protector.c.o
-/usr/bin/ranlib libstack_protector.a

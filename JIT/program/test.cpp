@@ -2,6 +2,17 @@
 #include "../startup/startup.hpp"
 #include "../emitter/emitter.hpp"
 
+// finit
+// fclex
+// mov rbx, 0xFFFFFFFF
+// mov rax, rbx
+// push 0xFF
+// push rax
+// pop rax
+// pop rbx
+// nop
+// ret
+
 int main()
 {
 	LLCCEP_JIT::program prog;

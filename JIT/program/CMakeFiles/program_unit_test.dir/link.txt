@@ -1,1 +1,0 @@
-/usr/bin/c++   -g -O0 -std=c++11   CMakeFiles/program_unit_test.dir/test.cpp.o  -o program_unit_test -rdynamic libemitter.a libstartup.a libprogram.a libstack_protector.a libemitter.a 
