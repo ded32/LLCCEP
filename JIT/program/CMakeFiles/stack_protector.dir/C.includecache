@@ -1,0 +1,16 @@
+#IncludeRegexLine: ^[ 	]*#[ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/andrew/Desktop/personal/projects/LLCCEP/JIT/stack-protector/stack-protector.c
+stdint.h
+-
+stdlib.h
+-
+limits.h
+-
+

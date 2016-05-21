@@ -16,12 +16,17 @@ namespace LLCCEP_JIT {
 		emit_byte(0xC3);
 	}
 
+	void program::emit_nop()
+	{
+		emit_byte(0x90);
+	}
+
 	void program::emit_mov_reg_reg(regID dst, regID src)
 	{
 		emit({0x89}, dst, src);
 	}
 
-	void program::emit_mov_reg_32(regID dst, uint32_t src)
+	void program::emit_mov_reg_imm(regID dst, uint32_t src)
 	{
 		emit_byte(0xB8 + dst);
 		emit_data<uint32_t>(src);
@@ -32,7 +37,7 @@ namespace LLCCEP_JIT {
 		emit_byte(0x50 + src);
 	}
 
-	void program::emit_push_32(uint32_t src)
+	void program::emit_push_imm(uint32_t src)
 	{
 		emit_byte(0x68);
 		emit_data<uint32_t>(src);
@@ -60,55 +65,55 @@ namespace LLCCEP_JIT {
 
 	void program::emit_fld_const(fld_const val)
 	{
-		emit({0xD9, 0xE8 + val});
+		emit({0xD9, static_cast<uint8_t>(0xE8 + val)});
 	}
 
-	void emit_fabs()
+	void program::emit_fabs()
 	{
 		emit({0xD9, 0xE1});
 	}
 
-	void emit_fadd()
+	void program::emit_fadd()
 	{
 		emit({0xD8, 0xC0 + 1});
 	}
 
-	void emit_fsub()
+	void program::emit_fsub()
 	{
 		emit({0xDC, 0xE8 + 1});
 	}
 
-	void emit_fmul()
+	void program::emit_fmul()
 	{
 		emit({0xD8, 0xC8 + 1});
 	}
 
-	void emit_fdiv()
+	void program::emit_fdiv()
 	{
 		emit({0xDC, 0xF8 + 1});
 	}
 
-	void emit_fsqrt()
+	void program::emit_fsqrt()
 	{
 		emit({0xD9, 0xFA});
 	}
 
-	void emit_fsin()
+	void program::emit_fsin()
 	{
 		emit({0xD9, 0xFE});
 	}
 
-	void emit_fcos()
+	void program::emit_fcos()
 	{
 		emit({0xD9, 0xFF});
 	}
 
-	void emit_fptan()
+	void program::emit_fptan()
 	{
 		emit({0xD9, 0xF2});
 	}
 
-	void emit_fpatan()
+	void program::emit_fpatan()
 	{
 		emit({0xD9, 0xF3});
 	}

@@ -22,12 +22,13 @@ namespace LLCCEP_JIT {
 		program(const program &src);
 
 		void emit_ret();
+		void emit_nop();
 		
 		void emit_mov_reg_reg(regID dst, regID src);
-		void emit_mov_reg_32(regID dst, uint32_t src);
+		void emit_mov_reg_imm(regID dst, uint32_t src);
 
 		void emit_push_reg(regID src);
-		void emit_push_32(uint32_t src);
+		void emit_push_imm(uint32_t src);
 		void emit_pop_reg(regID dst);
 
 		void emit_finit();
