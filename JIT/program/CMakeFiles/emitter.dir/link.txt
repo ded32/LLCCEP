@@ -1,2 +1,0 @@
-/usr/bin/ar qc libemitter.a  CMakeFiles/emitter.dir/home/andrew/Desktop/personal/projects/LLCCEP/JIT/emitter/emitter.cpp.o
-/usr/bin/ranlib libemitter.a
