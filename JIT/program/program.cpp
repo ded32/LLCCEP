@@ -58,9 +58,9 @@ namespace LLCCEP_JIT {
 		emit({0x9B, 0xDB, 0xE2});
 	}
 
-	void program::emit_fld_reg_mem(regID src)
+	void program::emit_fld_esp()
 	{
-		emit({0xDD, src});
+		emit({0xDD, 0x04, 0x24});
 	}
 
 	void program::emit_fld_const(fld_const val)
@@ -116,5 +116,15 @@ namespace LLCCEP_JIT {
 	void program::emit_fpatan()
 	{
 		emit({0xD9, 0xF3});
+	}
+
+	void program::emit_fstp_esp()
+	{
+		emit({0xDD, 0x1C, 0x24});
+	}
+
+	void program::emit_call_reg(regID id)
+	{
+		emit({0xDD, static_cast<uint8_t>(0xD0 + id)});
 	}
 }
