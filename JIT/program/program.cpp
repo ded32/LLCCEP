@@ -1,4 +1,6 @@
 #include <initializer_list>
+#include <iostream>
+#include <cstdlib>
 
 #include "program.hpp"
 
@@ -23,29 +25,41 @@ namespace LLCCEP_JIT {
 
 	void program::emit_mov_reg_reg(regID dst, regID src)
 	{
-		emit({0x89}, dst, src);
+		emit({0x48, dst, src});
 	}
 
-	void program::emit_mov_reg_imm(regID dst, uint32_t src)
+	void program::emit_mov_reg_imm(regID dst, uint64_t src)
 	{
-		emit_byte(0xB8 + dst);
-		emit_data<uint32_t>(src);
+		emit({0x48, static_cast<uint8_t>(0xB8 + dst)});
+		emit_data<uint64_t>(src);
 	}
 
 	void program::emit_push_reg(regID src)
 	{
-		emit_byte(0x50 + src);
+		emit({0xFF, static_cast<uint8_t>(0xF0 + src)});
 	}
 
-	void program::emit_push_imm(uint32_t src)
+	void program::emit_push_imm(uint64_t src)
 	{
 		emit_byte(0x68);
-		emit_data<uint32_t>(src);
+		emit_data<uint32_t>((reinterpret_cast<uint32_t *>(&src))[1]);
+		emit_byte(0x68);
+		emit_data<uint32_t>((reinterpret_cast<uint32_t *>(&src))[0]);
 	}
 
 	void program::emit_pop_reg(regID dst)
 	{
-		emit_byte(0x58 + dst);
+		emit_byte(static_cast<uint8_t>(0x58 + dst));
+	}
+
+	void program::emit_pop_reg_ptr(regID src)
+	{
+		if (src == RSP || src == RBP) {
+			std::cout << "SP & BP are denied to do reg_ptr_pop";
+			std::exit(EXIT_FAILURE);
+		}
+
+		emit({0x8F, src});
 	}
 
 	void program::emit_finit()
@@ -125,6 +139,6 @@ namespace LLCCEP_JIT {
 
 	void program::emit_call_reg(regID id)
 	{
-		emit({0xDD, static_cast<uint8_t>(0xD0 + id)});
+		emit({0xFF, static_cast<uint8_t>(0xD0 + id)});
 	}
 }

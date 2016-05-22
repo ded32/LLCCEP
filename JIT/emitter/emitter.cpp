@@ -39,7 +39,7 @@ namespace LLCCEP_JIT {
 	{
 		emit(op);
 
-		uint8_t rm = 0b11000000;
+		uint8_t rm = 0b00000000;
 		rm |= (src << 3) & 0b00111000;
 		rm |= dst & 0b00000111;
 

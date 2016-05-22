@@ -1,3 +1,5 @@
+#include <iostream>
+
 #include "program.hpp"
 #include "../startup/startup.hpp"
 #include "../emitter/emitter.hpp"
@@ -10,25 +12,27 @@
 // push rax
 // pop rax
 // pop rbx
+// mov rax, some_func
+// call rax
 // nop
 // ret
+
+void some_func()
+{
+
+}
 
 int main()
 {
 	LLCCEP_JIT::program prog;
+	void *func = *(void **)&some_func;
 
-	prog.emit_finit();
-	prog.emit_fclex();
-	prog.emit_mov_reg_imm(LLCCEP_JIT::RBX, 0xFFFFFFFF);
-	prog.emit_mov_reg_reg(LLCCEP_JIT::RAX, LLCCEP_JIT::RBX);
+	std::cout << func << "\n";
 
-	prog.emit_push_imm(0xFF);
-	prog.emit_push_reg(LLCCEP_JIT::RAX);
+	prog.emit_mov_reg_imm(LLCCEP_JIT::RAX, 0xFFFFFFFFFFFFFFFF);
+//	prog.emit_call_reg(LLCCEP_JIT::RAX);
 
-	prog.emit_pop_reg(LLCCEP_JIT::RAX);
-	prog.emit_pop_reg(LLCCEP_JIT::RBX);
-
-	prog.emit_nop();
+//	prog.emit_nop();
 	prog.emit_ret();
 
 	prog.dump();
