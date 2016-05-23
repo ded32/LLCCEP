@@ -8,6 +8,7 @@ The changes between ARM and LLCCEP assembly:
 - Register's indication begins with '&' character, not 'r'
 - There are only 7 conditions
 - There are no branches.
+- There are arithmetics, syscalls, FP-working rountines placed
 
 # TODO LIST
 Watch around difference between JIT execution on Linux and BSD-family OSs.
