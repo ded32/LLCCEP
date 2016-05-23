@@ -1,0 +1,3 @@
+00000000  48B8FFFFFFFFFFFF  mov rax,0xffffffffffffffff
+         -FFFF
+0000000A  C3                ret

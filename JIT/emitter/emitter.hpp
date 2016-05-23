@@ -50,7 +50,7 @@ namespace LLCCEP_JIT {
 		void emit(std::initializer_list<uint8_t> data);
 		void emit(opcode op, regID dst, regID src);
 		void emit(opcode op, regID src);
-		void dump();
+		void dump(bool bin = false);
 
 		std::vector<uint8_t>::const_iterator begin() const;
 		std::vector<uint8_t>::iterator begin();

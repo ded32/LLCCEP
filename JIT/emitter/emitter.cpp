@@ -52,14 +52,16 @@ namespace LLCCEP_JIT {
 		emit_byte(src);
 	}
 
-	void emitter::dump()
+	void emitter::dump(bool bin /*= false*/)
 	{
 		std::cout << std::hex;
 
-		for (auto byte: program)
-			std::cout << static_cast<int>(byte) << " ";
-
-		std::cout << std::dec <<"\n";
+		for (auto byte: program) {
+			if (bin)
+				std::cout << byte;
+			else
+				std::cout << static_cast<int>(byte) << " ";
+		}
 	}
 
 	std::vector<uint8_t>::const_iterator emitter::begin() const

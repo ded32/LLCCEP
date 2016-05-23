@@ -1,6 +1,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <limits.h>
+#include <stdio.h>
 
 #if UINT32_MAX == UNITPTR_MAX
 #	define STACK_CHECK_GUARD 0xE2DEE396

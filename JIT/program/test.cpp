@@ -27,7 +27,7 @@ int main()
 	LLCCEP_JIT::program prog;
 	void *func = *(void **)&some_func;
 
-	std::cout << func << "\n";
+//	std::cout << func << "\n";
 
 	prog.emit_mov_reg_imm(LLCCEP_JIT::RAX, 0xFFFFFFFFFFFFFFFF);
 //	prog.emit_call_reg(LLCCEP_JIT::RAX);
@@ -35,7 +35,7 @@ int main()
 //	prog.emit_nop();
 	prog.emit_ret();
 
-	prog.dump();
+	prog.dump(true);
 
 	auto data = LLCCEP_JIT::make_program(prog);
 	call(data);

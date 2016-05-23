@@ -8,7 +8,9 @@ namespace LLCCEP_DisASM {
 		"sub", "mul", "dev",
 		"and", "or", "xor",
 		"off", "nop", "swi",
-		"cmp", "inc", "dec"
+		"cmp", "inc", "dec",
+		"sqrt", "sin", "cos",
+		"ptan", "patan", "ldc"
 	};
 }
 

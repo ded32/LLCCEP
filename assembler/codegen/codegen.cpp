@@ -6,8 +6,13 @@
 #include "../lexer/lexer.hpp"
 #include "../analysis/analysis.hpp"
 
+void dump_arg(::std::ofstream &out, LLCCEP_ASM::arg data)
+{
+	
+}
+
 namespace LLCCEP_ASM {
-	op *prepare_op(std::vector <lexem> lex)
+	op *prepare_op(::std::vector <lexem> lex)
 	{
 		if (!Analyze(lex))
 			return 0;
@@ -31,17 +36,15 @@ namespace LLCCEP_ASM {
 		return res;
 	}
 
-	void dump_bitset(std::ofstream& out, op *addr)
+	void dump_bitset(::std::ofstream& out, op *addr)
 	{
 		assert(addr);
 		assert(!out.fail());
 
-		out << addr->condition << " "
-		    << addr->instruction << " ";
+		out << addr->condition
+		    << addr->instruction;
 
-		for (size_t i = 0; i < 3; i++) {
-			out << static_cast<char>(addr->args[i].type) << " "
-		            << addr->args[i].value << " ";  
-		}
+		for (size_t i = 0; i < 3; i++)
+			dump_arg(out, addr->args[i]);
 	}
 }

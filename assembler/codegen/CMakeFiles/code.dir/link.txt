@@ -1,0 +1,2 @@
+/usr/bin/ar qc libcode.a  CMakeFiles/code.dir/codegen.cpp.o
+/usr/bin/ranlib libcode.a
