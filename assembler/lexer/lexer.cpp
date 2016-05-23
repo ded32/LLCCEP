@@ -1,16 +1,26 @@
 #include <string>
+#include <sstream>
 #include <vector>
 #include <cctype>
 #include <cstddef>
 #include <new>
-#include <iostream>
+
+#include <STDExtras.hpp>
 
 #include "lexer.hpp"
 
-#define PARSE_ISSUE(file, line, msg) std::cerr << "A parsing issue has been detected!\n" << file << ":" << line << ":\n" << msg;
+#define PARSE_ISSUE(file, line, msg) \
+({\
+	::std::stringstrream __res__;\
+	__res__ << "A parsing issue has been detected!\n" \
+	        << file << ":" << line << ":\n" << msg;\
+	\
+	__res__.str().c_str();\
+})
 
 namespace LLCCEP_ASM {
-	bool ToLexems(std::string data, std::vector <lexem>& lex, std::string file, size_t line)
+	void to_lexems(::std::string data, ::std::vector<lexem> &lex, 
+	               ::std::string file, ::std::size_t line)
 	{
 		size_t i = 0, l = data.length();
 		lexem curr = {};
@@ -60,10 +70,8 @@ namespace LLCCEP_ASM {
 				std::string msg = "Undefined reference to '";
 				msg += data[i]; msg += "'!\n";
 
-				PARSE_ISSUE(file, line, msg)
 				lex.clear();
-
-				return false;
+				throw DEFAULT_EXCEPTION(PARSE_ISSUE(file, line, msg))
 			}
 
 			lex.push_back(curr);
@@ -73,8 +81,6 @@ namespace LLCCEP_ASM {
 			curr.pos.file = "";
 			curr.pos.line = 0;
 		}
-
-		return true;
 	}
 }
 

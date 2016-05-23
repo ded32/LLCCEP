@@ -3,6 +3,7 @@
 
 #include <string>
 #include <vector>
+#include <cstddef>
 
 namespace LLCCEP_ASM {
 	enum lex_t: uint8_t { 
@@ -16,15 +17,16 @@ namespace LLCCEP_ASM {
 
 	struct lexem {
 		lex_t type;
-		std::string val;	
+		::std::string val;
 
 		struct {
-			std::string file;
+			::std::string file;
 			size_t line;
 		} pos;
 	};
 
-	bool ToLexems(std::string str, std::vector <lexem>& lex, std::string file, size_t line);
+	void to_lexems(::std::string str, ::std::vector<lexem> &lex, 
+	               ::std::string file, size_t line);
 }
 
 #endif // LEXER_HPP
