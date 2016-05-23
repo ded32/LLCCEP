@@ -1,0 +1,3 @@
+use64
+
+mov rax, 0xFF00FF00FF00FF00

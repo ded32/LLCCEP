@@ -54,13 +54,11 @@ namespace LLCCEP_JIT {
 
 	void emitter::dump(bool bin /*= false*/)
 	{
-		std::cout << std::hex;
-
 		for (auto byte: program) {
 			if (bin)
 				std::cout << byte;
 			else
-				std::cout << static_cast<int>(byte) << " ";
+				std::cout << static_cast<int>(byte);
 		}
 	}
 
