@@ -1,1 +1,0 @@
-/usr/bin/c++   -g -O0 -std=c++11   CMakeFiles/codegen.dir/test.cpp.o  -o codegen -rdynamic liblexer.a libanalysis.a libcode.a 
