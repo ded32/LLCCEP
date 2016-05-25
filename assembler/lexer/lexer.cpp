@@ -1,7 +1,7 @@
 #include <string>
-#include <sstream>
 #include <vector>
 #include <cctype>
+#include <cstdio>
 #include <cstddef>
 #include <new>
 
@@ -9,13 +9,10 @@
 
 #include "lexer.hpp"
 
-#define PARSE_ISSUE(file, line, msg) \
+#define PARSE_ISSUE(file, line, fmt, ...) \
 ({\
-	::std::stringstrream __res__;\
-	__res__ << "A parsing issue has been detected!\n" \
-	        << file << ":" << line << ":\n" << msg;\
-	\
-	__res__.str().c_str();\
+	char *__res__ = new (std::nothrow) char[1024];\
+	::std::sprintf(__res__, "Parsing issue:\n%s:%d:\n", file, line)\
 })
 
 namespace LLCCEP_ASM {

@@ -15,7 +15,7 @@
 #include <cstdint>
 
 #if defined(__linux__)
-#	include <linux/limits.h>
+#include <linux/limits.h>
 #endif // linux
 
 #define yes true
@@ -23,13 +23,21 @@
 
 #define FATAL_ERROR(quit, place, fmt, ...) \
 ({\
-	::std::fprintf(stderr, "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n"\
-	                       "Fatal error in " place ":\n%s file\n%d line\n%s function\n" fmt\
-	                       "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n", __FILE__, __LINE__, __PRETTY_FUNCTION__, ##__VA_ARGS__);\
+	::std::fprintf(stderr, "Fatal error in " place\
+	                       ":\n%s file\n%d line\n%s function\n" fmt,\
+	                       __FILE__, __LINE__, __PRETTY_FUNCTION__, ##__VA_ARGS__);\
 	\
-	if (quit == yes)\
+	if (quit)\
 		::std::exit(EXIT_FAILURE);\
 });
+
+#define QUITE_ERROR(quit, fmt, ...) \
+({\
+	::std::fprintf(stderr, fmt, ##__VA_ARGS__);\
+	\
+	if (quit)\
+		::std::exit(EXIT_SUCCESS);\
+})
 
 namespace LLCCEP {
 	class runtime_exception: public ::std::runtime_error {
