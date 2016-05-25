@@ -37,7 +37,7 @@
 	\
 	if (quit)\
 		::std::exit(EXIT_SUCCESS);\
-})
+});
 
 #define MAX_EXC_BUF_SIZE (512 * 1024)
 
