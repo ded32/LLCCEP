@@ -39,13 +39,11 @@
 		::std::exit(EXIT_SUCCESS);\
 })
 
+#define MAX_EXC_BUF_SIZE (512 * 1024)
+
 namespace LLCCEP {
 	class runtime_exception: public ::std::runtime_error {
-		char __file__[PATH_MAX];
-		uint64_t __line__;
-		char __function__[512];
-
-		runtime_exception *__cause__;
+		char __text__[MAX_EXC_BUF_SIZE];
 	public:
 		runtime_exception();
 		runtime_exception(const char file[PATH_MAX], 
@@ -56,6 +54,7 @@ namespace LLCCEP {
 
 		virtual ~runtime_exception() throw();
 		virtual const char *what() const throw();
+		virtual const char *msg() const throw();
 	};
 }
 

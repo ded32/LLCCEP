@@ -3,6 +3,7 @@
 #include <cctype>
 #include <cstdio>
 #include <cstddef>
+#include <cassert>
 #include <new>
 
 #include <STDExtras.hpp>
@@ -12,7 +13,9 @@
 #define PARSE_ISSUE(file, line, fmt, ...) \
 ({\
 	char *__res__ = new (std::nothrow) char[1024];\
-	::std::sprintf(__res__, "Parsing issue:\n%s:%d:\n", file, line)\
+	assert(__res__);\
+	::std::sprintf(__res__, "Parsing issue:\n%s:%d:\n" fmt, file, line, ##__VA_ARGS__);\
+	__res__;\
 })
 
 namespace LLCCEP_ASM {
@@ -64,11 +67,13 @@ namespace LLCCEP_ASM {
 			} else if (!data[i] || data[i] == ';') {
 				break;
 			} else {
-				std::string msg = "Undefined reference to '";
-				msg += data[i]; msg += "'!\n";
-
 				lex.clear();
-				throw DEFAULT_EXCEPTION(PARSE_ISSUE(file, line, msg))
+				
+				throw RUNTIME_EXCEPTION(PARSE_ISSUE(
+					file.c_str(), 
+					line, 
+					"Forbidden characted '%c'!\n",
+					data[i]))
 			}
 
 			lex.push_back(curr);

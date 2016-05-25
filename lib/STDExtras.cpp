@@ -10,15 +10,29 @@
 
 #include <STDExtras.hpp>
 
-#define MAX_BUF_SIZE (1024 * 512)
+#define MAKE_EXCEPTION_MESSAGE(file, line, func, msg, cause)\
+({\
+	char *__res = new (std::nothrow) char[MAX_EXC_BUF_SIZE];\
+	memset(__res, 0, MAX_EXC_BUF_SIZE);\
+	::std::sprintf(__res, "Exception data:\n"\
+	                      "File: \"%s\"\n"\
+	                      "Function: \"%s\"\n"\
+	                      "Line: %llu\n"\
+	                      "Message: \"%s\"",\
+	                      file, func, line, msg);\
+	\
+	if (cause) {\
+		::std::sprintf(__res, "%s\n"\
+		                      "Caused by: \n%s",\
+		                      cause->what());\
+	}\
+	__res;\
+})
 
 namespace LLCCEP {
 	runtime_exception::runtime_exception():
 		runtime_error(""),
-		__file__(),
-		__line__(0),
-		__function__(),
-		__cause__(0)
+		__text__("")
 	{
 		FATAL_ERROR(yes, "runtime exception constructor",
    		                 "invalid initalization type:"
@@ -31,13 +45,14 @@ namespace LLCCEP {
 	                                     const char msg[1024],
 	                                     runtime_exception *cause):
 		runtime_error(msg),
-		__file__(),
-		__line__(line),
-		__function__(),
-		__cause__(cause)
+		__text__("")
 	{
-		::std::strcpy(__file__, file);
-		::std::strcpy(__function__, function);
+		char *data = MAKE_EXCEPTION_MESSAGE(
+		                     file, line, function,
+		                     msg, cause);
+
+		strcpy(__text__, data);
+		delete data;
 	}
 
 	runtime_exception::~runtime_exception() throw()
@@ -45,23 +60,11 @@ namespace LLCCEP {
 
 	const char *runtime_exception::what() const throw()
 	{
-		char *str = new char[MAX_BUF_SIZE];
-		char res[MAX_BUF_SIZE] = "";
-		::std::strcpy(res, runtime_error::what());
+		return __text__;
+	}
 
-		::std::sprintf(str, "Exception data:\n"
-		                    "File: %s\n"
-		                    "Line: %d\n"
-		                    "Function: %s\n"
-		                    "Message: %s\n",
-		                     __file__, __line__, 
-		                     __function__, res);
-
-		if (__cause__) {
-			::std::sprintf(str, "Caused by:\n%s",
-			               __cause__->what());
-		}
-
-		return str;
+	const char *runtime_exception::msg() const throw()
+	{
+		return runtime_error::what();	
 	}
 }

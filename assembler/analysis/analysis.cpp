@@ -14,7 +14,7 @@
 #define ANALYSIS_ISSUE(file, line, fmt, ...) \
 ({\
 	char *__res__ = new char[1024];\
-	::std::sprintf(__res__, "Syntax error!\n%s:%d:\n" fmt, file, line, ##__VA_ARGS__);\
+	::std::sprintf(__res__, "Syntax error!\n%s:%d:\n" fmt "\n", file, line, ##__VA_ARGS__);\
 	__res__;\
 })
 
@@ -52,39 +52,39 @@ namespace LLCCEP_ASM {
 		long long pos_inst = 0;
 
 		if (size < required) {
-			throw DEFAULT_EXCEPTION(ANALYSIS_ISSUE(
-				lex[0].pos.file, 
+			throw RUNTIME_EXCEPTION(ANALYSIS_ISSUE(
+				lex[0].pos.file.c_str(), 
 				lex[0].pos.line, 
-				"No instruction & condition!\n"))
+				"No instruction or condition!"))
 		}
 
 		if (is_cond(lex[0].val) == -1) {
-			throw DEFAULT_EXCEPTION(ANALYSIS_ISSUE(
-				lex[0].pos.file,
+			throw RUNTIME_EXCEPTION(ANALYSIS_ISSUE(
+				lex[0].pos.file.c_str(),
 				lex[0].pos.line,
-				"Unknown condition '%s'!\n",
+				"Unknown condition '%s'!",
 				lex[0].val.c_str()))
 		}
 
 		pos_inst = is_inst(lex[1].val);
 		if (pos_inst == -1) {
-			throw DEFAULT_EXCEPTION(ANALYSIS_ISSUE(
-				lex[1].pos.file,
+			throw RUNTIME_EXCEPTION(ANALYSIS_ISSUE(
+				lex[1].pos.file.c_str(),
 				lex[1].pos.line,
-				"Unknown instruction '%s'\n",
-				lex[1].val.c_str())
+				"Unknown instruction '%s'",
+				lex[1].val.c_str()))
 		}
 
 		for (unsigned i = 2; i < lex.size(); i++) {
 			if (INSTRUCTIONS[pos_inst].types[i - 2] < lex[i].type) {
-				throw DEFAULT_EXCEPTION(ANALYSIS_ISSUE(
-					lex[i].pos.file,
+				throw RUNTIME_EXCEPTION(ANALYSIS_ISSUE(
+					lex[i].pos.file.c_str(),
 					lex[i].pos.line,
 					"Conflicting types for %u argument of '%s' instruction:\n"
 					"%s is requested, but %s is given",
 					i - 1, lex[1].val.c_str(), 
 					__static_only_mnemonics[INSTRUCTIONS[pos_inst].types[i - 2]],
-					__static_only_mnemonics[lex[i].type])
+					__static_only_mnemonics[lex[i].type]))
 			}
 		}
 	}
