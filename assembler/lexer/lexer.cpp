@@ -33,7 +33,7 @@ namespace LLCCEP_ASM {
 				curr.type = LEX_T_REG;
 				i++;
 
-				while (isdigit(data[i])) {
+				while (isdigit(data[i]) || data[i] == '.') {
 					curr.val += data[i];
 					i++;
 				}

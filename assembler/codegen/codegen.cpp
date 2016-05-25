@@ -35,10 +35,17 @@ namespace LLCCEP_ASM {
 		res->condition = is_cond(lex[0].val);
 		res->instruction = is_inst(lex[1].val);
 
-		for (size_t i = 2; i < lex.size(); i++) {
-			res->args[i - 2].type = lex[i].type;
-			res->args[i - 2].value = std::stod(lex[i].val);
-		}
+		try {
+			for (size_t i = 2; i < lex.size(); i++) {
+				res->args[i - 2].type = lex[i].type;
+				res->args[i - 2].value = ::std::stod(lex[i].val);
+			}
+		} catch (::std::invalid_argument &exc) {
+			for (unsigned i = 0; i < 5; i++)
+				::std::cerr << lex[i].type << " " << lex[i].val << ::std::endl;
+
+			throw (exc);
+		} DEFAULT_HANDLING
 
 		return res;
 	}

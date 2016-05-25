@@ -2,6 +2,7 @@
 #include <cstdlib>
 #include <climits>
 #include <cstring>
+#include <cassert>
 #include <stdexcept>
 
 #if defined(__linux__)
@@ -13,6 +14,7 @@
 #define MAKE_EXCEPTION_MESSAGE(file, line, func, msg, cause)\
 ({\
 	char *__res = new (std::nothrow) char[MAX_EXC_BUF_SIZE];\
+	assert(__res);\
 	memset(__res, 0, MAX_EXC_BUF_SIZE);\
 	::std::sprintf(__res, "Exception data:\n"\
 	                      "File: \"%s\"\n"\
