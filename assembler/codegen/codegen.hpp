@@ -18,7 +18,7 @@ namespace LLCCEP_ASM {
 		arg args[3];
 	};
 
-	op *prepare_op(::std::vector <lexem> &lex);
+	op *prepare_op(::std::vector<lexem> &lex);
 	void dump_bitset(::std::ostream &out, op *addr);
 }
 
