@@ -3,11 +3,11 @@
 
 namespace LLCCEP_ASM {
 	struct inst {
-		std::string name;
+		::std::string name;
 		lex_t types[3];
 	};
 
-	static const int INST_NUM = 24;
+	static const int INST_NUM = 28;
 	static const inst INSTRUCTIONS[] = {
 		{"mov",   {LEX_T_MEM, LEX_T_VAL, LEX_T_NO}},
 		{"mva",   {LEX_T_VAL, LEX_T_VAL, LEX_T_NO}},
@@ -32,7 +32,11 @@ namespace LLCCEP_ASM {
 		{"cos",   {LEX_T_MEM, LEX_T_VAL, LEX_T_NO}},
 		{"ptan",  {LEX_T_MEM, LEX_T_VAL, LEX_T_NO}},
 		{"patan", {LEX_T_MEM, LEX_T_VAL, LEX_T_NO}},
-		{"ldc",   {LEX_T_MEM, LEX_T_VAL, LEX_T_NO}} 
+		{"ldc",   {LEX_T_MEM, LEX_T_VAL, LEX_T_NO}},
+		{"outvs", {LEX_T_VAL, LEX_T_VAL, LEX_T_NO}},
+		{"outs",  {LEX_T_VAL, LEX_T_VAL, LEX_T_NO}},
+		{"outl",  {LEX_T_VAL, LEX_T_VAL, LEX_T_NO}},
+                {"outvl", {LEX_T_VAL, LEX_T_VAL, LEX_T_NO}}
 	};
 }
 
