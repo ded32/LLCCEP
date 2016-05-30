@@ -3,6 +3,8 @@
 #include <stdlib.h>
 #include <stddef.h>
 
+#include "section.h"
+
 #define YY_(val) ((char const *)val)
 
 int yylex(void);
@@ -31,19 +33,22 @@ section:
 	'(' NAME ')' '{' section_declaration_list '}';
 
 section_declaration_list:
-	section_declaration
-	| section_declaration_list section_declaration;
+	section_declaration {$$ = section_list_init()}
+	| section_declaration_list section_declaration
+          {$$ = $1 = section_list_append($1, $2)};
 
 section_declaration:
-	NAME ':' value;
+	NAME ':' value {$$ = section_field_init(
+	                             extract_field_t($<str>1),
+	                             field_val_make($<str>3));};
 
 value:
-	SIZE
-	| NUMBER
-	| path;
+	SIZE {$$ = $<str>1}
+	| NUMBER {$$ = $<str>1}
+	| path {$$ = $<str>1};
 
 path:
-	'"' NAME '"';
+	'"' NAME '"' {$$ = $<str>2};
 %%
 
 int yylex(void)
