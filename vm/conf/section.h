@@ -1,6 +1,10 @@
 #ifndef SECTION_H
 #define SECTION_H
 
+#if defined(__cplusplus)
+extern "C" {
+#endif
+
 #include <limits.h>
 
 enum sect_t {
@@ -32,5 +36,9 @@ struct section {
 struct section *section_init(enum sect_t type,
                              struct section_field *fields);
 void section_delete(struct section *sect);
+
+#if defined(__cplusplus)
+}
+#endif
 
 #endif // SECTION_H
