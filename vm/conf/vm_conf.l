@@ -1,5 +1,7 @@
+%option prefix="vm_conf_"
+%option yylineno;
 size_sub[bkmgBKMG]
-alpha[a-zA-Z]
+char[0-9a-zA-Z\/\\!@#$%^&*()\-\+'~<>\.,|{}'\"_:]
 digit[0-9]
 
 %{
@@ -14,20 +16,23 @@ int yywrap(void);
 #define RET(val) {update(); return val;};
 %}
 
+str {char}+
+
 %%
 #         skip();
 [ \t\n\r] update();
 
-"(" RET('(');
-")" RET(')');
-
-"{" RET('{');
-"}" RET('}');
+"("  RET('(');
+")"  RET(')');
+"{"  RET('{');
+"}"  RET('}');
+"\"" RET('"');
+":"  RET(':');
 
 {alpha}+ RET(NAME);
 
 ({digit}+{size_sub}) RET(SIZE);
-{digit}+ RET(DIGIT);
+{digit}+ RET(NUMBER);
 
 {size_sub} RET(*yytext);
 
@@ -51,16 +56,16 @@ void update(void)
 	for (unsigned i = 0; yytext[i]; i++) {
 		switch (yytext[i]) {
 		case '\n':
-			pos.charno = 0;
-			pos.lineno++;
+			pos = 0;
+			yylineno++;
 			break;
 
 		case '\t':
-			pos.charno += 8;
+			pos += 8;
 			break;
 
 		default:
-			pos.charno++;
+			pos++;
 		}
 	}
 }
