@@ -1,2 +1,2 @@
-al mov &00, &01
-al mov &02, &00
+al mov &00, 48
+al mov &11, 45

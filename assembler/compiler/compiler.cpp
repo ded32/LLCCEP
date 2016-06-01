@@ -13,7 +13,7 @@
 #include "../codegen/codegen.hpp"
 
 namespace LLCCEP_ASM {
-	void compile(char * const in_path, ::std::stringstream &out)
+	void compile(::std::string in_path, ::std::stringstream &out)
 	{
 		::std::ifstream in(in_path);
 		if (in.fail()) {
@@ -24,19 +24,25 @@ namespace LLCCEP_ASM {
 
 		::std::vector<lexem> program;
 
-		for (uint64_t i = 0; !in.eof(); i++) {
+		for (uint64_t i = 1; !in.eof(); i++) {
 			::std::string code = "";
 			::std::getline(in, code);
-			
+	
 			try {
 				to_lexems(code, program, 
 				          in_path, i);
+			} DEFAULT_HANDLING
+	
+			if (!program.size())
+				continue;
+
+			try {
 				LLCCEP_ASM::op *prep = prepare_op(program);
 				dump_bitset(out, prep);
 				delete prep;
 			} catch (::LLCCEP::runtime_exception &exc) {
 				out.flush();
-				throw RUNTIME_EXCEPTION("Compilation fails!", &exc);
+				throw (exc);
 			} DEFAULT_HANDLING
 
 			code.clear();

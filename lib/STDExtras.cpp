@@ -26,7 +26,7 @@
 	if (cause) {\
 		::std::sprintf(__res, "%s\n"\
 		                      "Caused by: \n%s",\
-		                      cause->what());\
+		                      __res/*, cause->what()*/);\
 	}\
 	__res;\
 })

@@ -58,8 +58,8 @@ namespace LLCCEP {
 	};
 }
 
-#define RUNTIME_EXCEPTION(...) new (std::nothrow) ::LLCCEP::runtime_exception(__FILE__, __LINE__,\
-                                                                              __PRETTY_FUNCTION__, ##__VA_ARGS__);
+#define RUNTIME_EXCEPTION(...) ::LLCCEP::runtime_exception(__FILE__, __LINE__,\
+                                                           __PRETTY_FUNCTION__, ##__VA_ARGS__);
 
 #define DEFAULT_HANDLING \
 catch (::std::exception &exc) {\
