@@ -6,6 +6,8 @@
 #include <sstream>
 #include <fstream>
 #include <iostream>
+#include <cstring>
+#include <cerrno>
 
 #include <STDExtras.hpp>
 
@@ -17,9 +19,8 @@ namespace LLCCEP_ASM {
 	{
 		::std::ifstream in(in_path);
 		if (in.fail()) {
-			QUITE_ERROR(yes, "can't open '%s'"
-			                 " file!\n", 
-			                 in_path)
+			QUITE_ERROR(yes, "Can't open '%s' for read: %s!\n",
+			            in_path.c_str(), ::std::strerror(errno));
 		}
 
 		::std::vector<lexem> program;
@@ -41,7 +42,6 @@ namespace LLCCEP_ASM {
 				dump_bitset(out, prep);
 				delete prep;
 			} catch (::LLCCEP::runtime_exception &exc) {
-				out.flush();
 				throw (exc);
 			} DEFAULT_HANDLING
 

@@ -70,6 +70,7 @@ int main(int argn, char * const *argv)
 
 	::std::stringstream out;
 	::std::ofstream out_f;
+	size_t i;
 
 	try {
 		parse_command_line_params(argn, argv, inputs, output);
@@ -79,11 +80,14 @@ int main(int argn, char * const *argv)
 	} DEFAULT_HANDLING
 
 	try {
-		for (size_t i = 0; i < inputs.size(); i++)
+		for (i = 0; i < inputs.size(); i++)
 			LLCCEP_ASM::compile(inputs[i], out);
+	} catch (::std::ios_base::failure &info) {
+		QUITE_ERROR(yes, "Can't open '%s' for read: "
+		                 "%s\n", inputs[i], info.what());
 	} catch (::LLCCEP::runtime_exception &exc) {
 		QUITE_ERROR(yes, exc.msg());
-	} DEFAULT_HANDLING
+	} //DEFAULT_HANDLING
 
 	try {
 		out_f.exceptions(::std::ofstream::failbit);

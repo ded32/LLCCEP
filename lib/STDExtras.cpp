@@ -4,6 +4,7 @@
 #include <cstring>
 #include <cassert>
 #include <stdexcept>
+#include <sstream>
 
 #if defined(__linux__)
 #	include <linux/limits.h>
@@ -13,22 +14,17 @@
 
 #define MAKE_EXCEPTION_MESSAGE(file, line, func, msg, cause)\
 ({\
-	char *__res = new (std::nothrow) char[MAX_EXC_BUF_SIZE];\
-	assert(__res);\
-	memset(__res, 0, MAX_EXC_BUF_SIZE);\
-	::std::sprintf(__res, "Exception data:\n"\
-	                      "File: \"%s\"\n"\
-	                      "Function: \"%s\"\n"\
-	                      "Line: %llu\n"\
-	                      "Message: \"%s\"",\
-	                      file, func, line, msg);\
+	::std::stringstream __res;\
+	__res << "Exception data:\n"\
+	         "File: \"" << file << "\"\n"\
+	         "Function: \"" << func << "\"\n"\
+	         "Line: " << line << "\n"\
+	         "Message: \"" << msg << "%s\n";\
 	\
-	if (cause) {\
-		::std::sprintf(__res, "%s\n"\
-		                      "Caused by: \n%s",\
-		                      __res/*, cause->what()*/);\
-	}\
-	__res;\
+	if (cause) \
+		__res << "Caused by: " << cause->what() << "\n";\
+	\
+	__res.str().c_str();\
 })
 
 namespace LLCCEP {
@@ -49,7 +45,7 @@ namespace LLCCEP {
 		runtime_error(msg),
 		__text__("")
 	{
-		char *data = MAKE_EXCEPTION_MESSAGE(
+		const char *data = MAKE_EXCEPTION_MESSAGE(
 		                     file, line, function,
 		                     msg, cause);
 
