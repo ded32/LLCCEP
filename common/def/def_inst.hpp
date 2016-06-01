@@ -1,6 +1,8 @@
 #ifndef DEF_INST_HPP
 #define DEF_INST_HPP
 
+#include <string>
+
 namespace LLCCEP_ASM {
 	struct inst {
 		::std::string name;
@@ -36,7 +38,7 @@ namespace LLCCEP_ASM {
 		{"outvs", {LEX_T_VAL, LEX_T_VAL, LEX_T_NO}},
 		{"outs",  {LEX_T_VAL, LEX_T_VAL, LEX_T_NO}},
 		{"outl",  {LEX_T_VAL, LEX_T_VAL, LEX_T_NO}},
-                {"outvl", {LEX_T_VAL, LEX_T_VAL, LEX_T_NO}}
+		{"outvl", {LEX_T_VAL, LEX_T_VAL, LEX_T_NO}}
 	};
 }
 

@@ -2,10 +2,11 @@
 #define DEF_COND_HPP
 
 #include <map>
+#include <cstdint>
 
 namespace LLCCEP_ASM {
 	static const int CONDS_NUM = 7;
-	static const std::map<std::string, uint8_t> CONDS = {
+	static const ::std::map<::std::string, uint8_t> CONDS = {
 		{"al", 0b1000},
 		{"eq", 0b0100},
 		{"ne", 0b0011},
