@@ -38,8 +38,8 @@ struct section {
 	struct undirected_list *fields;
 };
 
-enum sect_t get_section_type(char const *str);
-enum sect_field_t get_field_type(char const *str);
+enum sect_t get_section_type(const char * const str);
+enum sect_field_t get_field_type(const char * const str);
 
 #if defined(__cplusplus)
 }

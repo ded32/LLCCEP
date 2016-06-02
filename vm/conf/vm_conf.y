@@ -6,6 +6,9 @@
 #include <list.h>
 
 #include "section.h"
+#include "reader.h"
+
+struct undirected_list *configuration_file_data;
 
 #define YY_(val) ((char const *)val)
 
@@ -27,28 +30,31 @@ char yyfilename[PATH_MAX] = "";
 
 %token <string> NAME SIZE NUMBER;
 
-%type <sects> section_list
+%type <sects> section_list main
 %type <sect> section
 %type <fields> section_declaration_list
 %type <field> section_declaration
 %type <string> value path
 
-%start section_list
+%start main
 
 %%
+main:
+	section_list {configuration_file_data = $$ = $<sects>1;};
+
 section_list:
 	section {$$ = unidirected_list_init(&$<sect>1);}
 	| section_list section {$$ = unidirected_list_insert_head($<sects>1, &$<sect>2);};
 
 section:
-	'(' NAME ')' '{' section_declaration_list '}' {$$ = {.type = get_section_type($<string>2), .fields = $<fields>5};};
+	'(' NAME ')' '{' section_declaration_list '}' {$$.type = get_section_type($<string>2); $$.fields = $<fields>5;};
 
 section_declaration_list:
-	section_declaration {$$ = unidirected_list_init(&$<field>1);}
+	| section_declaration {$$ = unidirected_list_init(&$<field>1);}
 	| section_declaration_list section_declaration {$$ = unidirected_list_insert_head($<fields>1, &$<field>2);};
 
 section_declaration:
-	NAME ':' value {$$ = {get_section_type($<string>1), $<string>3};};
+	NAME ':' value {$$;};
 
 value:
 	SIZE {$$ = $<string>1;}
@@ -64,16 +70,6 @@ int yyerror(char const *str)
 	fprintf(stderr, "%s:%d:%d:\n%s\n"
 	                "%s\n",
 	        yyfilename, yylineno, yycharno, str, yytext);
-
-	return 0;
-}
-
-int main(void)
-{
-	yyin = stdin;
-	strcpy(yyfilename, "stdin");
-
-	yyparse();
 
 	return 0;
 }
