@@ -7,7 +7,7 @@ extern "C" {
 
 struct unidirected_list {
 	void *data;
-	struct list *next;
+	struct unidirected_list *next;
 };
 
 struct unidirected_list *undirected_list_init(void *data);

@@ -3,6 +3,8 @@
 #include <stdlib.h>
 #include <stddef.h>
 
+#include <list.h>
+
 #include "section.h"
 
 #define YY_(val) ((char const *)val)
@@ -10,48 +12,68 @@
 int yylex(void);
 int yyerror(char const *str);
 
-size_t pos = 0;
+size_t yycharno = 0;
+char yyfilename[PATH_MAX] = "";
 %}
 
 %union {
-	struct section *sect;
-	struct section_field *field;
-	char const *str;
+	struct section sect;
+	struct section_field field;
+
+	struct unidirected_list *sects;
+	struct unidirected_list *fields;
+	char const *string;
 }
 
-%token <str> NAME SIZE NUMBER;
+%token <string> NAME SIZE NUMBER;
 
-%type <sect> section_list section
-%type <field> section_declaration_list section_declaration
-%type <str> value path
+%type <sects> section_list
+%type <sect> section
+%type <fields> section_declaration_list
+%type <field> section_declaration
+%type <string> value path
+
+%start section_list
+
 %%
 section_list:
-	section {$$ = $1}
-	| section_list section};
+	section {$$ = unidirected_list_init(&$<sect>1);}
+	| section_list section {$$ = unidirected_list_insert_head($<sects>1, &$<sect>2);};
 
 section:
-	'(' NAME ')' '{' section_declaration_list '}';
+	'(' NAME ')' '{' section_declaration_list '}' {$$ = {.type = get_section_type($<string>2), .fields = $<fields>5};};
 
 section_declaration_list:
-	section_declaration {$$ = section_list_init()}
-	| section_declaration_list section_declaration
-          {$$ = $1 = section_list_append($1, $2)};
+	section_declaration {$$ = unidirected_list_init(&$<field>1);}
+	| section_declaration_list section_declaration {$$ = unidirected_list_insert_head($<fields>1, &$<field>2);};
 
 section_declaration:
-	NAME ':' value {$$ = section_field_init(
-	                             extract_field_t($<str>1),
-	                             field_val_make($<str>3));};
+	NAME ':' value {$$ = {get_section_type($<string>1), $<string>3};};
 
 value:
-	SIZE {$$ = $<str>1}
-	| NUMBER {$$ = $<str>1}
-	| path {$$ = $<str>1};
+	SIZE {$$ = $<string>1;}
+	| NUMBER {$$ = $<string>1;}
+	| path {$$ = $<string>1;};
 
 path:
-	'"' NAME '"' {$$ = $<str>2};
+	'"' NAME '"' {$$ = $<string>2;};
 %%
 
-int yylex(void)
+int yyerror(char const *str)
 {
-	
+	fprintf(stderr, "%s:%d:%d:\n%s\n"
+	                "%s\n",
+	        yyfilename, yylineno, yycharno, str, yytext);
+
+	return 0;
+}
+
+int main(void)
+{
+	yyin = stdin;
+	strcpy(yyfilename, "stdin");
+
+	yyparse();
+
+	return 0;
 }

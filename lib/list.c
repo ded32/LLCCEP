@@ -1,12 +1,13 @@
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
+#include <stdio.h>
 
 #include <list.h>
 
 struct unidirected_list *unidirected_list_init(void *data)
 {
-	struct unidirected_list *res = (struct undirected_list *)calloc(1, sizeof(*res));
+	struct unidirected_list *res = calloc(1, sizeof(*res));
 
 	if (!res) {
 		fprintf(stderr, "Can't alloc memory for list head: %s",
@@ -38,7 +39,7 @@ struct unidirected_list *unidirected_list_remove_head(
 		return 0;
 
 	res = head->next;
-	free((void *)head);
+	free(head);
 
 	return res;
 }
@@ -46,7 +47,7 @@ struct unidirected_list *unidirected_list_remove_head(
 void unidirected_list_delete(struct unidirected_list *head)
 {
 	while (head) {
-		free((void *)head);
+		free(head);
 		head = head->next;
 	}
 }
