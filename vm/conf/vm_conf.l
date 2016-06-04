@@ -1,3 +1,6 @@
+%option yylineno
+%option noyywrap
+
 size_sub[bkmgBKMG]
 char[0-9a-zA-Z\/\\!@#$%^&*()\-\+'~<>\.,|{}'\"_:]
 digit[0-9]
@@ -12,9 +15,8 @@ alpha[a-zA-Z]
 void forbidden(void);
 void skip(void);
 void update(void);
-int yywrap(void);
 
-#define RET(val) {update(); return val;};
+#define RET(val) {update(); yylval.string = yytext; return val;};
 %}
 
 str {char}+
@@ -30,12 +32,12 @@ str {char}+
 "\"" RET('"');
 ":"  RET(':');
 
-{size_sub} RET(*yytext);
+\"(\\.|[^\\"])*\"    RET(LITERAL);
 
-{alpha}+ RET(NAME);
-
+{size_sub}           RET(SIZE_SUBSCRIPT);
+{alpha}+             RET(NAME);
 ({digit}+{size_sub}) RET(SIZE);
-{digit}+ RET(NUMBER);
+{digit}+             RET(NUMBER);
 
 
 [.] forbidden();
@@ -72,7 +74,3 @@ void update(void)
 	}
 }
 
-int yywrap(void)
-{
-	return 1;
-}

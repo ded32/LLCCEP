@@ -2,11 +2,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stddef.h>
+#include <string.h>
 
 #include <list.h>
 
-#include "section.h"
-#include "reader.h"
+#include "./section.h"
+#include "./reader.h"
 
 struct undirected_list *configuration_file_data;
 
@@ -28,7 +29,8 @@ char yyfilename[PATH_MAX] = "";
 	char const *string;
 }
 
-%token <string> NAME SIZE NUMBER;
+%token <string> NAME SIZE NUMBER
+%token <string> SIZE_SUBSCRIPT LITERAL
 
 %type <sects> section_list main
 %type <sect> section
@@ -62,7 +64,7 @@ value:
 	| path {$$ = $<string>1;};
 
 path:
-	'"' NAME '"' {$$ = $<string>2;};
+	LITERAL {$$ = $<string>1;};
 %%
 
 int yyerror(char const *str)
@@ -73,3 +75,16 @@ int yyerror(char const *str)
 
 	return 0;
 }
+
+int main(void)
+{
+	strcpy(yyfilename, "stdin");
+	yyin = stdin;
+
+	yyparse();
+
+	undirected_list_delete(configuration_file_data);
+
+	return 0;	
+}
+

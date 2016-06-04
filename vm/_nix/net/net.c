@@ -27,6 +27,10 @@ void __net_clean__(void)
 	undirected_list_delete(__net_sockets_data_list__);
 }
 
+
+
+void 
+
 void net_create_srv(int portno) 
 {
 	if (!__net_atexit_set__) {
@@ -60,5 +64,5 @@ void net_create_srv(int portno)
 	__net_sockets_data_list__ = undirected_list_insert_head(
 		__net_sockets_data_list__, data);
 
-	__net_start_listening__(__net_sockets_data_list__);
+	__net_start_listening__(__net_sockets_data_list__->data);
 }
