@@ -35,7 +35,7 @@ struct section_field {
 
 struct section {
 	enum sect_t type;
-	struct undirected_list *fields;
+	struct unidirected_list *fields;
 };
 
 enum sect_t get_section_type(const char * const str);

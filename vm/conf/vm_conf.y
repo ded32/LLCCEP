@@ -1,24 +1,38 @@
-%{
-#include <stdio.h>
-#include <stdlib.h>
-#include <stddef.h>
-#include <string.h>
+%code requires {
+	#include <stdio.h>
+	#include <stdlib.h>
+	#include <stddef.h>
+	#include <string.h>
 
-#include <list.h>
+	#include <list.h>
 
-#include "./section.h"
-#include "./reader.h"
+	#include "section.h"
+	#include "reader.h"
 
-struct undirected_list *configuration_file_data;
+	struct unidirected_list *configuration_file_data;
 
-#define YY_(val) ((char const *)val)
+	#define YY_(val) ((char const *)val)
 
-int yylex(void);
-int yyerror(char const *str);
+	int yylex(void);
+	int yyerror(char const *str);
 
-size_t yycharno = 0;
-char yyfilename[PATH_MAX] = "";
-%}
+	size_t yycharno = 0;
+	char yyfilename[PATH_MAX] = "";
+
+	#define MSG(fmt, ...) \
+	({\
+		char *__str__ = calloc(1, 1024);\
+		sprintf(__str__, fmt, ##__VA_ARGS__);\
+		__str__;\
+	})
+
+	#define ERROR(fmt, ...) \
+	({\
+		char *str = MSG(fmt, ##__VA_ARGS__);\
+		yyerror(str);\
+		free(str);\
+	});
+}
 
 %union {
 	struct section sect;
@@ -29,8 +43,7 @@ char yyfilename[PATH_MAX] = "";
 	char const *string;
 }
 
-%token <string> NAME SIZE NUMBER
-%token <string> SIZE_SUBSCRIPT LITERAL
+%token <string> NAME SIZE NUMBER LITERAL
 
 %type <sects> section_list main
 %type <sect> section
@@ -42,49 +55,52 @@ char yyfilename[PATH_MAX] = "";
 
 %%
 main:
-	section_list {configuration_file_data = $$ = $<sects>1;};
+	section_list {
+		configuration_file_data = $$ = $1;
+	};
 
 section_list:
-	section {$$ = unidirected_list_init(&$<sect>1);}
-	| section_list section {$$ = unidirected_list_insert_head($<sects>1, &$<sect>2);};
+	section {
+		$$ = unidirected_list_insert_head(0, &$1);
+	} | section_list section {
+		$$ = unidirected_list_insert_head($1, &$2);
+	};
 
 section:
-	'(' NAME ')' '{' section_declaration_list '}' {$$.type = get_section_type($<string>2); $$.fields = $<fields>5;};
+	'(' NAME ')' '{' section_declaration_list '}' {
+		if (($$.type = get_section_type($2)) == SECT_T_INVALID)
+			ERROR("Invalid '%s' section!\n", $2);
+
+		$$.fields = $5;
+	};
 
 section_declaration_list:
-	| section_declaration {$$ = unidirected_list_init(&$<field>1);}
-	| section_declaration_list section_declaration {$$ = unidirected_list_insert_head($<fields>1, &$<field>2);};
+	| section_declaration {
+		$$ = unidirected_list_insert_head(0, &$1);
+	} | section_declaration_list section_declaration {
+		$$ = unidirected_list_insert_head($1, &$2);
+	};
 
 section_declaration:
-	NAME ':' value {$$;};
+	NAME ':' value {
+		if (($$.type = get_field_type($1)) == SECT_FIELD_T_INVALID)
+			ERROR("Invalid '%s' field!\n", $1);
+
+		strcpy($$.str, $3);
+	};
 
 value:
-	SIZE {$$ = $<string>1;}
-	| NUMBER {$$ = $<string>1;}
-	| path {$$ = $<string>1;};
+	SIZE {
+		$$ = $1;
+	} | NUMBER {
+		$$ = $1;
+	} | path {
+		$$ = $1;
+	};
 
 path:
-	LITERAL {$$ = $<string>1;};
+	LITERAL {
+		$$ = $1;
+	};
 %%
-
-int yyerror(char const *str)
-{
-	fprintf(stderr, "%s:%d:%d:\n%s\n"
-	                "%s\n",
-	        yyfilename, yylineno, yycharno, str, yytext);
-
-	return 0;
-}
-
-int main(void)
-{
-	strcpy(yyfilename, "stdin");
-	yyin = stdin;
-
-	yyparse();
-
-	undirected_list_delete(configuration_file_data);
-
-	return 0;	
-}
 

@@ -27,10 +27,6 @@ void __net_clean__(void)
 	undirected_list_delete(__net_sockets_data_list__);
 }
 
-
-
-void 
-
 void net_create_srv(int portno) 
 {
 	if (!__net_atexit_set__) {

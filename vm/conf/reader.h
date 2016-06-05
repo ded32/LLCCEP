@@ -8,7 +8,7 @@
 extern "C" {
 #endif
 
-extern struct undirected_list *configuration_file_data;
+extern struct unidirected_list *configuration_file_data;
 
 struct undirected_list *read_vm_configuration_file(FILE *fd);
 

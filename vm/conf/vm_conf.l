@@ -2,7 +2,6 @@
 %option noyywrap
 
 size_sub[bkmgBKMG]
-char[0-9a-zA-Z\/\\!@#$%^&*()\-\+'~<>\.,|{}'\"_:]
 digit[0-9]
 alpha[a-zA-Z]
 
@@ -11,10 +10,16 @@ alpha[a-zA-Z]
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <limits.h>
+
+#if defined(__linux__)
+#include <linux/limits.h>
+#endif
 
 void forbidden(void);
 void skip(void);
 void update(void);
+int yyerror(char const *str);
 
 #define RET(val) {update(); yylval.string = yytext; return val;};
 %}
@@ -34,7 +39,6 @@ str {char}+
 
 \"(\\.|[^\\"])*\"    RET(LITERAL);
 
-{size_sub}           RET(SIZE_SUBSCRIPT);
 {alpha}+             RET(NAME);
 ({digit}+{size_sub}) RET(SIZE);
 {digit}+             RET(NUMBER);
@@ -42,6 +46,14 @@ str {char}+
 
 [.] forbidden();
 %%
+
+int yyerror(char const *str)
+{
+	fprintf(stderr, "%s:%d:%d:\n%s\n"
+	                "%s\n",
+	        yyfilename, yylineno, yycharno, str, yytext);
+
+}
 
 void forbidden(void)
 {
