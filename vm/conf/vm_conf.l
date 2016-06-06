@@ -6,6 +6,9 @@ digit[0-9]
 alpha[a-zA-Z]
 
 %{
+#ifndef LEXER_H
+#define LEXER_H
+
 #include "parser.h"
 
 #include <stdio.h>
@@ -33,8 +36,9 @@ void update(void);
 str {char}+
 
 %%
-#         skip();
-[ \t\n\r] update();
+# skip();
+\n {yylineno++; yycharno = 0;}
+[ \t\r] update();
 
 "("  RET('(');
 ")"  RET(')');
@@ -68,19 +72,11 @@ void skip(void)
 void update(void)
 {
 	for (unsigned i = 0; yytext[i]; i++) {
-		switch (yytext[i]) {
-		case '\n':
-			yycharno = 0;
-			yylineno++;
-			break;
-
-		case '\t':
+		if (yytext[i] == '\t')
 			yycharno += 8;
-			break;
-
-		default:
+		else
 			yycharno++;
-		}
 	}
 }
 
+#endif // LEXER_H

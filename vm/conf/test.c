@@ -1,15 +1,8 @@
-#include <list.h>
-
-#include "lexer.h"
+#include "reader.h"
 
 int main(void)
 {
-	strcpy(yyfilename, "stdin");
-	yyin = stdin;
-
-	yyparse();
-
-	unidirected_list_delete(configuration_file_data);
-
+	struct unidirected_list *config = read_vm_configuration_file(stdin);
+ 
 	return 0;
 }

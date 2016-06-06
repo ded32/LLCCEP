@@ -1,18 +1,38 @@
-FLAGS:=-std=gnu99 -I../../include/ -g -O0
+OBJ:=./obj
+BIN:=./bin
+LIB:=./lib
+SYNTH:=./synthesis
+
+INC:=./../../include/
+SRC:=./../../lib
+
+FLAGS:=-std=gnu99 -I$(INC) -g -O0
+
 all: build
 
-build_static:
-	cc -c $(FLAGS) -o section.o section.c
-	ar rcs libsection.a section.o
-	rm section.o
-	cc -c $(FLAGS) -o list.o ../../lib/list.c
-	ar rcs liblist.a list.o
-	rm list.o
+init:
+	mkdir -p $(OBJ) $(BIN) $(LIB) $(SYNTH)
 
-build: build_static
-	lex -o lexer.h vm_conf.l
-	yacc -o parser.h vm_conf.y
-	cc $(FLAGS) -L./ -o test.out test.c -ly -ll -lsection -llist
+synthesis: init ./vm_conf.l ./vm_conf.y
+	lex -o $(SYNTH)/lexer.h ./vm_conf.l
+	yacc -o $(SYNTH)/parser.h ./vm_conf.y
+
+build_section: ./section.c ./section.h
+	cc -c $(FLAGS) -o $(OBJ)/section.o ./section.c
+	ar rcs $(LIB)/libsection.a $(OBJ)/section.o
+
+build_list: ./../../lib/list.c ./../../include/list.h
+	cc -c $(FLAGS) -o $(OBJ)/list.o $(SRC)/list.c
+	ar rcs $(LIB)/liblist.a $(OBJ)/list.o
+
+build_reader: ./reader.c ./reader.h
+	cc -c $(FLAGS) -o $(OBJ)/reader.o ./reader.c
+	ar rcs $(LIB)/libreader.a $(OBJ)/reader.o
+
+build_static: synthesis build_section build_list build_reader
+
+build: build_static test.c
+	cc $(FLAGS) -L$(LIB) -o $(BIN)/test.out ./test.c -lreader -ly -ll -lsection -llist
 
 clean:
-	rm test.out *.a lexer.h parser.h
+	rm -rf $(OBJ) $(BIN) $(LIB) $(SYNTH)

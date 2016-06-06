@@ -1,4 +1,7 @@
-%code requires {
+%{
+#ifndef PARSER_H
+#define PARSER_H
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <stddef.h>
@@ -6,8 +9,8 @@
 
 #include <list.h>
 
-#include "section.h"
-#include "reader.h"
+#include "./../section.h"
+#include "./../reader.h"
 
 struct unidirected_list *configuration_file_data;
 
@@ -34,7 +37,7 @@ char yyfilename[PATH_MAX] = "";
 });
 
 #define REMOVE(val) free((void *)val);
-}
+%}
 
 %union {
 	struct section sect;
@@ -117,4 +120,7 @@ int yyerror(char const *str)
 	fprintf(stderr, "%s:%d:%zu:\n%s\n",
 	        yyfilename, yylineno, yycharno, str);
 
+	exit(EXIT_FAILURE);
 }
+
+#endif // PARSER_H
