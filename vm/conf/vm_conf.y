@@ -1,37 +1,39 @@
 %code requires {
-	#include <stdio.h>
-	#include <stdlib.h>
-	#include <stddef.h>
-	#include <string.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <stddef.h>
+#include <string.h>
 
-	#include <list.h>
+#include <list.h>
 
-	#include "section.h"
-	#include "reader.h"
+#include "section.h"
+#include "reader.h"
 
-	struct unidirected_list *configuration_file_data;
+struct unidirected_list *configuration_file_data;
 
-	#define YY_(val) ((char const *)val)
+#define YY_(val) ((char const *)val)
 
-	int yylex(void);
-	int yyerror(char const *str);
+int yylex(void);
+int yyerror(char const *str);
 
-	size_t yycharno = 0;
-	char yyfilename[PATH_MAX] = "";
+size_t yycharno = 0;
+char yyfilename[PATH_MAX] = "";
 
-	#define MSG(fmt, ...) \
-	({\
-		char *__str__ = calloc(1, 1024);\
-		sprintf(__str__, fmt, ##__VA_ARGS__);\
-		__str__;\
-	})
+#define MSG(fmt, ...) \
+({\
+	char *__str__ = calloc(1, 1024);\
+	sprintf(__str__, fmt, ##__VA_ARGS__);\
+	__str__;\
+})
 
-	#define ERROR(fmt, ...) \
-	({\
-		char *str = MSG(fmt, ##__VA_ARGS__);\
-		yyerror(str);\
-		free(str);\
-	});
+#define ERROR(fmt, ...) \
+({\
+	char *str = MSG(fmt, ##__VA_ARGS__);\
+	yyerror(str);\
+	free(str);\
+});
+
+#define REMOVE(val) free((void *)val);
 }
 
 %union {
@@ -40,7 +42,8 @@
 
 	struct unidirected_list *sects;
 	struct unidirected_list *fields;
-	char const *string;
+
+	char *string;
 }
 
 %token <string> NAME SIZE NUMBER LITERAL
@@ -72,6 +75,8 @@ section:
 			ERROR("Invalid '%s' section!\n", $2);
 
 		$$.fields = $5;
+
+		REMOVE($2)
 	};
 
 section_declaration_list:
@@ -87,6 +92,9 @@ section_declaration:
 			ERROR("Invalid '%s' field!\n", $1);
 
 		strcpy($$.str, $3);
+
+		REMOVE($1)
+		REMOVE($3)
 	};
 
 value:
@@ -104,3 +112,10 @@ path:
 	};
 %%
 
+int yyerror(char const *str)
+{
+	fprintf(stderr, "%s:%d:%zu:\n%s\n"
+	                "%s\n",
+	        yyfilename, yylineno, yycharno, str, yytext);
+
+}

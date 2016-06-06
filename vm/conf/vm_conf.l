@@ -19,9 +19,10 @@ alpha[a-zA-Z]
 void forbidden(void);
 void skip(void);
 void update(void);
-int yyerror(char const *str);
 
-#define RET(val) {update(); yylval.string = yytext; return val;};
+#define RET(val) \
+{\
+	update(); yylval.string = strdup(yytext); return val;};
 %}
 
 str {char}+
@@ -46,14 +47,6 @@ str {char}+
 
 [.] forbidden();
 %%
-
-int yyerror(char const *str)
-{
-	fprintf(stderr, "%s:%d:%d:\n%s\n"
-	                "%s\n",
-	        yyfilename, yylineno, yycharno, str, yytext);
-
-}
 
 void forbidden(void)
 {

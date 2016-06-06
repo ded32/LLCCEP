@@ -31,7 +31,7 @@ namespace LLCCEP_JIT {
 	void program::emit_mov_reg_ptr_reg(regID dst, regID src)
 	{
 		emit({0x48, 0x89});
-		emit_rm_field(0b00, dst, src)
+		//emit_rm_field(0b00, dst, src)
 	}
 
 	void program::emit_mov_reg_imm(regID dst, uint64_t src)
