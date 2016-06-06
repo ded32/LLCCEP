@@ -22,7 +22,12 @@ void update(void);
 
 #define RET(val) \
 {\
-	update(); yylval.string = strdup(yytext); return val;};
+	update(); \
+	if (val > 255) \
+		yylval.string = strdup(yytext); \
+	\
+	return val; \
+};
 %}
 
 str {char}+

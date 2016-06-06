@@ -114,8 +114,7 @@ path:
 
 int yyerror(char const *str)
 {
-	fprintf(stderr, "%s:%d:%zu:\n%s\n"
-	                "%s\n",
-	        yyfilename, yylineno, yycharno, str, yytext);
+	fprintf(stderr, "%s:%d:%zu:\n%s\n",
+	        yyfilename, yylineno, yycharno, str);
 
 }
