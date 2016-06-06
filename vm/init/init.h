@@ -17,10 +17,10 @@ struct init_data {
 	uint16_t dispW;
 	uint16_t dispH;
 
-	struct undirected_list *devD;
+	struct unidirected_list *devD;
 };
 
-struct init_data process_configuration(struct undirected_list *data);
+struct init_data process_configuration(struct unidirected_list *data);
 void setup(struct init_data data);
 
 #endif // INIT_H
