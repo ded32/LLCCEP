@@ -53,6 +53,7 @@ str {char}+
 ({digit}+{size_sub}) RET(SIZE);
 {digit}+             RET(NUMBER);
 
+<<EOF>> yyterminate();
 
 [.] forbidden();
 %%
