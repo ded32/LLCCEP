@@ -1,6 +1,7 @@
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <ctype.h>
 
 #include <convert.h>
 
@@ -46,9 +47,36 @@ static size_t __static_getRamS(struct section *sect)
 	assert(sect);
 
 	struct unidirected_list *fields = sect->fields;
+	size_t sz = 0;
+	char postfix = 0;
+
 	while (fields) {
-		if (((struct section_field *)fields->data)->type == SECT_FIELD_T_ALLOC)
-			return str2size_t(((struct section_field *)fields->data)->str);
+		struct section_field *field = (struct section_field *)fields->data;
+
+		if (field->type == SECT_FIELD_T_ALLOC) {
+			sscanf(field->str, "%zd%c", &sz, &postfix);
+			postfix = tolower(postfix);
+
+			switch (postfix) {
+				case 'b':
+					break;
+
+				case 'k':
+					sz *= 1024;
+					break;
+
+				case 'm':
+					sz *= 1048576;
+					break;
+
+				case 'g':
+					sz *= 1073741824;
+					break;
+
+				default:
+					break;
+			}
+		}
 
 		fields = fields->next;
 	}
@@ -84,5 +112,7 @@ struct init_data process_configuration(struct unidirected_list *data)
 			default:
 				break;
 		}
+
+		data = data->next;
 	}	
 }

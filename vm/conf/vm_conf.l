@@ -1,5 +1,4 @@
 %option yylineno
-%option noyywrap
 
 size_sub[bkmgBKMG]
 digit[0-9]
@@ -23,6 +22,8 @@ void forbidden(void);
 void skip(void);
 void update(void);
 
+int yywrap(void);
+
 #define RET(val) \
 {\
 	update(); \
@@ -37,6 +38,8 @@ str {char}+
 
 %%
 # skip();
+<<EOF>> {yyterminate(); return 0;}
+
 [ \t\r\n] update();
 
 "("  RET('(');
@@ -51,8 +54,6 @@ str {char}+
 {alpha}+             RET(NAME);
 ({digit}+{size_sub}) RET(SIZE);
 {digit}+             RET(NUMBER);
-
-<<EOF>> yyterminate();
 
 [.] forbidden();
 %%
@@ -85,6 +86,11 @@ void update(void)
 				yycharno++;
 		}
 	}
+}
+
+int yywrap(void)
+{
+	return 1;
 }
 
 #endif // LEXER_H
