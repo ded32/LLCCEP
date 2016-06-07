@@ -37,8 +37,7 @@ str {char}+
 
 %%
 # skip();
-\n {yylineno++; yycharno = 0;}
-[ \t\r] update();
+[ \t\r\n] update();
 
 "("  RET('(');
 ")"  RET(')');
@@ -73,10 +72,18 @@ void skip(void)
 void update(void)
 {
 	for (unsigned i = 0; yytext[i]; i++) {
-		if (yytext[i] == '\t')
-			yycharno += 8;
-		else
-			yycharno++;
+		switch (yytext[i]) {
+			case '\t':
+				yycharno += 8;
+				break;
+
+			case '\n':
+				yycharno = 0;
+				break;
+
+			default:
+				yycharno++;
+		}
 	}
 }
 

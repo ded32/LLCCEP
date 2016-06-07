@@ -83,7 +83,9 @@ section:
 	};
 
 section_declaration_list:
-	| section_declaration {
+	{
+		$$ = 0;
+	} | section_declaration {
 		$$ = unidirected_list_insert_head(0, &$1);
 	} | section_declaration_list section_declaration {
 		$$ = unidirected_list_insert_head($1, &$2);
