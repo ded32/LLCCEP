@@ -4,37 +4,37 @@
 #include <cstdio>
 #include <cstring>
 #include <cerrno>
+#include <utility>
 
 #include "./../conf/conf.hpp"
 #include "setup.hpp"
 
-static void __readFile2vec(::std::string path, ::std::vector<uint8_t> &vec)
+static void __vm_load_dev(LLCCEP_vm::config conf)
 {
-	::std::ifstream in(path);
+	size_t offset = 0;
 
-	if (in.fail()) {
-		::std::fprintf(stderr, "Error!\nCan't open %s: %s!\n",
-		               path.c_str(), ::std::strerror(errno));
+	for (size_t i = 0; i < conf.dev.size(); i++) {
+		::std::fstream device(conf.dev[i]);
+		if (device.fail()) {
+			::std::fprintf(stderr, "Error!\nCan't open %s: %s!\nSkipping...",
+				       conf.dev[i].c_str(), ::std::strerror(errno));
+
+			offset++;
+			continue;
+		}
+
+		LLCCEP_vm::dev[i - offset] = ::std::move(device);
 	}
-
-	in.seekg(0, in.end);
-	size_t len = in.tellg();
-	in.seekg(0, in.beg);
-
-	char *buf = new char[len];
-	in.read(buf, len);
-
-	for (size_t i = 0; i < len - 1; i++)
-		vec.push_back(buf[i]);
 }
 
 namespace LLCCEP_vm {
 	double regs[32] = {};
 	void *mem = 0;
-	::std::vector<::std::vector<uint8_t> > dev;
-	
+
 	int dispW = 0;
 	int dispH = 0;
+
+	::std::vector<::std::fstream> dev;
 
 	void setup_vm(config conf)
 	{
@@ -43,11 +43,14 @@ namespace LLCCEP_vm {
 		dispW = conf.displayW;
 		dispH = conf.displayH;
 
-		for (size_t i = 0; i < conf.dev.size(); i++) {
-			::std::vector<uint8_t> tmp;
-			__readFile2vec(cong.dev[i], tmp);
+		__vm_load_dev(conf);
+	}
 
-			dev.push_back(tmp);
-		}
+	void free_vm_resources()
+	{
+		free(mem);
+
+		for (size_t i = 0; i < dev.size(); i++)
+			dev[i].close();
 	}
 }
