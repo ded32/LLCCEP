@@ -4,6 +4,7 @@ This module is one of the most important in the vm.
 It reads your configuration files for VM startup.
 
 Configuration files should look alike this one:
+
 vm: {                                     # Config root 
 	config: {                         # Config data
 		screen: {                 # Screen config
