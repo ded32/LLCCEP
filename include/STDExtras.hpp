@@ -13,6 +13,7 @@
 #include <climits>
 #include <stdexcept>
 #include <cstdint>
+#include <sstream>
 
 #if defined(__linux__)
 #include <linux/limits.h>
@@ -21,26 +22,36 @@
 #define yes true
 #define no false
 
+#define MAX_EXC_BUF_SIZE (512 * 1024)
+
 #define FATAL_ERROR(quit, place, fmt, ...) \
-({\
-	::std::fprintf(stderr, "Fatal error in " place\
-	                       ":\n%s file\n%d line\n%s function\n" fmt,\
-	                       __FILE__, __LINE__, __PRETTY_FUNCTION__, ##__VA_ARGS__);\
+({ \
+	::std::fprintf(stderr, "Fatal error in " place \
+	                       ":\n%s file\n%d line\n%s function\n" fmt, \
+	                       __FILE__, __LINE__, __PRETTY_FUNCTION__, ##__VA_ARGS__); \
 	\
-	if (quit)\
-		::std::exit(EXIT_FAILURE);\
+	if (quit) \
+		::std::exit(EXIT_FAILURE); \
 });
 
 #define QUITE_ERROR(quit, fmt, ...) \
-({\
-	::std::fprintf(stderr, fmt, ##__VA_ARGS__);\
+({ \
+	::std::fprintf(stderr, fmt, ##__VA_ARGS__); \
 	\
-	if (quit)\
-		::std::exit(EXIT_SUCCESS);\
+	if (quit) \
+		::std::exit(EXIT_SUCCESS); \
 });
 
-#define MAX_EXC_BUF_SIZE (512 * 1024)
-
+#define CONSTRUCT_MSG(fmt, ...) \
+({ \
+	::std::stringstream __res; \
+	char __str[MAX_EXC_BUF_SIZE] = ""; \
+	::std::sprintf(__str, fmt, ##__VA_ARGS__); \
+	__res << __str; \
+	\
+	__res.str().c_str(); \
+})
+	
 namespace LLCCEP {
 	class runtime_exception: public ::std::runtime_error {
 		char __text__[MAX_EXC_BUF_SIZE];
@@ -70,7 +81,7 @@ catch (::std::exception &exc) {\
 	           " content: %s", str.c_str());\
 } catch (int64_t &id) {\
 	FATAL_ERROR(yes, "default catch block", "caught "\
-	            "exception data: %lls", id);\
+	            "exception data: %zd", id);\
 } catch (...) {\
 	FATAL_ERROR(yes, "default catch block", "unknown "\
  	            "exception type");\

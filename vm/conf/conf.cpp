@@ -2,31 +2,35 @@
 #include <vector>
 #include <map>
 
-#include <stdint.h>
+#include <cstdint>
+#include <cstring>
+#include <cerrno>
 
 #include <libconfig.h++>
 #include <STDExtras.hpp>
+
+#include "conf.hpp"
 
 namespace LLCCEP_vm {
 	config read_configuration_file(::std::string path)
 	{
 		::libconfig::Config data;
-		const ::libconfig::Setting &root;
-		config conf = {
-			.displayW = 800,
-			.displayH = 640,
-			.ramS = 1024 * 1024 * 512
-		};
+		config conf = { };
+		conf.displayW = 800;
+		conf.displayH = 640;
+		conf.ramS = 1024 * 1024 * 512;
 
 		try {
-			data.readFile(path);
+			data.readFile(path.c_str());
 		} catch (const ::libconfig::FileIOException &exc) {
-			throw RUNTIME_EXCEPTION(exc.what());
+			throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
+				"FileIOException: reading file %s failed: %s!\n",
+				path.c_str(), strerror(errno)));
 		} catch (const ::libconfig::ParseException &exc) {
 			throw RUNTIME_EXCEPTION(exc.what());
 		} DEFAULT_HANDLING
 
-		root = data.getRoot();
+		const ::libconfig::Setting &root = data.getRoot();
 
 		try {
 			const ::libconfig::Setting &sc  = root["config"]["screen"],
@@ -36,7 +40,6 @@ namespace LLCCEP_vm {
 			sc.lookupValue("width",  conf.displayW);
 			sc.lookupValue("height", conf.displayH);
 			ram.lookupValue("size",  conf.ramS);
-			dev.lookupValue("dev",   conf.dev);
 		} catch (::libconfig::SettingNotFoundException &nf) {
 
 		} DEFAULT_HANDLING

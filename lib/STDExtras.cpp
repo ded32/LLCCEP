@@ -30,7 +30,7 @@
 namespace LLCCEP {
 	runtime_exception::runtime_exception():
 		runtime_error(""),
-		__text__("")
+		__text__()
 	{
 		FATAL_ERROR(yes, "runtime exception constructor",
    		                 "invalid initalization type:"
@@ -43,14 +43,13 @@ namespace LLCCEP {
 	                                     const char msg[1024],
 	                                     runtime_exception *cause):
 		runtime_error(msg),
-		__text__("")
+		__text__()
 	{
 		const char *data = MAKE_EXCEPTION_MESSAGE(
 		                     file, line, function,
 		                     msg, cause);
 
 		strcpy(__text__, data);
-		delete data;
 	}
 
 	runtime_exception::~runtime_exception() throw()
