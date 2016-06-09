@@ -7,5 +7,8 @@ int main()
 	::std::cout << "Screen: " << conf.displayW << "x" << conf.displayH << "\n" 
 	            << "RAM: " << conf.ramS << "\n";
 
+	for (size_t i = 0; i < conf.dev.size(); i++)
+		::std::cout << "Dev[" << i << "]: " << conf.dev[i] << "\n";
+
 	return 0;
 }

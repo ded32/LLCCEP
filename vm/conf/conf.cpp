@@ -35,11 +35,17 @@ namespace LLCCEP_vm {
 		try {
 			const ::libconfig::Setting &sc  = root["config"]["screen"],
 			                           &ram = root["config"]["ram"],
-			                           &dev = root["config"]["devices"];
+			                           &dev = root["config"]["devices"]["dev"];
 
-			sc.lookupValue("width",  conf.displayW);
+			sc.lookupValue("width", conf.displayW);
 			sc.lookupValue("height", conf.displayH);
 			ram.lookupValue("size",  conf.ramS);
+
+			for (size_t i = 0; i < dev.getLength(); i++) {
+				::std::string val = "";
+				dev.lookupValue("path", val);
+				conf.dev.push_back(val);
+			}
 		} catch (::libconfig::SettingNotFoundException &nf) {
 
 		} DEFAULT_HANDLING
