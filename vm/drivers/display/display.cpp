@@ -37,6 +37,45 @@ namespace LLCCEP_vm {
 		SDL_RendererClean(__sys__::renderer);
 	}
 
+	void handle_msg() 
+	{
+		
+	}
+
+	void set_clr(uint32_t clr)
+	{
+		SDL_SetRenderDrawColor(__sys__::renderer,
+		                       RGBA_R(clr),
+		                       RGBA_G(clr),
+		                       RGBA_B(clr),
+		                       RGBA_A(clr));
+	}
+
+	uint32_t get_clr()
+	{
+		uint32_t res = 0;
+		SDL_GetRenderDrawColor(__sys__::renderer,
+		                       ((uint8_t *)&res)[3],
+		                       ((uint8_t *)&res)[2],
+		                       ((uint8_t *)&res)[1],
+		                       ((uint8_t *)&res)[0]);
+
+		return res;
+	}
+
+	void set_pix(int posX, int posY)
+	{
+		SDL_RenderDrawPoint(__sys__::renderer, posX, posY);
+	}
+
+	uint32_t get_pix(int posX, int posY)
+	{
+		SDL_Surface *sfc = SDL_GetWindowSurface(__sys__::window);
+		UInt32 *pix = (UInt32 *)sfc->pixels;
+
+		return pix[(posY * sfc->width) + posX];
+	}
+
 	void kill_display()
 	{
 		SDL_DestroyRenderer(__sys__::renderer);
