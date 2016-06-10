@@ -37,9 +37,46 @@ namespace LLCCEP_vm {
 		SDL_RendererClean(__sys__::renderer);
 	}
 
-	void handle_msg() 
+	bool handle_msg() 
 	{
-		
+		SDL_Event ev = {};
+
+		while (SDL_PollEvent(&ev)) {
+			switch (ev.type) {
+				case SDL_QUIT:
+					return true;
+					break;
+
+				case SDL_KEYDOWN:
+					__sys__::__kb__::keys[ev.key.keysym.scancode] = true;
+					break;
+
+				case SDL_KEYUP:
+					__sys__::__kb__::keys[ev.key.keysym.scancode] = false;
+					break;
+
+				case SDL_MOUSEMOTION:
+					__sys__::__mouse__::x = ev.motion.x;
+					__sys__::__mouse__::y = ev.motion.y;
+					__sys__::__mouse__::buttons = ev.motion.state;
+					break;
+
+				case SDL_MOUSEBUTTONDOWN:
+					__sys__::__mouse__::x = ev.button.x;
+					__sys__::__mouse__::y = ev.button.y;
+					__sys__::__mouse__::buttons |= ev.button.button;
+					break;
+
+				case SDL_MOUSEBUTTONUP:
+					__sys__::__mouse__::x = ev.button.x;
+					__sys__::__mouse__::y = ev.button.y;
+					__sys__::__mouse__::buttons &= ~(ev.button.button);
+					break;
+
+				default:
+					break;
+			}
+		}
 	}
 
 	void set_clr(uint32_t clr)
