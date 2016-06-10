@@ -19,6 +19,16 @@ namespace LLCCEP_vm {
 	namespace __sys__ {
 		SDL_Window *window = 0;
 		SDL_Renderer *renderer = 0;
+
+		namespace __kb__ {
+			bool keys[256] = {};
+		}
+
+		namespace __mouse__ {
+			int x = 0;
+			int y = 0;
+			uint32_t buttons = 0;
+		}
 	}
 
 	bool init_display(::std::string title, int width, int height)
@@ -31,10 +41,13 @@ namespace LLCCEP_vm {
 		INIT_FAIL(!__sys__::window)
 
 		__sys__::renderer = SDL_CreateRenderer(__sys__::window, -1,
-		                                       SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENT_VSYNC);
+		                                       SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 		INIT_FAIL(!__sys__::renderer)
 
-		SDL_RendererClean(__sys__::renderer);
+		set_clr(RGB(0x0, 0x0, 0x0));
+		SDL_RenderClear(__sys__::renderer);
+
+		return true;
 	}
 
 	bool handle_msg() 
@@ -44,7 +57,7 @@ namespace LLCCEP_vm {
 		while (SDL_PollEvent(&ev)) {
 			switch (ev.type) {
 				case SDL_QUIT:
-					return true;
+					return false;
 					break;
 
 				case SDL_KEYDOWN:
@@ -76,7 +89,12 @@ namespace LLCCEP_vm {
 				default:
 					break;
 			}
+
+			SDL_RenderPresent(__sys__::renderer);
+			SDL_UpdateWindowSurface(__sys__::window);
 		}
+
+		return true;
 	}
 
 	void set_clr(uint32_t clr)
@@ -92,10 +110,10 @@ namespace LLCCEP_vm {
 	{
 		uint32_t res = 0;
 		SDL_GetRenderDrawColor(__sys__::renderer,
-		                       ((uint8_t *)&res)[3],
-		                       ((uint8_t *)&res)[2],
-		                       ((uint8_t *)&res)[1],
-		                       ((uint8_t *)&res)[0]);
+		                       ((uint8_t *)&res) + 3 * sizeof(uint8_t),
+		                       ((uint8_t *)&res) + 2 * sizeof(uint8_t),
+		                       ((uint8_t *)&res) + 1 * sizeof(uint8_t),
+		                       ((uint8_t *)&res) + 0 * sizeof(uint8_t));
 
 		return res;
 	}
@@ -108,9 +126,9 @@ namespace LLCCEP_vm {
 	uint32_t get_pix(int posX, int posY)
 	{
 		SDL_Surface *sfc = SDL_GetWindowSurface(__sys__::window);
-		UInt32 *pix = (UInt32 *)sfc->pixels;
+		uint32_t *pix = (uint32_t *)sfc->pixels;
 
-		return pix[(posY * sfc->width) + posX];
+		return pix[(posY * sfc->w) + posX];
 	}
 
 	void kill_display()
