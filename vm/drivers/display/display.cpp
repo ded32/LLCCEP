@@ -2,16 +2,35 @@
 #include <cstdio>
 #include <string>
 
+#include <STDExtras.hpp>
+
 #include "display.hpp"
 
 #define INIT_FAIL(cond) \
 ({ \
 	if (cond) { \
-		::std::fprintf(stderr, "Error!\n" \
-		               "Can't init display: %s!\n", \
-		               SDL_GetError()); \
-		\
-		return false; \
+		throw DEFAULT_EXCEPTION(CONSTRUCT_MSG( \
+			"Error!\n" \
+			"Can't init display: %s!\n", \
+			SDL_GetError())); \
+	} \
+});
+
+#define RUNNING_FATAL \
+({ \
+	if (::LLCCEP_vm::__sys__::window || ::LLCCEP_vm::__sys__::renderer) { \
+		throw DEFAULT_EXCEPTION(CONSTRUCT_MSG( \
+			"Error!\n" \
+			"Rendering suite already exists!\n")); \
+	} \
+});
+
+#define NON_RUNNING_FATAL \
+({ \
+	if (!(::LLCCEP_vm::__sys__::window && ::LLCCEP_vm::__sys__::renderer)) { \
+		throw DEFAULT_EXCEPTION(CONSTRUCT_MSG( \
+			"Error!\n" \
+			"No rendering suite for display!\n")); \
 	} \
 });
 
@@ -31,9 +50,9 @@ namespace LLCCEP_vm {
 		}
 	}
 
-	bool init_display(::std::string title, int width, int height)
+	void init_display(::std::string title, int width, int height)
 	{
-		INIT_FAIL(SDL_Init(SDL_INIT_EVERYTHING != 0))
+		RUNNING_FATAL
 
 		__sys__::window = SDL_CreateWindow(title.c_str(), SDL_WINDOWPOS_CENTERED,
 		                                   SDL_WINDOWPOS_CENTERED, width, height,
@@ -46,12 +65,12 @@ namespace LLCCEP_vm {
 
 		set_clr(RGB(0x0, 0x0, 0x0));
 		SDL_RenderClear(__sys__::renderer);
-
-		return true;
 	}
 
 	bool handle_msg() 
 	{
+		NON_RUNNING_FATAL
+
 		SDL_Event ev = {};
 
 		while (SDL_PollEvent(&ev)) {
@@ -99,6 +118,8 @@ namespace LLCCEP_vm {
 
 	void set_clr(uint32_t clr)
 	{
+		NON_RUNNING_FATAL
+
 		SDL_SetRenderDrawColor(__sys__::renderer,
 		                       RGBA_R(clr),
 		                       RGBA_G(clr),
@@ -108,6 +129,8 @@ namespace LLCCEP_vm {
 
 	uint32_t get_clr()
 	{
+		NON_RUNNING_FATAL
+
 		uint32_t res = 0;
 		SDL_GetRenderDrawColor(__sys__::renderer,
 		                       ((uint8_t *)&res) + 3 * sizeof(uint8_t),
@@ -120,21 +143,46 @@ namespace LLCCEP_vm {
 
 	void set_pix(int posX, int posY)
 	{
+		NON_RUNNING_FATAL
+
 		SDL_RenderDrawPoint(__sys__::renderer, posX, posY);
 	}
 
 	uint32_t get_pix(int posX, int posY)
 	{
+		NON_RUNNING_FATAL
+
 		SDL_Surface *sfc = SDL_GetWindowSurface(__sys__::window);
 		uint32_t *pix = (uint32_t *)sfc->pixels;
 
 		return pix[(posY * sfc->w) + posX];
 	}
 
+	int get_host_width()
+	{
+		SDL_DisplayMode mode = {};
+		SDL_GetCurrentDisplayMode(0, &mode);
+
+		return mode.w;
+	}
+
+	int get_host_height()
+	{
+		SDL_DisplayMode mode = {};
+		SDL_GetCurrentDisplayMode(0, &mode);
+
+		return mode.h;
+	}
+
 	void kill_display()
 	{
+		NON_RUNNING_FATAL
+
 		SDL_DestroyRenderer(__sys__::renderer);
 		SDL_DestroyWindow(__sys__::window);
 		SDL_Quit();
+
+		__sys__::window = 0;
+		__sys__::renderer = 0;
 	}
 }

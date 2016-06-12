@@ -23,10 +23,16 @@
 namespace LLCCEP_vm {
 	bool init_display(::std::string title, int width, int height);
 	bool handle_msg();
+
 	void set_clr(uint32_t clr);
 	uint32_t get_clr();
+
 	void set_pix(int posX, int posY);
 	uint32_t get_pix(int posX, int posY);
+
+	int get_host_width();
+	int get_host_height();
+
 	void kill_display();
 }
 
