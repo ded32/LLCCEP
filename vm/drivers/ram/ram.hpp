@@ -1,15 +1,34 @@
 #ifndef RAM_HPP
 #define RAM_HPP
 
+#include <cstring>
+
 namespace LLCCEP_vm {
-	void allocate_mem(size_t size_b);
+	inline void allocate_mem(size_t size_b);
+
+	inline uint8_t *get_mem(size_t offset);
 
 	template<class T>
-	T access_mem_data(size_t id);
-	template<class T>
-	void access_mem_data(size_t id, T val);
+	inline T access_mem_data(size_t id)
+	{
+		uint8_t *mem = get_mem(id);
+		union {
+			uint8_t data[sizeof(T)];
+			T val;
+		} conv;
 
-	void free_mem();
+		::std::memcpy(conv.data, mem, sizeof(T));
+
+		return conv.val;
+	}
+
+	template<class T>
+	inline void access_mem_data(size_t id, T val)
+	{
+		::std::memcpy(get_mem(id), &val, sizeof(T));
+	}
+
+	inline void free_mem();
 }
 
 #endif // RAM_HPP

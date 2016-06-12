@@ -24,19 +24,19 @@ namespace LLCCEP_vm {
 	bool init_display(::std::string title, int width, int height);
 	bool handle_msg();
 
-	void set_clr(uint32_t clr);
-	uint32_t get_clr();
+	inline void set_clr(uint32_t clr);
+	inline uint32_t get_clr();
 
-	void set_pix(int posX, int posY);
-	uint32_t get_pix(int posX, int posY);
+	inline void set_pix(int posX, int posY);
+	inline uint32_t get_pix(int posX, int posY);
 
-	int get_host_width();
-	int get_host_height();
+	inline int get_host_width();
+	inline int get_host_height();
 
-	bool get_captured_kb_state(uint8_t id);
-	unsigned get_captured_mouse_x();
-	unsigned get_captured_mouse_y();
-	unsigned get_captured_mouse_buttons_state();
+	inline bool get_captured_kb_state(uint8_t id);
+	inline unsigned get_captured_mouse_x();
+	inline unsigned get_captured_mouse_y();
+	inline unsigned get_captured_mouse_buttons_state();
 
 	void kill_display();
 }

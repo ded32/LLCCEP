@@ -13,7 +13,7 @@ namespace LLCCEP_vm {
 		size_t sizeb = 0;
 	}
 
-	void allocate_mem(size_t size_b) 
+	inline void allocate_mem(size_t size_b) 
 	{
 		__sys__::mem = ::std::calloc(size_b, 1);
 		if (!__sys__::mem) {
@@ -24,31 +24,18 @@ namespace LLCCEP_vm {
 		}
 	}
 
-	template<class T>
-	T access_mem_data(size_t id)
+	inline uint8_t *get_mem(size_t offset)
 	{
-		if (id + sizeof(T) >= __sys__::sizeb) {
+		if (offset >= __sys__::sizeb) {
 			throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
-				"Error!\n"
-				"Overbound due mem access!\n"));
+				"Error!\nOverbound due access!\n"
+			));
 		}
 
-		return (static_cast<T *>(__sys__::mem))[id];
+		return __sys__::mem + offset;
 	}
 
-	template<class T>
-	void access_mem_data(size_t id, T val)
-	{
-		if (id + sizeof(T) >= __sys__::sizeb) {
-			throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
-				"Error!\n"
-				"Overbound due mem access!\n"));
-		}
-
-		(static_cast<T *>(__sys__::mem))[id] = val;
-	}
-
-	void free_mem()
+	inline void free_mem()
 	{
 		if (__sys__::mem)	
 			free((void *)__sys__::mem);

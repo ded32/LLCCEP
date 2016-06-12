@@ -116,7 +116,7 @@ namespace LLCCEP_vm {
 		return true;
 	}
 
-	void set_clr(uint32_t clr)
+	inline void set_clr(uint32_t clr)
 	{
 		NON_RUNNING_FATAL
 
@@ -127,7 +127,7 @@ namespace LLCCEP_vm {
 		                       RGBA_A(clr));
 	}
 
-	uint32_t get_clr()
+	inline uint32_t get_clr()
 	{
 		NON_RUNNING_FATAL
 
@@ -141,14 +141,14 @@ namespace LLCCEP_vm {
 		return res;
 	}
 
-	void set_pix(int posX, int posY)
+	inline void set_pix(int posX, int posY)
 	{
 		NON_RUNNING_FATAL
 
 		SDL_RenderDrawPoint(__sys__::renderer, posX, posY);
 	}
 
-	uint32_t get_pix(int posX, int posY)
+	inline uint32_t get_pix(int posX, int posY)
 	{
 		NON_RUNNING_FATAL
 
@@ -158,7 +158,7 @@ namespace LLCCEP_vm {
 		return pix[(posY * sfc->w) + posX];
 	}
 
-	int get_host_width()
+	inline int get_host_width()
 	{
 		SDL_DisplayMode mode = {};
 		SDL_GetCurrentDisplayMode(0, &mode);
@@ -166,7 +166,7 @@ namespace LLCCEP_vm {
 		return mode.w;
 	}
 
-	int get_host_height()
+	inline int get_host_height()
 	{
 		SDL_DisplayMode mode = {};
 		SDL_GetCurrentDisplayMode(0, &mode);
@@ -174,22 +174,22 @@ namespace LLCCEP_vm {
 		return mode.h;
 	}
 
-	bool get_captured_kb_state(uint8_t id)
+	inline bool get_captured_kb_state(uint8_t id)
 	{
 		return __sys__::__kb__::keys[id]; 
 	}
 
-	unsigned get_captured_mouse_x()
+	inline unsigned get_captured_mouse_x()
 	{
 		return __sys__::__mouse__::x;
 	}
 
-	unsigned get_captured_mouse_y()
+	inline unsigned get_captured_mouse_y()
 	{
 		return __sys__::__mouse__::y;
 	}
 
-	unsigned get_captured_mouse_buttons_state()
+	inline unsigned get_captured_mouse_buttons_state()
 	{
 		return __sys__::__mouse__::buttons;
 	}
