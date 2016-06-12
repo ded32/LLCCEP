@@ -19,6 +19,7 @@ namespace LLCCEP_vm {
 		conf.displayW = 800;
 		conf.displayH = 640;
 		conf.ramS = 1024 * 1024 * 512;
+		conf.title = "LLCCEP VM";
 
 		try {
 			data.readFile(path.c_str());
@@ -40,6 +41,7 @@ namespace LLCCEP_vm {
 			sc.lookupValue("width", conf.displayW);
 			sc.lookupValue("height", conf.displayH);
 			ram.lookupValue("size",  conf.ramS);
+			root.lookupValue("title", conf.title);
 
 			for (size_t i = 0; i < dev.getLength(); i++) {
 				::std::string val = "";
