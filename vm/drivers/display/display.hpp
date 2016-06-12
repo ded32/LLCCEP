@@ -33,6 +33,11 @@ namespace LLCCEP_vm {
 	int get_host_width();
 	int get_host_height();
 
+	bool get_captured_kb_state(uint8_t id);
+	unsigned get_captured_mouse_x();
+	unsigned get_captured_mouse_y();
+	unsigned get_captured_mouse_buttons_state();
+
 	void kill_display();
 }
 

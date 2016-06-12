@@ -4,8 +4,8 @@
 #include "kb.hpp"
 
 namespace LLCCEP_vm {
-	void get_key_state(uint8_t code)
+	bool get_key_state(uint8_t code)
 	{
-		return __sys__::__kb__::keys[code];
+		return get_captured_kb_state(code);
 	}
 }

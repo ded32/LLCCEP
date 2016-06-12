@@ -174,6 +174,26 @@ namespace LLCCEP_vm {
 		return mode.h;
 	}
 
+	bool get_captured_kb_state(uint8_t id)
+	{
+		return __sys__::__kb__::keys[id]; 
+	}
+
+	unsigned get_captured_mouse_x()
+	{
+		return __sys__::__mouse__::x;
+	}
+
+	unsigned get_captured_mouse_y()
+	{
+		return __sys__::__mouse__::y;
+	}
+
+	unsigned get_captured_mouse_buttons_state()
+	{
+		return __sys__::__mouse__::buttons;
+	}
+
 	void kill_display()
 	{
 		NON_RUNNING_FATAL
