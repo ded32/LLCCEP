@@ -9,6 +9,9 @@
 #include "./../conf/conf.hpp"
 #include "setup.hpp"
 
+#include "./../drivers/display/display.hpp"
+#include "./../drivers/ram/ram.hpp"
+
 static void __vm_load_dev(::LLCCEP_vm::config conf)
 {
 	for (size_t i = 0; i < conf.dev.size(); i++) {
@@ -18,29 +21,31 @@ static void __vm_load_dev(::LLCCEP_vm::config conf)
 }
 
 namespace LLCCEP_vm {
-	double regs[32] = {};
-	void *mem = 0;
-
-	int dispW = 0;
-	int dispH = 0;
-
 	::std::vector<FILE *> dev;
 
 	void setup_vm(config conf)
 	{
-		mem = calloc(1, conf.ramS);
-
-		dispW = conf.displayW;
-		dispH = conf.displayH;
-
 		__vm_load_dev(conf);
+
+		if (conf.displayW < 0 ||
+		    conf.displayH < 0) {
+			init_display(conf.title.c_str(), 
+			             get_host_width(),
+			             get_host_height());
+		} else {
+			init_display(conf.title.c_str(),
+			             conf.dispayW, conf.displayH);
+		}
+
+		allocate_mem(conf.memS);
 	}
 
 	void free_vm_resources()
 	{
-		free(mem);
+		free_mem();
+		kill_display();
 
 		for (size_t i = 0; i < dev.size(); i++)
-			fclose(dev[i]);
+			fclose(dev[i]);		
 	}
 }
