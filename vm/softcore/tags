@@ -1,0 +1,70 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.9~svn20110310	//
+LLCCEP_vm	softcore.cpp	/^namespace LLCCEP_vm {$/;"	n	file:
+LLCCEP_vm	softcore.hpp	/^namespace LLCCEP_vm {$/;"	n
+LLCCEP_vm::__added__	softcore.cpp	/^	namespace __added__ {$/;"	n	namespace:LLCCEP_vm	file:
+LLCCEP_vm::__added__::cmp	softcore.cpp	/^		double cmp = 0;$/;"	m	namespace:LLCCEP_vm::__added__	file:
+LLCCEP_vm::__added__::regs	softcore.cpp	/^		double regs[32] = {};$/;"	m	namespace:LLCCEP_vm::__added__	file:
+LLCCEP_vm::__added__::stk	softcore.cpp	/^		::std::stack<double> stk;$/;"	m	namespace:LLCCEP_vm::__added__	file:
+LLCCEP_vm::funcs	softcore.hpp	/^	void (*funcs[])(instruction &data) = {$/;"	m	namespace:LLCCEP_vm
+SOFTCORE_HPP	softcore.hpp	2;"	d
+__added__	softcore.cpp	/^	namespace __added__ {$/;"	n	namespace:LLCCEP_vm	file:
+cmp	softcore.cpp	/^		double cmp = 0;$/;"	m	namespace:LLCCEP_vm::__added__	file:
+emulated_add	softcore.cpp	/^inline void emulated_add(LLCCEP_vm::instruction &data)$/;"	f	signature:(LLCCEP_vm::instruction &data)
+emulated_add	softcore.hpp	/^inline void emulated_add(LLCCEP_vm::instruction &data);$/;"	p	signature:(LLCCEP_vm::instruction &data)
+emulated_and	softcore.cpp	/^inline void emulated_and(LLCCEP_vm::instruction &data)$/;"	f	signature:(LLCCEP_vm::instruction &data)
+emulated_and	softcore.hpp	/^inline void emulated_and(LLCCEP_vm::instruction &data);$/;"	p	signature:(LLCCEP_vm::instruction &data)
+emulated_cmp	softcore.cpp	/^inline void emulated_cmp(LLCCEP_vm::instruction &data)$/;"	f	signature:(LLCCEP_vm::instruction &data)
+emulated_cmp	softcore.hpp	/^inline void emulated_cmp(LLCCEP_vm::instruction &data);$/;"	p	signature:(LLCCEP_vm::instruction &data)
+emulated_cos	softcore.cpp	/^inline void emulated_cos(LLCCEP_vm::instruction &data)$/;"	f	signature:(LLCCEP_vm::instruction &data)
+emulated_cos	softcore.hpp	/^inline void emulated_cos(LLCCEP_vm::instruction &data);$/;"	p	signature:(LLCCEP_vm::instruction &data)
+emulated_dec	softcore.cpp	/^inline void emulated_dec(LLCCEP_vm::instruction &data)$/;"	f	signature:(LLCCEP_vm::instruction &data)
+emulated_dec	softcore.hpp	/^inline void emulated_dec(LLCCEP_vm::instruction &data);$/;"	p	signature:(LLCCEP_vm::instruction &data)
+emulated_dev	softcore.cpp	/^inline void emulated_dev(LLCCEP_vm::instruction &data)$/;"	f	signature:(LLCCEP_vm::instruction &data)
+emulated_dev	softcore.hpp	/^inline void emulated_dev(LLCCEP_vm::instruction &data);$/;"	p	signature:(LLCCEP_vm::instruction &data)
+emulated_inc	softcore.cpp	/^inline void emulated_inc(LLCCEP_vm::instruction &data)$/;"	f	signature:(LLCCEP_vm::instruction &data)
+emulated_inc	softcore.hpp	/^inline void emulated_inc(LLCCEP_vm::instruction &data);$/;"	p	signature:(LLCCEP_vm::instruction &data)
+emulated_ldc	softcore.cpp	/^inline void emulated_ldc(LLCCEP_vm::instruction &data)$/;"	f	signature:(LLCCEP_vm::instruction &data)
+emulated_ldc	softcore.hpp	/^inline void emulated_ldc(LLCCEP_vm::instruction &data);$/;"	p	signature:(LLCCEP_vm::instruction &data)
+emulated_mov	softcore.cpp	/^inline void emulated_mov(LLCCEP_vm::instruction &data)$/;"	f	signature:(LLCCEP_vm::instruction &data)
+emulated_mov	softcore.hpp	/^inline void emulated_mov(LLCCEP_vm::instruction &data);$/;"	p	signature:(LLCCEP_vm::instruction &data)
+emulated_mul	softcore.cpp	/^inline void emulated_mul(LLCCEP_vm::instruction &data)$/;"	f	signature:(LLCCEP_vm::instruction &data)
+emulated_mul	softcore.hpp	/^inline void emulated_mul(LLCCEP_vm::instruction &data);$/;"	p	signature:(LLCCEP_vm::instruction &data)
+emulated_mva	softcore.cpp	/^inline void emulated_mva(LLCCEP_vm::instruction &data)$/;"	f	signature:(LLCCEP_vm::instruction &data)
+emulated_mva	softcore.hpp	/^inline void emulated_mva(LLCCEP_vm::instruction &data);$/;"	p	signature:(LLCCEP_vm::instruction &data)
+emulated_nop	softcore.cpp	/^inline void emulated_nop(LLCCEP_vm::instruction &data)$/;"	f	signature:(LLCCEP_vm::instruction &data)
+emulated_nop	softcore.hpp	/^inline void emulated_nop(LLCCEP_vm::instruction &data);$/;"	p	signature:(LLCCEP_vm::instruction &data)
+emulated_off	softcore.cpp	/^inline void emulated_off(LLCCEP_vm::instruction &data)$/;"	f	signature:(LLCCEP_vm::instruction &data)
+emulated_off	softcore.hpp	/^inline void emulated_off(LLCCEP_vm::instruction &data);$/;"	p	signature:(LLCCEP_vm::instruction &data)
+emulated_or	softcore.cpp	/^inline void emulated_or(LLCCEP_vm::instruction &data)$/;"	f	signature:(LLCCEP_vm::instruction &data)
+emulated_or	softcore.hpp	/^inline void emulated_or(LLCCEP_vm::instruction &data);$/;"	p	signature:(LLCCEP_vm::instruction &data)
+emulated_outp	softcore.cpp	/^inline void emulated_outp(LLCCEP_vm::instruction &data)$/;"	f	signature:(LLCCEP_vm::instruction &data)
+emulated_outp	softcore.hpp	/^inline void emulated_outp(LLCCEP_vm::instruction &data);$/;"	p	signature:(LLCCEP_vm::instruction &data)
+emulated_patan	softcore.cpp	/^inline void emulated_patan(LLCCEP_vm::instruction &data)$/;"	f	signature:(LLCCEP_vm::instruction &data)
+emulated_patan	softcore.hpp	/^inline void emulated_patan(LLCCEP_vm::instruction &data);$/;"	p	signature:(LLCCEP_vm::instruction &data)
+emulated_pop	softcore.cpp	/^inline void emulated_pop(LLCCEP_vm::instruction &data)$/;"	f	signature:(LLCCEP_vm::instruction &data)
+emulated_pop	softcore.hpp	/^inline void emulated_pop(LLCCEP_vm::instruction &data);$/;"	p	signature:(LLCCEP_vm::instruction &data)
+emulated_ptan	softcore.cpp	/^inline void emulated_ptan(LLCCEP_vm::instruction &data)$/;"	f	signature:(LLCCEP_vm::instruction &data)
+emulated_ptan	softcore.hpp	/^inline void emulated_ptan(LLCCEP_vm::instruction &data);$/;"	p	signature:(LLCCEP_vm::instruction &data)
+emulated_push	softcore.cpp	/^inline void emulated_push(LLCCEP_vm::instruction &data)$/;"	f	signature:(LLCCEP_vm::instruction &data)
+emulated_push	softcore.hpp	/^inline void emulated_push(LLCCEP_vm::instruction &data);$/;"	p	signature:(LLCCEP_vm::instruction &data)
+emulated_sin	softcore.cpp	/^inline void emulated_sin(LLCCEP_vm::instruction &data)$/;"	f	signature:(LLCCEP_vm::instruction &data)
+emulated_sin	softcore.hpp	/^inline void emulated_sin(LLCCEP_vm::instruction &data);$/;"	p	signature:(LLCCEP_vm::instruction &data)
+emulated_sqrt	softcore.cpp	/^inline void emulated_sqrt(LLCCEP_vm::instruction &data)$/;"	f	signature:(LLCCEP_vm::instruction &data)
+emulated_sqrt	softcore.hpp	/^inline void emulated_sqrt(LLCCEP_vm::instruction &data);$/;"	p	signature:(LLCCEP_vm::instruction &data)
+emulated_sub	softcore.cpp	/^inline void emulated_sub(LLCCEP_vm::instruction &data)$/;"	f	signature:(LLCCEP_vm::instruction &data)
+emulated_sub	softcore.hpp	/^inline void emulated_sub(LLCCEP_vm::instruction &data);$/;"	p	signature:(LLCCEP_vm::instruction &data)
+emulated_swi	softcore.cpp	/^inline void emulated_swi(LLCCEP_vm::instruction &data)$/;"	f	signature:(LLCCEP_vm::instruction &data)
+emulated_swi	softcore.hpp	/^inline void emulated_swi(LLCCEP_vm::instruction &data);$/;"	p	signature:(LLCCEP_vm::instruction &data)
+emulated_top	softcore.cpp	/^inline void emulated_top(LLCCEP_vm::instruction &data)$/;"	f	signature:(LLCCEP_vm::instruction &data)
+emulated_top	softcore.hpp	/^inline void emulated_top(LLCCEP_vm::instruction &data);$/;"	p	signature:(LLCCEP_vm::instruction &data)
+emulated_xor	softcore.cpp	/^inline void emulated_xor(LLCCEP_vm::instruction &data)$/;"	f	signature:(LLCCEP_vm::instruction &data)
+emulated_xor	softcore.hpp	/^inline void emulated_xor(LLCCEP_vm::instruction &data);$/;"	p	signature:(LLCCEP_vm::instruction &data)
+funcs	softcore.hpp	/^	void (*funcs[])(instruction &data) = {$/;"	m	namespace:LLCCEP_vm
+get	softcore.cpp	/^inline double get(LLCCEP_vm::arg &data) $/;"	f	signature:(LLCCEP_vm::arg &data)
+regs	softcore.cpp	/^		double regs[32] = {};$/;"	m	namespace:LLCCEP_vm::__added__	file:
+stk	softcore.cpp	/^		::std::stack<double> stk;$/;"	m	namespace:LLCCEP_vm::__added__	file:

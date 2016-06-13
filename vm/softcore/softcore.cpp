@@ -1,11 +1,88 @@
 #include <stack>
 
+#include "./../drivers/ram/ram.hpp"
+
 #include "softcore.hpp"
-#include "./../program.hpp"
+#include "fp.h"
+#include "./../program/program.hpp"
 
 namespace LLCCEP_vm {
 	namespace __added__ {
 		::std::stack<double> stk;
+		double cmp = 0;
+		double regs[32] = {};
+	}
+}
+
+inline double get(LLCCEP_vm::arg &data) 
+{
+	switch (data.type) {
+		case ARG_T_REG:
+			if (DBL_AE(data.val, 31) || 
+			    DBL_L(data.val, 0)) {
+				throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
+					"Error!\n"
+					"Overbounding while reading data from register!\n"));
+			} else
+				return LLCCEP_vm::__added__::regs[static_cast<long long>(data.val)];
+			break;
+
+		case ARG_T_MEM:
+			if (DBL_AE(data.val, get_mem_size()) ||
+			    DBL_L(data.val, 0)) {
+				throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
+					"Error!\n"
+					"Overbouding while reading data from RAM!\n"));
+			} else
+				return access_mem_data<double>(static_cast<long long>(data.val));
+			break;
+
+		case ARG_T_VAL:
+			return data.val;
+			break;
+
+		default:
+			throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
+				"Error!\n"
+				"Invalid or damaged binary file!\n"));
+	}
+
+	return 0;
+}
+
+inline void set(LLCCEP_vm::arg &what, double val)
+{
+	switch (data.type) {
+		case ARG_T_REG:
+			if (DBL_AE(data.val, 31) ||
+			    DBL_L(data.val, 0)) {
+				throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
+					"Error!\n"
+					"Overbounding while writing data to register!\n"));
+			} else
+				LLCCEP_vm::__added__::regs[what.val] = val;
+			break;
+
+		case ARG_T_MEM:
+			if (DBL_AE(data.val, get_mem_size()) ||
+			    DBL_L(data.val, 0)) {
+				throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
+					"Error!\n"
+					"Overbounding while writing data to mem!\n"));
+			} else
+				access_mem_data<double>(static_cast<long long>(data.val), val);
+			break;
+
+		case ARG_T_VAL:
+			throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
+				"Error!\n"
+				"An attempt of writing data to non-memory!\n"));
+			break;
+
+		default:
+			throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
+				"Error!\n"
+				"Invalid or damaged binary file!\n"));
 	}
 }
 
@@ -16,7 +93,9 @@ inline void emulated_mov(LLCCEP_vm::instruction &data)
 
 inline void emulated_mva(LLCCEP_vm::instruction &data)
 {
-	set
+	access_mem_data<double>(
+		static_cast<long long unsigned>(get(data.args[0])), 
+		get(data.args[1]));
 }
 
 inline void emulated_push(LLCCEP_vm::instruction &data)
@@ -98,7 +177,7 @@ inline void emulated_swi(LLCCEP_vm::instruction &data)
 
 inline void emulated_cmp(LLCCEP_vm::instruction &data)
 {
-	// TODO: internal cmp stuff
+	LLCCEP_vm::__added__::cmp = get(data.args[0]) - get(data.args[1]);
 }
 
 inline void emulated_inc(LLCCEP_vm::instruction &data)
@@ -174,5 +253,9 @@ inline void emulated_ldc(LLCCEP_vm::instruction &data)
 
 inline void emulated_outp(LLCCEP_vm::instruction &data)
 {
-	// TODO: Internal stuff, do later
+	switch (get(data.args[0])) {
+		case 0:
+			set_clr(get(data.args[2]));
+			break;		
+	}
 }
