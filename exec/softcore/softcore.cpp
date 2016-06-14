@@ -1,5 +1,8 @@
 #include <stack>
 #include <cmath>
+#include <fstream>
+
+#include <STDExtras.hpp>
 
 #include "./../drivers/ram/ram.hpp"
 
@@ -12,6 +15,9 @@ namespace LLCCEP_vm {
 		::std::stack<double> stk;
 		double cmp = 0;
 		double regs[32] = {};
+
+		::std::vector<::std::ifstream> inputs;
+		::std::vector<::std::ofstream> outputs;
 	}
 }
 
@@ -174,26 +180,87 @@ static inline void emulated_nop(LLCCEP_vm::instruction &data)
 static void emulated_swi(LLCCEP_vm::instruction &data)
 {
 	switch (static_cast<long long unsigned>(get(data.args[0]))) {
-		case 0: // out char
+		/***************************************************************************
+		 * Output character
+		 *
+		 * Inputs:
+		 * r00 - (double)chr
+		 * 
+		 * Outputs:
+		 * None
+		 *
+		 * Used data:
+		 * chr - characted being printed
+		 **************************************************************************/
+		case 0:
 			::std::cout << static_cast<unsigned char>(LLCCEP_vm::__added__::regs[0]);
 			break;
 
-		case 1: // round num
-			LLCCEP_vm::__added__::regs[1] = static_cast<long long>(LLCCEP_vm::__added__::regs[0] + 0.5);
+		/***************************************************************************
+		 * Integer number
+		 *
+		 * Inputs:
+		 * r00 - val
+		 *
+		 * Outputs:
+		 * r01 - (long long)r00
+		 *
+		 * Used data:
+		 * val - value being integered
+		 **************************************************************************/
+		case 1:
+			LLCCEP_vm::__added__::regs[1] = static_cast<long long>(LLCCEP_vm::__added__::regs[0]);
 			break;
 
-		case 2: // out string
-			::std::cout << access_mem_data<char *>(static_cast<long long unsigned>(LLCCEP_vm::__added__::regs[0]));
+		/***************************************************************************
+		 * Output string
+		 * 
+		 * Inputs:
+		 * r00 - ptr
+		 * 
+		 * Outputs:
+		 * None
+		 *
+		 * Used data:
+		 * ptr - pointer to string being printed
+		 **************************************************************************/
+		case 2:
+			::std::cout << access_mem_data<char *>(static_cast<size_t>(LLCCEP_vm::__added__::regs[0]));
 			break;
 
-		case 3: { // read char
+		/***************************************************************************
+		 * Read char
+		 * 
+		 * Inputs:
+		 * None
+		 *
+		 * Outputs:
+		 * r00 - val
+		 *
+		 * Used data:
+		 * val - char was entered last time
+		 **************************************************************************/
+		case 3: {
 			unsigned char val = 0;
 			::std::cin >> val;
 			LLCCEP_vm::__added__::regs[0] = val;
 			break;
 		}
 
-		case 4: {  // read string
+		/***************************************************************************
+		 * Read string
+		 *
+		 * Inputs:
+		 * r00 - ptr
+		 * 
+		 * Outputs:
+		 * ram[r00] - str
+		 *
+		 * Used data:
+		 * ptr - pointer to place, where to put string
+		 * str - string was entered
+		 **************************************************************************/
+		case 4: {
 			::std::string val = "";
 			::std::cin >> val;
 
@@ -203,9 +270,13 @@ static void emulated_swi(LLCCEP_vm::instruction &data)
 			break;
 		}
 
+		/***************************************************************************
+		 * Only emulator interrupts[sys calls]
+		 **************************************************************************/
+
 #if !VM
-		case 7: { // open file
-			if (static_cast<long long>(LLCCEP_vm::__added__::regs[0]) == 0)) {
+		case 7: {
+			if (static_cast<size_t>(LLCCEP_vm::__added__::regs[0]) == 0)) {
 				::std::ifstream in;
 				in.open(LLCCEP_vm::get_mem(static_cast<size_t>(LLCCEP_vm::__added__::regs[1])));
 				LLCCEP_vm::__added__::inputs.push_back(::std::move(in));
@@ -218,52 +289,112 @@ static void emulated_swi(LLCCEP_vm::instruction &data)
 		}
 
 		case 9: { // close file
-			if (static_cast<long long>(LLCCEP_vm::__added__::regs[0]) == 0) {
-				if (static_cast<long long>(LLCCEP_vm::__added__::regs[1]) >= LLCCEP_vm::__added__::inputs.size() ||
-				    static_cast<long long>(LLCCEP_vm::__added__::regs[1]) < 0) {
+			if (static_cast<size_t>(LLCCEP_vm::__added__::regs[0]) == 0) {
+				if (static_cast<size_t>(LLCCEP_vm::__added__::regs[1]) >= LLCCEP_vm::__added__::inputs.size()) {
 					throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
-						"Overbounding due file accessing: no 'r' file %lls",
-						static_cast<long long>(LLCCEP_vm::__added__::regs[1])));
+						"Overbounding due file accessing: no 'r' file %zu",
+						static_cast<size_t>(LLCCEP_vm::__added__::regs[1])));
 				}
 
-				LLCCEP_vm::__added__::inputs[static_cast<long long>(LLCCEP_vm::__added__::regs[1])].close();
+				LLCCEP_vm::__added__::inputs[static_cast<size_t>(LLCCEP_vm::__added__::regs[1])].close();
 			} else {
-				if (static_cast<long long>(LLCCEP_vm::__added__::regs[1]) >= LLCCEP_vm::__added__::outputs.size() ||
-				    static_cast<long long>(LLCCEP_vm::__added__::regs[1]) < 0) {
+				if (static_cast<size_t>(LLCCEP_vm::__added__::regs[1]) >= LLCCEP_vm::__added__::outputs.size()) {
 					throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
-						"Overbounding due file accessing: no 'w' file %lls",
-						static_cast<long long>(LLCCEP_vm::__added__::regs[1]))));
+						"Overbounding due file accessing: no 'w' file %zu",
+						static_cast<size_t>(LLCCEP_vm::__added__::regs[1]))));
 				}
 
-				LLCCEP_vm::__added__::outputs[static_cast<long long>(LLCCEP_vm::__added__::regs[1])].close();
+				LLCCEP_vm::__added__::outputs[static_cast<size_t>(LLCCEP_vm::__added__::regs[1])].close();
 			}
 			break;
 		}
 
 		case 10: { // r/w byte to/from file
-			if (static_cast<long long>(LLCCEP_vm::__added__::regs[0]) == 0) {
-				if (static_cast<long long>(LLCCEP_vm::__added__::regs[1]) >= LLCCEP_vm::__added__::inputs.size() ||
-				    static_cast<long long>(LLCCEP_vm::__added__::regs[1]) < 0) {
+			if (static_cast<size_t>(LLCCEP_vm::__added__::regs[0]) == 0) {
+				if (static_cast<size_t>(LLCCEP_vm::__added__::regs[1]) >= LLCCEP_vm::__added__::inputs.size()) {
 					throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
-						"Overbounding due file accessing: no 'r' file %lls",
-						static_cast<long long>(LLCCEP_vm::__added__::regs[1])));
+						"Overbounding due file accessing: no 'r' file %zu",
+						static_cast<size_t>(LLCCEP_vm::__added__::regs[1])));
 				}
 
 				uint8_t val;
-				LLCCEP_vm::__added__::inputs[static_cast<long long>(LLCCEP_vm::__added__::regs[1])] >> val;
+				LLCCEP_vm::__added__::inputs[static_cast<size_t>(LLCCEP_vm::__added__::regs[1])] >> val;
 				LLCCEP_vm::__added__::regs[2] = val;
 			} else {
-				if (static_cast<long long>(LLCCEP_vm::__added__::regs[1]) >= LLCCEP_vm::__added__::outputs.size() ||
-				    static_cast<long long>(LLCCEP_vm::__added__::regs[1]) < 0) {
+				if (static_cast<size_t>(LLCCEP_vm::__added__::regs[1]) >= LLCCEP_vm::__added__::outputs.size()) {
 					throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
-						"Overbounding due file accessing: no 'w' file %lls",
-						static_cast<long long>(LLCCEP_vm::__added__::regs[1])));
+						"Overbounding due file accessing: no 'w' file %zu",
+						static_cast<size_t>(LLCCEP_vm::__added__::regs[1])));
 				}
 
-				LLCCEP_vm::__added__::inputs[static_cast<long long>(LLCCEP_vm::__added__::regs[1])] <<
+				LLCCEP_vm::__added__::inputs[static_cast<size_t>(LLCCEP_vm::__added__::regs[1])] <<
 					static_cast<uint8_t>(LLCCEP_vm::__added__::regs[2]);
 			}
 			break;
+		}
+
+		case 11: { // create window
+			LLCCEP_vm::window new_wnd(LLCCEP_vm::get_mem(static_cast<size_t>(LLCCEP_vm::__added__::regs[0])),
+			                          static_cast<uint16_t>(LLCCEP_vm::__added__::regs[0]),
+			                          static_cast<uint16_t>(LLCCEP_vm::__added__::regs[0]));
+			LLCCEP_vm::__added__::windows(::std::move(new_wnd));
+			break;
+		}
+
+		case 12: { // delete window
+			if (static_cast<size_t>(LLCCEP_vm::__added__::regs[0]) >= LLCCEP_vm::__added__::windows.size()) {
+				throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
+					"Overbounding due window accessing: no window %zu",
+					static_cast<size_t>(LLCCEP_vm::__added__::regs[1])));
+			}
+
+			LLCCEP_vm::__added__::windows[static_cast<size_t>(LLCCEP_vm::__added__::regs[0])].close();
+			LLCCEP_vm::__added__::windows.erase(LLCCEP_vm::__added__::window.begin + static_cast<size_t>(
+				LLCCEP_vm::__added__::regs[0]));
+
+			break;
+		}
+
+		case 13: { // on-window drawing
+			size_t id = static_cast<size_t>(LLCCEP_vm::__added__::regs[0]);
+			if (id >= LLCCEP_vm::__added__::window.size()) {
+				throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
+					"Overbounding due window accessing: no window %zu",
+					static_cast<size_t>(LLCCEP_vm::__added__::regs[0])));
+			}
+
+			switch (static_cast<int64_t>(LLCCEP_vm::__added__::regs[1])) {
+				case 0:
+					LLCCEP_vm::__added__::windows[id].set_clr(static_cast<uint32_t>(
+						LLCCEP_vm::__added__::regs[2]));
+					break;
+
+				case 1:
+					LLCCEP_vm::__added__::regs[2] = LLCCEP_vm::__added__::windows[id].get_clr();
+					break;
+
+				case 2: {
+					uint16_t pos[2] = {
+						 static_cast<uint32_t>(LLCCEP_vm::__added__::regs[2])          & 0xFFFF,
+						(static_cast<uint32_t>(LLCCEP_vm::__added__::regs[2]) >> 0x10) & 0xFFFF
+					};
+					LLCCEP_vm::__added__::windows[id].set_pix(pos[0], pos[1]);
+				}
+
+				case 3: {
+					uint16_t pos[2] = {
+						 static_cast<uint32_t>(LLCCEP_vm::__added__::regs[2])          & 0xFFFF,
+						(static_cast<uint32_t>(LLCCEP_vm::__added__::regs[2]) >> 0x10) & 0xFFFF
+					};
+					LLCCEP_vm::__added__::regs[3] = LLCCEP_vm::__added__::windows[id].get_pix(pos[0], pos[1]);
+				}
+
+				default:
+					throw DEFAULT_EXCEPTION(CONSTRUCT_MSG(
+						"Error!\n"
+						"No function %zd of 13th interrupt!\n",
+						static_cast<int64_t>(LLCCEP_vm::__added__::regs[0])));
+			}
 		}
 #endif
 
@@ -353,50 +484,54 @@ static void emulated_ldc(LLCCEP_vm::instruction &data)
 
 static void emulated_outp(LLCCEP_vm::instruction &data)
 {
-	switch (static_cast<long long>(get(data.args[0]))) {
+	switch (static_cast<size_t>(get(data.args[0]))) {
+#if VM
 		case 0:
 			LLCCEP_vm::set_clr(static_cast<uint32_t>(get(data.args[1])));
 			break;
 
 		case 1: {
 			uint16_t pos[2] = {
-				static_cast<long long>(get(data.args[1])) & 0xFFFF,
-				(static_cast<long long>(get(data.args[1])) >> 16) & 0xFFFF
+				 static_cast<uint16_t>(get(data.args[1]))        & 0xFFFF,
+				(static_cast<uint16_t>(get(data.args[1])) >> 16) & 0xFFFF
 			};
 			LLCCEP_vm::set_pix(pos[0], pos[1]);
 
 			break;
 		}
+#endif // VM
 
 		default:
 			throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
 				"Error!\n"
-				"No port #%lls!\n",
-				static_cast<long long>(get(data.args[0]))));
+				"No port #%zu!\n",
+				static_cast<size_t>(get(data.args[0]))));
 	}
 }
 
 static void emulated_inp(LLCCEP_vm::instruction &data)
 {
-	switch (static_cast<long long>(get(data.args[0]))) {
+	switch (static_cast<size_t>(get(data.args[0]))) {
+#if VM
 		case 0:
 			set(data.args[1], LLCCEP_vm::get_clr());
 			break;
 
 		case 1: {
 			uint16_t pos[2] = {
-				static_cast<long long>(get(data.args[1]) & 0xFFFF,
-				(static_cast<long long>(get(data.args[1])) >> 16) & 0xFFFF;
+				 static_cast<uint16_t>(get(data.args[1])         & 0xFFFF,
+				(static_cast<uint16_t>(get(data.args[1])) >> 16) & 0xFFFF;
 			};
 			set(data.args[2], LLCCEP_vm::get_pix(pos[0], pos[1]));
 			break;
 		}
+#endif // VM
 
 		default:
 			throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
 				"Error!\n"
-				"No port #%lls!\n",
-				static_cast<long long>(get(data.args[0]))));
+				"No port #%zu!\n",
+				static_cast<size_t>(get(data.args[0]))));
 	}
 }
 
