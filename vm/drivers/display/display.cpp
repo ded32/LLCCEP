@@ -141,14 +141,14 @@ namespace LLCCEP_vm {
 		return res;
 	}
 
-	inline void set_pix(int posX, int posY)
+	inline void set_pix(uint16_t posX, uint16_t posY)
 	{
 		NON_RUNNING_FATAL
 
 		SDL_RenderDrawPoint(__sys__::renderer, posX, posY);
 	}
 
-	inline uint32_t get_pix(int posX, int posY)
+	inline uint32_t get_pix(uint16_t posX, uint16_t posY)
 	{
 		NON_RUNNING_FATAL
 

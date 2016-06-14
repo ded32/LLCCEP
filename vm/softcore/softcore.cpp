@@ -3,7 +3,7 @@
 #include "./../drivers/ram/ram.hpp"
 
 #include "softcore.hpp"
-#include "fp.h"
+#include "fp.hpp"
 #include "./../program/program.hpp"
 
 namespace LLCCEP_vm {
@@ -14,7 +14,7 @@ namespace LLCCEP_vm {
 	}
 }
 
-inline double get(LLCCEP_vm::arg &data) 
+double get(LLCCEP_vm::arg &data) 
 {
 	switch (data.type) {
 		case ARG_T_REG:
@@ -50,7 +50,7 @@ inline double get(LLCCEP_vm::arg &data)
 	return 0;
 }
 
-inline void set(LLCCEP_vm::arg &what, double val)
+void set(LLCCEP_vm::arg &what, double val)
 {
 	switch (data.type) {
 		case ARG_T_REG:
@@ -172,7 +172,53 @@ inline void emulated_nop(LLCCEP_vm::instruction &data)
 
 inline void emulated_swi(LLCCEP_vm::instruction &data)
 {
-	// TODO: internal swi stuff
+	switch (static_cast<long long unsigned>(get(data.args[0]))) {
+		case 0: // out char
+			::std::cout << static_cast<unsigned char(get(data.args[1]));
+			break;
+
+		case 1: // out num
+			::std::cout << get(data.args[1]);
+			break;
+
+		case 2: // round num
+			set(data.args[1], static_cast<long long>(get(data.args[2]) + 0.5));
+			break;
+
+		case 3: // out string
+			::std::cout << access_mem_data<char *>(static_cast<long long unsigned>(get(data.args[1])));
+			break;
+
+		case 4: {
+			unsigned char val = 0;
+			::std::cin >> val;
+			set(data.args[1], val);
+			break;
+		}
+
+		case 5: {
+			double val = 0;
+			::std::cin >> val;
+			set(data.args[1], val);
+			break
+		}
+
+		case 6: {
+			::std::string val = "";
+			::std::cin >> val;
+
+			for (size_t i = 0; i < val.length(); i++)
+				access_mem_data<char>(static_cast<long long unsigned>(get(data.args[1])), val[i]);
+
+			break;
+		}
+
+		default:
+			throw DEFAULT_EXCEPTION(CONSTRUCT_MSG(
+				"Error!\n"
+				"No swi #%llu", 
+				static_cast<long long unsigned>(get(data.args[0]))));
+	}
 }
 
 inline void emulated_cmp(LLCCEP_vm::instruction &data)
@@ -255,7 +301,23 @@ inline void emulated_outp(LLCCEP_vm::instruction &data)
 {
 	switch (get(data.args[0])) {
 		case 0:
-			set_clr(get(data.args[2]));
-			break;		
+			LLCCEP_vm::set_clr(static_cast<uint32_t>(get(data.args[1])));
+			break;
+
+		case 1: {
+			uint16_t data[2] = {
+				get(data.args[1]) & 0xFFFF,
+				(get(data.args[1]) >> 16) & 0xFFFF
+			};
+			LLCCEP_vm::set_pix(data[0], data[1]);
+
+			break;
+		}
+
+		default:
+			throw DEFAULT_EXCEPTION(CONSTRUCT_MSG(
+				"Error!\n"
+				"No port #%llu!\n",
+				static_cast<long long unsigned>(get(data.args[0]))));
 	}
 }
