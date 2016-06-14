@@ -14,7 +14,7 @@ namespace LLCCEP_vm {
 	}
 }
 
-double get(LLCCEP_vm::arg &data) 
+static double get(LLCCEP_vm::arg &data) 
 {
 	switch (data.type) {
 		case ARG_T_REG:
@@ -50,7 +50,7 @@ double get(LLCCEP_vm::arg &data)
 	return 0;
 }
 
-void set(LLCCEP_vm::arg &what, double val)
+static void set(LLCCEP_vm::arg &what, double val)
 {
 	switch (data.type) {
 		case ARG_T_REG:
@@ -86,75 +86,75 @@ void set(LLCCEP_vm::arg &what, double val)
 	}
 }
 
-inline void emulated_mov(LLCCEP_vm::instruction &data)
+static inline void emulated_mov(LLCCEP_vm::instruction &data)
 {
 	set(data.args[0], get(data.args[1]));
 }
 
-inline void emulated_mva(LLCCEP_vm::instruction &data)
+static inline void emulated_mva(LLCCEP_vm::instruction &data)
 {
 	access_mem_data<double>(
 		static_cast<long long unsigned>(get(data.args[0])), 
 		get(data.args[1]));
 }
 
-inline void emulated_push(LLCCEP_vm::instruction &data)
+static inline void emulated_push(LLCCEP_vm::instruction &data)
 {
 	LLCCEP_vm::__added__::stk.push(get(data.args[0]))
 }
 
-inline void emulated_pop(LLCCEP_vm::instruction &data)
+static inline void emulated_pop(LLCCEP_vm::instruction &data)
 {
 	LLCCEP_vm::__added__::stk.pop();
 }
 
-inline void emulated_top(LLCCEP_vm::instruction &data)
+static inline void emulated_top(LLCCEP_vm::instruction &data)
 {
 	set(data.args[0], LLCCEP_vm::__added__::stk.top());
 }
 
-inline void emulated_add(LLCCEP_vm::instruction &data)
+static inline void emulated_add(LLCCEP_vm::instruction &data)
 {
 	set(data.args[0], get(data.args[1]) + get(data.args[2]));
 }
 
-inline void emulated_sub(LLCCEP_vm::instruction &data)
+static inline void emulated_sub(LLCCEP_vm::instruction &data)
 {
 	set(data.args[0], get(data.args[1]) + get(data.args[2]));
 }
 
-inline void emulated_mul(LLCCEP_vm::instruction &data)
+static inline void emulated_mul(LLCCEP_vm::instruction &data)
 {
 	set(data.args[0], get(data.args[1]) * get(data.args[2]));
 }
 
-inline void emulated_dev(LLCCEP_vm::instruction &data)
+static inline void emulated_dev(LLCCEP_vm::instruction &data)
 {
 	set(data.args[0], get(data.args[1]) / get(data.args[2]));
 }
 
-inline void emulated_and(LLCCEP_vm::instruction &data)
+static inline void emulated_and(LLCCEP_vm::instruction &data)
 {
 	set(data.args[0], 
 	    static_cast<long long>(get(data.args[1])) & 
 	    static_cast<long long>(get(data.args[2])));
 }
 
-inline void emulated_or(LLCCEP_vm::instruction &data)
+static inline void emulated_or(LLCCEP_vm::instruction &data)
 {
 	set(data.args[0],
 	    static_cast<long long>(get(data.args[1])) |
 	    static_cast<long long>(get(data.args[2])));
 }
 
-inline void emulated_xor(LLCCEP_vm::instruction &data)
+static inline void emulated_xor(LLCCEP_vm::instruction &data)
 {
 	set(data.args[0],
 	    static_cast<long long>(get(data.args[1])) ^
 	    static_cast<long long>(get(data.args[2])));
 }
 
-inline void emulated_off(LLCCEP_vm::instruction &data)
+static inline void emulated_off(LLCCEP_vm::instruction &data)
 {
 	unsigned direction = ((get(data.args[0]) >= 0)?(1):(-1));
 	set(data.args[0],
@@ -165,12 +165,12 @@ inline void emulated_off(LLCCEP_vm::instruction &data)
 	      static_cast<long long>(get(data.args[2])))));
 }
 
-inline void emulated_nop(LLCCEP_vm::instruction &data)
+static inline void emulated_nop(LLCCEP_vm::instruction &data)
 {
 	(void)0;
 }
 
-inline void emulated_swi(LLCCEP_vm::instruction &data)
+static void emulated_swi(LLCCEP_vm::instruction &data)
 {
 	switch (static_cast<long long unsigned>(get(data.args[0]))) {
 		case 0: // out char
@@ -221,47 +221,47 @@ inline void emulated_swi(LLCCEP_vm::instruction &data)
 	}
 }
 
-inline void emulated_cmp(LLCCEP_vm::instruction &data)
+static inline void emulated_cmp(LLCCEP_vm::instruction &data)
 {
 	LLCCEP_vm::__added__::cmp = get(data.args[0]) - get(data.args[1]);
 }
 
-inline void emulated_inc(LLCCEP_vm::instruction &data)
+static inline void emulated_inc(LLCCEP_vm::instruction &data)
 {
 	set(data.args[0], get(data.args[0]) + 1);
 }
 
-inline void emulated_dec(LLCCEP_vm::instruction &data)
+static inline void emulated_dec(LLCCEP_vm::instruction &data)
 {
 	set(data.args[0], get(data.args[0]) - 1);
 }
 
-inline void emulated_sqrt(LLCCEP_vm::instruction &data)
+static inline void emulated_sqrt(LLCCEP_vm::instruction &data)
 {
 	set(data.args[0], sqrt(get(data.args[1])));
 }
 
-inline void emulated_sin(LLCCEP_vm::instruction &data)
+static inline void emulated_sin(LLCCEP_vm::instruction &data)
 {
 	set(data.args[0], sin(get(data.args[1])));
 }
 
-inline void emulated_cos(LLCCEP_vm::instruction &data)
+static inline void emulated_cos(LLCCEP_vm::instruction &data)
 {
 	set(data.args[0], cos(get(data.args[1])));
 }
 
-inline void emulated_ptan(LLCCEP_vm::instruction &data)
+static inline void emulated_ptan(LLCCEP_vm::instruction &data)
 {
 	set(data.args[0], tan(get(data.args[1])));
 }
 
-inline void emulated_patan(LLCCEP_vm::instruction &data)
+static inline void emulated_patan(LLCCEP_vm::instruction &data)
 {
 	set(data.args[0], atan(get(data.args[1])));
 }
 
-inline void emulated_ldc(LLCCEP_vm::instruction &data)
+static inline void emulated_ldc(LLCCEP_vm::instruction &data)
 {
 	switch (get(data.args[1])) {
 		case 0:
@@ -297,27 +297,100 @@ inline void emulated_ldc(LLCCEP_vm::instruction &data)
 	}
 }
 
-inline void emulated_outp(LLCCEP_vm::instruction &data)
+static inline void emulated_outp(LLCCEP_vm::instruction &data)
 {
-	switch (get(data.args[0])) {
+	switch (static_cast<long long>(get(data.args[0]))) {
 		case 0:
 			LLCCEP_vm::set_clr(static_cast<uint32_t>(get(data.args[1])));
 			break;
 
 		case 1: {
-			uint16_t data[2] = {
-				get(data.args[1]) & 0xFFFF,
-				(get(data.args[1]) >> 16) & 0xFFFF
+			uint16_t pos[2] = {
+				static_cast<long long>(get(data.args[1])) & 0xFFFF,
+				(static_cast<long long>(get(data.args[1])) >> 16) & 0xFFFF
 			};
-			LLCCEP_vm::set_pix(data[0], data[1]);
+			LLCCEP_vm::set_pix(pos[0], pos[1]);
 
 			break;
 		}
 
 		default:
-			throw DEFAULT_EXCEPTION(CONSTRUCT_MSG(
+			throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
 				"Error!\n"
-				"No port #%llu!\n",
-				static_cast<long long unsigned>(get(data.args[0]))));
+				"No port #%lls!\n",
+				static_cast<long long>(get(data.args[0]))));
+	}
+}
+
+static inline void emulated_inp(LLCCEP_vm::instruction &data)
+{
+	switch (static_cast<long long>(get(data.args[0]))) {
+		case 0:
+			set(data.args[1], LLCCEP_vm::get_clr());
+			break;
+
+		case 1: {
+			uint16_t pos[2] = {
+				static_cast<long long>(get(data.args[1]) & 0xFFFF,
+				(static_cast<long long>(get(data.args[1])) >> 16) & 0xFFFF;
+			};
+			set(data.args[2], LLCCEP_vm::get_pix(pos[0], pos[1]));
+			break;
+		}
+
+		default:
+			throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
+				"Error!\n"
+				"No port #%lls!\n",
+				static_cast<long long>(get(data.args[0]))));
+	}
+}
+
+static void (*funcs[])(LLCCEP_vm::instruction &data) = {
+	emulated_mov,
+	emulated_mva,
+	emulated_push,
+	emulated_pop,
+	emulated_top,
+	emulated_add,
+	emulated_sub,
+	emulated_mul,
+	emulated_dev,
+	emulated_and,
+	emulated_or,
+	emulated_xor,
+	emulated_off,
+	emulated_nop,
+	emulated_sqi,
+	emulated_cmp,
+	emulated_inc,
+	emulated_dec,
+	emulated_sqrt,
+	emulated_sin,
+	emulated_cos,
+	emulated_ptan,
+	emulated_patan,
+	emulated_ldc,
+	emulated_outp,
+	emulated_inp	
+};
+
+static inline void emulate(LLCCEP_vm::instruction &data)
+{
+	if (data.opcode > INST_NUM) {
+		throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
+			"Error!\n"
+			"Invalid opcode: %d", static_cast<int>(data.opcode)));
+	}
+
+	funcs[data.opcode](data);
+}
+
+namespace LLCCEP_vm {
+	void execute(::std::vector<instruction> &data)
+	{
+		double &i = LLCCEP_vm::__added__::regs[14];
+		for (i = 1; i <= data.size(); i++)
+			emulate(data[i - 1]);
 	}
 }
