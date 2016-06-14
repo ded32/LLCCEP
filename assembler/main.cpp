@@ -55,8 +55,6 @@ void parse_command_line_params(int argn, char * const *argv, ::std::vector<::std
 	}
 }
 
-#define $(val) ({assert(val); val;})
-
 int main(int argn, char * const *argv)
 {
 	if (argn < 2) {
@@ -87,7 +85,7 @@ int main(int argn, char * const *argv)
 		                 "%s\n", inputs[i], info.what());
 	} catch (::LLCCEP::runtime_exception &exc) {
 		QUITE_ERROR(yes, exc.msg());
-	} //DEFAULT_HANDLING
+	} DEFAULT_HANDLING
 
 	try {
 		out_f.exceptions(::std::ofstream::failbit);

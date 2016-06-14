@@ -24,6 +24,8 @@
 
 #define MAX_EXC_BUF_SIZE (512 * 1024)
 
+#define $(val) ({assert(val); val})
+
 #define FATAL_ERROR(quit, place, fmt, ...) \
 ({ \
 	::std::fprintf(stderr, "Fatal error in " place \

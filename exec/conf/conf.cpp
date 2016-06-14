@@ -25,7 +25,7 @@ namespace LLCCEP_vm {
 			data.readFile(path.c_str());
 		} catch (const ::libconfig::FileIOException &exc) {
 			throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
-				"FileIOException: reading file %s failed: %s!\n",
+				"Reading file %s failed: %s!\n",
 				path.c_str(), strerror(errno)));
 		} catch (const ::libconfig::ParseException &exc) {
 			throw RUNTIME_EXCEPTION(exc.what());
