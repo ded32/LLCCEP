@@ -25,11 +25,11 @@ namespace LLCCEP_vm {
 
 	void setup_vm(config conf)
 	{
-		__vm_load_dev(conf);
+		__vm_load_dev(conf); // Open devices
 
-		if (conf.displayW < 0 ||
-		    conf.displayH < 0) {
-			init_display(conf.title.c_str(), 
+		if (conf.displayW <= 0 || // Init display
+		    conf.displayH <= 0) {
+			init_display(conf.title.c_str(),  
 			             get_host_width(),
 			             get_host_height());
 		} else {
@@ -37,7 +37,7 @@ namespace LLCCEP_vm {
 			             conf.dispayW, conf.displayH);
 		}
 
-		allocate_mem(conf.memS);
+		allocate_mem(conf.memS); // Allocate VM RAM
 	}
 
 	void free_vm_resources()
