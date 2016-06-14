@@ -79,9 +79,9 @@ int main(int argn, char * const *argv)
 	LLCCEP_vm::config conf = {};
 	try {
 		conf = LLCCEP_vm::read_configuration_file(cfg);
-		LLCCEP_vm::setup_vm(conf);
+		LLCCEP_vm::setup_vm(conf, true);
 		LLCCEP_vm::execute(program);
-		LLCCEP_vm::free_vm_resources();
+		LLCCEP_vm::free_vm_resources(true);
 	} DEFAULT_HANDLING
 
 	return 0;

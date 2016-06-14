@@ -175,44 +175,97 @@ static void emulated_swi(LLCCEP_vm::instruction &data)
 {
 	switch (static_cast<long long unsigned>(get(data.args[0]))) {
 		case 0: // out char
-			::std::cout << static_cast<unsigned char(get(data.args[1]));
+			::std::cout << static_cast<unsigned char>(LLCCEP_vm::__added__::regs[0]);
 			break;
 
-		case 1: // out num
-			::std::cout << get(data.args[1]);
+		case 1: // round num
+			LLCCEP_vm::__added__::regs[1] = static_cast<long long>(LLCCEP_vm::__added__::regs[0] + 0.5);
 			break;
 
-		case 2: // round num
-			set(data.args[1], static_cast<long long>(get(data.args[2]) + 0.5));
+		case 2: // out string
+			::std::cout << access_mem_data<char *>(static_cast<long long unsigned>(LLCCEP_vm::__added__::regs[0]));
 			break;
 
-		case 3: // out string
-			::std::cout << access_mem_data<char *>(static_cast<long long unsigned>(get(data.args[1])));
-			break;
-
-		case 4: {
+		case 3: { // read char
 			unsigned char val = 0;
 			::std::cin >> val;
-			set(data.args[1], val);
+			LLCCEP_vm::__added__::regs[0] = val;
 			break;
 		}
 
-		case 5: {
-			double val = 0;
-			::std::cin >> val;
-			set(data.args[1], val);
-			break
-		}
-
-		case 6: {
+		case 4: {  // read string
 			::std::string val = "";
 			::std::cin >> val;
 
 			for (size_t i = 0; i < val.length(); i++)
-				access_mem_data<char>(static_cast<long long unsigned>(get(data.args[1])), val[i]);
+				access_mem_data<char>(static_cast<long long unsigned>(LLCCEP_vm::__added__::regs[0] + i, val[i]);
 
 			break;
 		}
+
+#if !VM
+		case 7: { // open file
+			if (static_cast<long long>(LLCCEP_vm::__added__::regs[0]) == 0)) {
+				::std::ifstream in;
+				in.open(LLCCEP_vm::get_mem(static_cast<size_t>(LLCCEP_vm::__added__::regs[1])));
+				LLCCEP_vm::__added__::inputs.push_back(::std::move(in));
+			} else {
+				::std::ofstream out;
+				out.open(LLCCEP_vm::get_mem(static_cast<size_t>(LLCCEP_vm::__added__::regs[0])));
+				LLCCEP_vm::__added__::outputs.push_back(::std::move(out));
+			}
+			break;
+		}
+
+		case 9: { // close file
+			if (static_cast<long long>(LLCCEP_vm::__added__::regs[0]) == 0) {
+				if (static_cast<long long>(LLCCEP_vm::__added__::regs[1]) >= LLCCEP_vm::__added__::inputs.size() ||
+				    static_cast<long long>(LLCCEP_vm::__added__::regs[1]) < 0) {
+					throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
+						"Overbounding due file accessing: no 'r' file %lls",
+						static_cast<long long>(LLCCEP_vm::__added__::regs[1])));
+				}
+
+				LLCCEP_vm::__added__::inputs[static_cast<long long>(LLCCEP_vm::__added__::regs[1])].close();
+			} else {
+				if (static_cast<long long>(LLCCEP_vm::__added__::regs[1]) >= LLCCEP_vm::__added__::outputs.size() ||
+				    static_cast<long long>(LLCCEP_vm::__added__::regs[1]) < 0) {
+					throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
+						"Overbounding due file accessing: no 'w' file %lls",
+						static_cast<long long>(LLCCEP_vm::__added__::regs[1]))));
+				}
+
+				LLCCEP_vm::__added__::outputs[static_cast<long long>(LLCCEP_vm::__added__::regs[1])].close();
+			}
+			break;
+		}
+
+		case 10: { // r/w byte to/from file
+			if (static_cast<long long>(LLCCEP_vm::__added__::regs[0]) == 0) {
+				if (static_cast<long long>(LLCCEP_vm::__added__::regs[1]) >= LLCCEP_vm::__added__::inputs.size() ||
+				    static_cast<long long>(LLCCEP_vm::__added__::regs[1]) < 0) {
+					throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
+						"Overbounding due file accessing: no 'r' file %lls",
+						static_cast<long long>(LLCCEP_vm::__added__::regs[1])));
+				}
+
+				uint8_t val;
+				LLCCEP_vm::__added__::inputs[static_cast<long long>(LLCCEP_vm::__added__::regs[1])] >> val;
+				LLCCEP_vm::__added__::regs[2] = val;
+			} else {
+				if (static_cast<long long>(LLCCEP_vm::__added__::regs[1]) >= LLCCEP_vm::__added__::outputs.size() ||
+				    static_cast<long long>(LLCCEP_vm::__added__::regs[1]) < 0) {
+					throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
+						"Overbounding due file accessing: no 'w' file %lls",
+						static_cast<long long>(LLCCEP_vm::__added__::regs[1])));
+				}
+
+				LLCCEP_vm::__added__::inputs[static_cast<long long>(LLCCEP_vm::__added__::regs[1])] <<
+					static_cast<uint8_t>(LLCCEP_vm::__added__::regs[2]);
+			}
+			break;
+		}
+#endif
 
 		default:
 			throw DEFAULT_EXCEPTION(CONSTRUCT_MSG(

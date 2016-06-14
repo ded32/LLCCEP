@@ -23,29 +23,34 @@ static void __vm_load_dev(::LLCCEP_vm::config conf)
 namespace LLCCEP_vm {
 	::std::vector<FILE *> dev;
 
-	void setup_vm(config conf)
+	void setup_vm(config conf, bool vm)
 	{
-		__vm_load_dev(conf); // Open devices
+		if (vm) {
+			__vm_load_dev(conf); // Open devices
 
-		if (conf.displayW <= 0 || // Init display
-		    conf.displayH <= 0) {
-			init_display(conf.title.c_str(),  
-			             get_host_width(),
-			             get_host_height());
-		} else {
-			init_display(conf.title.c_str(),
-			             conf.dispayW, conf.displayH);
+			if (conf.displayW <= 0 || // Init display
+			    conf.displayH <= 0) {
+				init_display(conf.title.c_str(),  
+				             get_host_width(),
+				             get_host_height());
+			} else {
+				init_display(conf.title.c_str(),
+				             conf.dispayW, conf.displayH);
+			}
 		}
 
 		allocate_mem(conf.memS); // Allocate VM RAM
 	}
 
-	void free_vm_resources()
+	void free_vm_resources(bool vm)
 	{
 		free_mem();
-		kill_display();
 
-		for (size_t i = 0; i < dev.size(); i++)
-			fclose(dev[i]);		
+		if (vm) {
+			kill_display();
+
+			for (size_t i = 0; i < dev.size(); i++)
+				fclose(dev[i]);		
+		}
 	}
 }
