@@ -23,7 +23,7 @@ namespace LLCCEP_vm {
 		arg args[3];
 	};
 
-	void read_program(::std::ifstream &input, ::std::vector<instruction> &program);
+	void read_program(::std::string input, ::std::vector<instruction> &program);
 }
 
 #endif // PROGRAM_HPP

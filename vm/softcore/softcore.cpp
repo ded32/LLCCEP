@@ -1,4 +1,5 @@
 #include <stack>
+#include <cmath>
 
 #include "./../drivers/ram/ram.hpp"
 
@@ -238,30 +239,30 @@ static inline void emulated_dec(LLCCEP_vm::instruction &data)
 
 static inline void emulated_sqrt(LLCCEP_vm::instruction &data)
 {
-	set(data.args[0], sqrt(get(data.args[1])));
+	set(data.args[0], ::std::sqrt(get(data.args[1])));
 }
 
 static inline void emulated_sin(LLCCEP_vm::instruction &data)
 {
-	set(data.args[0], sin(get(data.args[1])));
+	set(data.args[0], ::std::sin(get(data.args[1])));
 }
 
 static inline void emulated_cos(LLCCEP_vm::instruction &data)
 {
-	set(data.args[0], cos(get(data.args[1])));
+	set(data.args[0], ::std::cos(get(data.args[1])));
 }
 
 static inline void emulated_ptan(LLCCEP_vm::instruction &data)
 {
-	set(data.args[0], tan(get(data.args[1])));
+	set(data.args[0], ::std::tan(get(data.args[1])));
 }
 
 static inline void emulated_patan(LLCCEP_vm::instruction &data)
 {
-	set(data.args[0], atan(get(data.args[1])));
+	set(data.args[0], ::std::atan(get(data.args[1])));
 }
 
-static inline void emulated_ldc(LLCCEP_vm::instruction &data)
+static void emulated_ldc(LLCCEP_vm::instruction &data)
 {
 	switch (get(data.args[1])) {
 		case 0:
@@ -269,7 +270,7 @@ static inline void emulated_ldc(LLCCEP_vm::instruction &data)
 			break;
 
 		case 1:
-			set(data.args[0], log2(10));
+			set(data.args[0], ::std::log2(10));
 			break;
 
 		case 2:
@@ -281,7 +282,7 @@ static inline void emulated_ldc(LLCCEP_vm::instruction &data)
 			break;
 
 		case 4:
-			set(data.args[0], log10(2));
+			set(data.args[0], ::std::log10(2));
 			break;
 
 		case 5:
@@ -297,7 +298,7 @@ static inline void emulated_ldc(LLCCEP_vm::instruction &data)
 	}
 }
 
-static inline void emulated_outp(LLCCEP_vm::instruction &data)
+static void emulated_outp(LLCCEP_vm::instruction &data)
 {
 	switch (static_cast<long long>(get(data.args[0]))) {
 		case 0:
@@ -322,7 +323,7 @@ static inline void emulated_outp(LLCCEP_vm::instruction &data)
 	}
 }
 
-static inline void emulated_inp(LLCCEP_vm::instruction &data)
+static void emulated_inp(LLCCEP_vm::instruction &data)
 {
 	switch (static_cast<long long>(get(data.args[0]))) {
 		case 0:

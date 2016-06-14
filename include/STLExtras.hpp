@@ -5,6 +5,7 @@
 #include <initializer_list>
 #include <algorithm>
 #include <cstddef>
+#include <cstdint>
 
 template<typename TYPE>
 std::vector<TYPE> subvector(std::vector<TYPE> &src, size_t id0, size_t id1)
@@ -32,6 +33,24 @@ template<typename TYPE>
 typename std::vector<TYPE>::const_iterator vec_find(std::vector<TYPE> &vec, TYPE srch)
 {
 	return find(vec.begin(), vec.end(), srch);
+}
+
+template<typename TYPE>
+TYPE from_bytes(uint8_t data[sizeof(TYPE)])
+{
+	union {
+		TYPE val;
+		uint8_t bytes[sizeof(TYPE)];
+	} res;
+
+	memcpy(res.bytes, data, sizeof(TYPE));
+	return res.val;
+}
+
+template<typename TYPE>
+uint8_t *to_bytes(TYPE &data)
+{
+	return static_cast<uint8_t *>(&data);
 }
 
 #endif // STLEXTRAS_HPP
