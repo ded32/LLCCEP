@@ -2,6 +2,7 @@
 #include <cmath>
 #include <fstream>
 #include <cstddef>
+#include <iostream>
 
 #include <STDExtras.hpp>
 
@@ -61,7 +62,7 @@ static double get(LLCCEP_vm::arg &data)
 	return 0;
 }
 
-static void set(LLCCEP_vm::arg &what, double val)
+static void set(LLCCEP_vm::arg &data, double val)
 {
 	switch (data.type) {
 		case LLCCEP_vm::ARG_T_REG:
@@ -71,11 +72,11 @@ static void set(LLCCEP_vm::arg &what, double val)
 					"Error!\n"
 					"Overbounding while writing data to register!\n"));
 			} else
-				LLCCEP_vm::__added__::regs[what.val] = val;
+				LLCCEP_vm::__added__::regs[static_cast<size_t>(data.val)] = val;
 			break;
 
 		case LLCCEP_vm::ARG_T_MEM:
-			if (DBL_AE(data.val, get_mem_size()) ||
+			if (DBL_AE(data.val, LLCCEP_vm::get_mem_size()) ||
 			    DBL_LESS(data.val, 0)) {
 				throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
 					"Error!\n"
@@ -111,7 +112,7 @@ static inline void emulated_mva(LLCCEP_vm::instruction &data)
 
 static inline void emulated_push(LLCCEP_vm::instruction &data)
 {
-	LLCCEP_vm::__added__::stk.push(get(data.args[0]))
+	LLCCEP_vm::__added__::stk.push(get(data.args[0]));
 }
 
 static inline void emulated_pop(LLCCEP_vm::instruction &data)
@@ -269,7 +270,7 @@ static void emulated_swi(LLCCEP_vm::instruction &data)
 			::std::cin >> val;
 
 			for (size_t i = 0; i < val.length(); i++)
-				LLCCEP_vm::access_mem_data<char>(static_cast<long long unsigned>(LLCCEP_vm::__added__::regs[0] + i, val[i]);
+				LLCCEP_vm::access_mem_data<char>(static_cast<long long unsigned>(LLCCEP_vm::__added__::regs[0] + i, val[i]));
 
 			break;
 		}
@@ -288,8 +289,8 @@ static void emulated_swi(LLCCEP_vm::instruction &data)
 			long long r00 = static_cast<long long>(LLCCEP_vm::__added__::regs[0]);
 
 			bool attrs[2] = {
-				r00 & 0b0100,
-				r00 & 0b1000
+				static_cast<bool>(r00 & 0b0100),
+				static_cast<bool>(r00 & 0b1000)
 			};
 
 			if (r00 & 0b11 >= 0b11)
@@ -302,7 +303,7 @@ static void emulated_swi(LLCCEP_vm::instruction &data)
 			if (attrs[1])
 				mode += 'b';
 
-			FILE *fd = fopen(LLCCEP_vm::get_mem(static_cast<long long unsigned>LLCCEP_vm::__added__::regs[1]),
+			FILE *fd = fopen(LLCCEP_vm::get_mem(static_cast<long long unsigned>(LLCCEP_vm::__added__::regs[1])),
 			                 mode.c_str());
 
 			LLCCEP_vm::__added__::files.push_back(fd);

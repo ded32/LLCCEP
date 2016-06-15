@@ -1,0 +1,2 @@
+/usr/bin/ar cr libSTDExtras.a  CMakeFiles/STDExtras.dir/home/andrew/shared/Home/Documents/projects/personal/LLCCEP/lib/STDExtras.cpp.o
+/usr/bin/ranlib libSTDExtras.a
