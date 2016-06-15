@@ -5,6 +5,7 @@
 #include <iostream>
 
 #include <STDExtras.hpp>
+#include <STLExtras.hpp>
 
 #include "./../drivers/ram/ram.hpp"
 
@@ -303,7 +304,7 @@ static void emulated_swi(LLCCEP_vm::instruction &data)
 			if (attrs[1])
 				mode += 'b';
 
-			FILE *fd = fopen(LLCCEP_vm::get_mem(static_cast<long long unsigned>(LLCCEP_vm::__added__::regs[1])),
+			FILE *fd = fopen(LLCCEP_vm::access_mem_data<char *>(static_cast<size_t>(LLCCEP_vm::__added__::regs[1])),
 			                 mode.c_str());
 
 			LLCCEP_vm::__added__::files.push_back(fd);
@@ -312,18 +313,18 @@ static void emulated_swi(LLCCEP_vm::instruction &data)
 		}
 
 		case 9: { // close file
-			FILE *r00 = *(FILE **)((void *)((double *)(LLCCEP_vm::__added__::regs[0])));
+			FILE *r00 = *(FILE **)((void *)((double *)(&LLCCEP_vm::__added__::regs[0])));
 			fclose(r00);
 			LLCCEP_vm::__added__::files.erase(vec_find(LLCCEP_vm::__added__::files, r00));
 			break;
 		}
 
 		case 10: { // r/w byte to/from file
-			FILE *r00 = *(FILE **)((void *)((double *)(LLCCEP_vm::__added__::regs[0])));
+			FILE *r00 = *(FILE **)((void *)((double *)(&LLCCEP_vm::__added__::regs[0])));
 			if (DBL_EQ(LLCCEP_vm::__added__::regs[1], 0))
 				fprintf(r00, "%c", static_cast<unsigned char>(LLCCEP_vm::__added__::regs[2]));
 			else
-				fscanf(r00, "%c", (char *)((void *)&LLCCE_vm::__added__::regs[2]));
+				fscanf(r00, "%c", (char *)((void *)&LLCCEP_vm::__added__::regs[2]));
 
 			break;
 		}

@@ -33,7 +33,7 @@ void append_init(std::vector<TYPE> &dst, std::initializer_list<TYPE> src)
 }
 
 template<typename TYPE>
-typename std::vector<TYPE>::const_iterator vec_find(std::vector<TYPE> &vec, TYPE srch)
+typename ::std::vector<TYPE>::iterator vec_find(::std::vector<TYPE> &vec, TYPE srch)
 {
 	return find(vec.begin(), vec.end(), srch);
 }
