@@ -1,0 +1,11 @@
+/home/andrew/shared/Home/Documents/projects/personal/LLCCEP/exec/vm/CMakeFiles/STDExtras.dir
+/home/andrew/shared/Home/Documents/projects/personal/LLCCEP/exec/vm/CMakeFiles/VM.dir
+/home/andrew/shared/Home/Documents/projects/personal/LLCCEP/exec/vm/CMakeFiles/conf.dir
+/home/andrew/shared/Home/Documents/projects/personal/LLCCEP/exec/vm/CMakeFiles/display_driver.dir
+/home/andrew/shared/Home/Documents/projects/personal/LLCCEP/exec/vm/CMakeFiles/hdd_driver.dir
+/home/andrew/shared/Home/Documents/projects/personal/LLCCEP/exec/vm/CMakeFiles/kb_driver.dir
+/home/andrew/shared/Home/Documents/projects/personal/LLCCEP/exec/vm/CMakeFiles/mouse_driver.dir
+/home/andrew/shared/Home/Documents/projects/personal/LLCCEP/exec/vm/CMakeFiles/prog.dir
+/home/andrew/shared/Home/Documents/projects/personal/LLCCEP/exec/vm/CMakeFiles/ram_driver.dir
+/home/andrew/shared/Home/Documents/projects/personal/LLCCEP/exec/vm/CMakeFiles/setup.dir
+/home/andrew/shared/Home/Documents/projects/personal/LLCCEP/exec/vm/CMakeFiles/softcore.dir

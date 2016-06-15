@@ -1,0 +1,40 @@
+#IncludeRegexLine: ^[ 	]*#[ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+../../include/STDExtras.hpp
+cstdio
+-
+cstdlib
+-
+climits
+-
+stdexcept
+-
+cstdint
+-
+sstream
+-
+linux/limits.h
+-
+
+/home/andrew/shared/Home/Documents/projects/personal/LLCCEP/exec/drivers/display/display.cpp
+SDL2/SDL.h
+-
+cstdio
+-
+string
+-
+STDExtras.hpp
+-
+display.hpp
+/home/andrew/shared/Home/Documents/projects/personal/LLCCEP/exec/drivers/display/display.hpp
+
+/home/andrew/shared/Home/Documents/projects/personal/LLCCEP/exec/drivers/display/display.hpp
+string
+-
+

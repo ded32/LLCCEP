@@ -9,7 +9,7 @@
 #define INIT_FAIL(cond) \
 ({ \
 	if (cond) { \
-		throw DEFAULT_EXCEPTION(CONSTRUCT_MSG( \
+		throw RUNTIME_EXCEPTION(CONSTRUCT_MSG( \
 			"Error!\n" \
 			"Can't init display: %s!\n", \
 			SDL_GetError())); \
@@ -19,7 +19,7 @@
 #define RUNNING_FATAL \
 ({ \
 	if (::LLCCEP_vm::__sys__::window || ::LLCCEP_vm::__sys__::renderer) { \
-		throw DEFAULT_EXCEPTION(CONSTRUCT_MSG( \
+		throw RUNTIME_EXCEPTION(CONSTRUCT_MSG( \
 			"Error!\n" \
 			"Rendering suite already exists!\n")); \
 	} \
@@ -28,7 +28,7 @@
 #define NON_RUNNING_FATAL \
 ({ \
 	if (!(::LLCCEP_vm::__sys__::window && ::LLCCEP_vm::__sys__::renderer)) { \
-		throw DEFAULT_EXCEPTION(CONSTRUCT_MSG( \
+		throw RUNTIME_EXCEPTION(CONSTRUCT_MSG( \
 			"Error!\n" \
 			"No rendering suite for display!\n")); \
 	} \
