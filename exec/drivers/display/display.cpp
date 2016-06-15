@@ -50,7 +50,7 @@ namespace LLCCEP_vm {
 		}
 	}
 
-	void init_display(::std::string title, int width, int height)
+	void init_display(::std::string title, uint16_t width, uint16_t height)
 	{
 		RUNNING_FATAL
 
@@ -158,7 +158,7 @@ namespace LLCCEP_vm {
 		return pix[(posY * sfc->w) + posX];
 	}
 
-	inline int get_host_width()
+	inline unsigned get_host_width()
 	{
 		SDL_DisplayMode mode = {};
 		SDL_GetCurrentDisplayMode(0, &mode);
@@ -166,7 +166,7 @@ namespace LLCCEP_vm {
 		return mode.w;
 	}
 
-	inline int get_host_height()
+	inline unsigned get_host_height()
 	{
 		SDL_DisplayMode mode = {};
 		SDL_GetCurrentDisplayMode(0, &mode);

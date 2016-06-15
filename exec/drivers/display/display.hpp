@@ -2,6 +2,7 @@
 #define DISPLAY_HPP
 
 #include <string>
+#include <cstdint>
 
 #if !defined(RGBA) && !defined(RGB)
 #define RGBA(r, g, b, a) (((a) & 0xFF) << 24) | \
@@ -21,17 +22,17 @@
 #endif
 
 namespace LLCCEP_vm {
-	bool init_display(::std::string title, int width, int height);
+	bool init_display(::std::string title, uint16_t width, uint16_t height);
 	bool handle_msg();
 
 	inline void set_clr(uint32_t clr);
 	inline uint32_t get_clr();
 
-	inline void set_pix(int posX, int posY);
-	inline uint32_t get_pix(int posX, int posY);
+	inline void set_pix(uint16_t posX, uint16_t posY);
+	inline uint32_t get_pix(uint16_t posX, uint16_t posY);
 
-	inline int get_host_width();
-	inline int get_host_height();
+	inline unsigned get_host_width();
+	inline unsigned get_host_height();
 
 	inline bool get_captured_kb_state(uint8_t id);
 	inline unsigned get_captured_mouse_x();
