@@ -2,6 +2,7 @@
 #define DEF_INST_HPP
 
 #include <string>
+#include "./../../assembler/lexer/lexer.hpp"
 
 namespace LLCCEP_ASM {
 	struct inst {

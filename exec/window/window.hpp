@@ -20,12 +20,13 @@ namespace LLCCEP_vm {
 
 		void handle();
 
-		void set_clr();
+		void set_clr(uint32_t clr);
 		uint32_t get_clr();
 
 		void set_pix(uint16_t x, uint16_t y);
 		uint32_t get_pix(uint16_t x, uint16_t y);
 
+		void close();
 
 		~window();
 	};

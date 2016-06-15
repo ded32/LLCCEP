@@ -16,6 +16,8 @@
 #include "./../selection/selection.hpp"
 #include "./../window/window.hpp"
 
+#include "./../../common/def/def_inst.hpp"
+
 namespace LLCCEP_vm {
 	namespace __added__ {
 		::std::stack<double> stk;
@@ -271,7 +273,7 @@ static void emulated_swi(LLCCEP_vm::instruction &data)
 			::std::cin >> val;
 
 			for (size_t i = 0; i < val.length(); i++)
-				LLCCEP_vm::access_mem_data<char>(static_cast<long long unsigned>(LLCCEP_vm::__added__::regs[0] + i, val[i]));
+				LLCCEP_vm::access_mem_data<char>(static_cast<size_t>(LLCCEP_vm::__added__::regs[0]) + i, val[i]);
 
 			break;
 		}
@@ -294,7 +296,7 @@ static void emulated_swi(LLCCEP_vm::instruction &data)
 				static_cast<bool>(r00 & 0b1000)
 			};
 
-			if (r00 & 0b11 >= 0b11)
+			if ((r00 & 0b11) >= 0b11)
 				throw RUNTIME_EXCEPTION("No file mode #3!")
 
 			::std::string mode = modes[r00 & 0b11];
@@ -330,10 +332,12 @@ static void emulated_swi(LLCCEP_vm::instruction &data)
 		}
 
 		case 11: { // create window
-			LLCCEP_vm::window new_wnd(LLCCEP_vm::get_mem(static_cast<size_t>(LLCCEP_vm::__added__::regs[0])),
-			                          static_cast<uint16_t>(LLCCEP_vm::__added__::regs[0]),
-			                          static_cast<uint16_t>(LLCCEP_vm::__added__::regs[0]));
-			LLCCEP_vm::__added__::windows(::std::move(new_wnd));
+			LLCCEP_vm::window new_wnd;
+			new_wnd.init(LLCCEP_vm::access_mem_data<char *>(static_cast<size_t>(LLCCEP_vm::__added__::regs[0])),
+			             static_cast<uint16_t>(LLCCEP_vm::__added__::regs[0]),
+			             static_cast<uint16_t>(LLCCEP_vm::__added__::regs[0]));
+
+			LLCCEP_vm::__added__::windows.push_back(new_wnd);
 			break;
 		}
 
@@ -345,7 +349,7 @@ static void emulated_swi(LLCCEP_vm::instruction &data)
 			}
 
 			LLCCEP_vm::__added__::windows[static_cast<size_t>(LLCCEP_vm::__added__::regs[0])].close();
-			LLCCEP_vm::__added__::windows.erase(LLCCEP_vm::__added__::window.begin + static_cast<size_t>(
+			LLCCEP_vm::__added__::windows.erase(LLCCEP_vm::__added__::windows.begin() + static_cast<size_t>(
 				LLCCEP_vm::__added__::regs[0]));
 
 			break;
@@ -353,7 +357,7 @@ static void emulated_swi(LLCCEP_vm::instruction &data)
 
 		case 13: { // on-window drawing
 			size_t id = static_cast<size_t>(LLCCEP_vm::__added__::regs[0]);
-			if (id >= LLCCEP_vm::__added__::window.size()) {
+			if (id >= LLCCEP_vm::__added__::windows.size()) {
 				throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
 					"Overbounding due window accessing: no window %zu",
 					static_cast<size_t>(LLCCEP_vm::__added__::regs[0])));
@@ -386,7 +390,7 @@ static void emulated_swi(LLCCEP_vm::instruction &data)
 				}
 
 				default:
-					throw DEFAULT_EXCEPTION(CONSTRUCT_MSG(
+					throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
 						"Error!\n"
 						"No function %zd of 13th interrupt!\n",
 						static_cast<int64_t>(LLCCEP_vm::__added__::regs[0])));
@@ -395,7 +399,7 @@ static void emulated_swi(LLCCEP_vm::instruction &data)
 #endif
 
 		default:
-			throw DEFAULT_EXCEPTION(CONSTRUCT_MSG(
+			throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
 				"Error!\n"
 				"No swi #%llu", 
 				static_cast<long long unsigned>(get(data.args[0]))));
@@ -444,7 +448,7 @@ static inline void emulated_patan(LLCCEP_vm::instruction &data)
 
 static void emulated_ldc(LLCCEP_vm::instruction &data)
 {
-	switch (get(data.args[1])) {
+	switch (static_cast<long long>(get(data.args[1]))) {
 		case 0:
 			set(data.args[0], 1);
 			break;
@@ -546,7 +550,7 @@ static void (*funcs[])(LLCCEP_vm::instruction &data) = {
 	emulated_xor,
 	emulated_off,
 	emulated_nop,
-	emulated_sqi,
+	emulated_swi,
 	emulated_cmp,
 	emulated_inc,
 	emulated_dec,
@@ -562,7 +566,7 @@ static void (*funcs[])(LLCCEP_vm::instruction &data) = {
 
 static inline void emulate(LLCCEP_vm::instruction &data)
 {
-	if (data.opcode > INST_NUM) {
+	if (data.opcode > LLCCEP_ASM::INST_NUM) {
 		throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
 			"Error!\n"
 			"Invalid opcode: %d", static_cast<int>(data.opcode)));

@@ -1,3 +1,5 @@
+#define VM_EXECUTION
+
 #include <string>
 
 #include <cstdio>
@@ -40,7 +42,7 @@ void parse_command_line_params(int argn, char * const *argv, ::std::string &cfg,
 		if (is_help(argv[i])) {
 			usage();
 			::std::exit(EXIT_SUCCESS);
-		} else if (is_out(argv[i])) {
+		} else if (is_cfg(argv[i])) {
 			i++;
 			if (i >= argn)
 				throw RUNTIME_EXCEPTION("Sudden end after '-c' option!\n");
@@ -55,33 +57,36 @@ void parse_command_line_params(int argn, char * const *argv, ::std::string &cfg,
 		} else {
 			throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
 				"Unexpected to '%s'!\n",
-				argv[i]);
+				argv[i]));
 		}
 	}
 }
 
 int main(int argn, char * const *argv)
 {
-	if (argv < 2) {
+	if (argn < 2) {
 		usage();
 		return EINVAL;
 	}
 
 	::std::string cfg = "";
 	::std::string program = "";
+	::std::vector<LLCCEP_vm::instruction> prog;
 	try {
 		parse_command_line_params(argn, argv, cfg, program);
 	} catch (::LLCCEP::runtime_exception &exc) {
 		usage();
-		QUITE_ERROR(yes, exc.msg())
+		QUITE_ERROR(yes, "%s", exc.msg())
 	} DEFAULT_HANDLING
 
 	LLCCEP_vm::config conf = {};
 	try {
 		conf = LLCCEP_vm::read_configuration_file(cfg);
-		LLCCEP_vm::setup_vm(conf, true);
-		LLCCEP_vm::execute(program);
-		LLCCEP_vm::free_vm_resources(true);
+		LLCCEP_vm::read_program(program, prog);
+
+		LLCCEP_vm::setup_vm_resources(conf);
+		LLCCEP_vm::execute(prog);
+		LLCCEP_vm::free_vm_resources();
 	} DEFAULT_HANDLING
 
 	return 0;
