@@ -1,2 +1,0 @@
-/usr/bin/ar cr libkb_driver.a  CMakeFiles/kb_driver.dir/home/andrew/shared/Home/Documents/projects/personal/LLCCEP/exec/drivers/kb/kb.cpp.o
-/usr/bin/ranlib libkb_driver.a

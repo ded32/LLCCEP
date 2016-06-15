@@ -1,2 +1,0 @@
-/usr/bin/ar cr libmouse_driver.a  CMakeFiles/mouse_driver.dir/home/andrew/shared/Home/Documents/projects/personal/LLCCEP/exec/drivers/mouse/mouse.cpp.o
-/usr/bin/ranlib libmouse_driver.a

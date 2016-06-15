@@ -1,2 +1,0 @@
-/usr/bin/ar cr libhdd_driver.a  CMakeFiles/hdd_driver.dir/home/andrew/shared/Home/Documents/projects/personal/LLCCEP/exec/drivers/hdd/hdd.cpp.o
-/usr/bin/ranlib libhdd_driver.a

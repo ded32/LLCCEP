@@ -1,2 +1,0 @@
-/usr/bin/ar cr libram_driver.a  CMakeFiles/ram_driver.dir/home/andrew/shared/Home/Documents/projects/personal/LLCCEP/exec/drivers/ram/ram.cpp.o
-/usr/bin/ranlib libram_driver.a

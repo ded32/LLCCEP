@@ -1,2 +1,0 @@
-/usr/bin/ar cr libdisplay_driver.a  CMakeFiles/display_driver.dir/home/andrew/shared/Home/Documents/projects/personal/LLCCEP/exec/drivers/display/display.cpp.o
-/usr/bin/ranlib libdisplay_driver.a
