@@ -7,6 +7,7 @@
 #include <utility>
 
 #include "./../conf/conf.hpp"
+#include "./../selection/selection.hpp"
 #include "setup.hpp"
 
 #include "./../drivers/display/display.hpp"
@@ -23,9 +24,9 @@ static void __vm_load_dev(::LLCCEP_vm::config conf)
 namespace LLCCEP_vm {
 	::std::vector<FILE *> dev;
 
-	void setup_vm(config conf, bool vm)
+	void setup_vm(config conf)
 	{
-		if (vm) {
+#if VM
 			__vm_load_dev(conf); // Open devices
 
 			if (conf.displayW <= 0 || // Init display
@@ -35,22 +36,23 @@ namespace LLCCEP_vm {
 				             get_host_height());
 			} else {
 				init_display(conf.title.c_str(),
-				             conf.dispayW, conf.displayH);
+				             conf.displayW, conf.displayH);
 			}
-		}
+#endif // VM
 
-		allocate_mem(conf.memS); // Allocate VM RAM
+		allocate_mem(conf.ramS); // Allocate VM RAM
 	}
 
 	void free_vm_resources(bool vm)
 	{
 		free_mem();
 
-		if (vm) {
+#if VM
 			kill_display();
 
 			for (size_t i = 0; i < dev.size(); i++)
 				fclose(dev[i]);		
 		}
+#endif // VM
 	}
 }

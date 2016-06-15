@@ -13,7 +13,7 @@ namespace LLCCEP_vm {
 		size_t sizeb = 0;
 	}
 
-	inline void allocate_mem(size_t size_b) 
+	void allocate_mem(size_t size_b) 
 	{
 		__sys__::mem = ::std::calloc(size_b, 1);
 		if (!__sys__::mem) {
@@ -24,7 +24,7 @@ namespace LLCCEP_vm {
 		}
 	}
 
-	inline uint8_t *get_mem(size_t offset)
+	uint8_t *get_mem(size_t offset)
 	{
 		if (offset >= __sys__::sizeb) {
 			throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
@@ -35,7 +35,7 @@ namespace LLCCEP_vm {
 		return __sys__::mem + offset;
 	}
 
-	inline void free_mem()
+	void free_mem()
 	{
 		if (__sys__::mem)	
 			free((void *)__sys__::mem);

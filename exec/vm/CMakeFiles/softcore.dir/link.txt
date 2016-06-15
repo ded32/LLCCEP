@@ -1,0 +1,2 @@
+/usr/bin/ar cr libsoftcore.a  CMakeFiles/softcore.dir/home/andrew/shared/Home/Documents/projects/personal/LLCCEP/exec/softcore/softcore.cpp.o
+/usr/bin/ranlib libsoftcore.a

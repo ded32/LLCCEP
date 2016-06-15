@@ -1,0 +1,26 @@
+#IncludeRegexLine: ^[ 	]*#[ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/andrew/shared/Home/Documents/projects/personal/LLCCEP/exec/drivers/kb/./../display/display.hpp
+string
+-
+cstdint
+-
+
+/home/andrew/shared/Home/Documents/projects/personal/LLCCEP/exec/drivers/kb/kb.cpp
+cstdint
+-
+./../display/display.hpp
+/home/andrew/shared/Home/Documents/projects/personal/LLCCEP/exec/drivers/kb/./../display/display.hpp
+kb.hpp
+/home/andrew/shared/Home/Documents/projects/personal/LLCCEP/exec/drivers/kb/kb.hpp
+
+/home/andrew/shared/Home/Documents/projects/personal/LLCCEP/exec/drivers/kb/kb.hpp
+cstdint
+-
+

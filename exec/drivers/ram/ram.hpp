@@ -4,9 +4,9 @@
 #include <cstring>
 
 namespace LLCCEP_vm {
-	inline void allocate_mem(size_t size_b);
+	void allocate_mem(size_t size_b);
 
-	inline uint8_t *get_mem(size_t offset);
+	uint8_t *get_mem(size_t offset);
 
 	template<class T>
 	inline T access_mem_data(size_t id)
@@ -28,7 +28,7 @@ namespace LLCCEP_vm {
 		::std::memcpy(get_mem(id), &val, sizeof(T));
 	}
 
-	inline void free_mem();
+	void free_mem();
 }
 
 #endif // RAM_HPP

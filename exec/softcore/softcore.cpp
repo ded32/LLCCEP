@@ -8,7 +8,10 @@
 
 #include "softcore.hpp"
 #include "fp.hpp"
+
 #include "./../program/program.hpp"
+#include "./../selection/selection.hpp"
+#include "./../window/window.hpp"
 
 namespace LLCCEP_vm {
 	namespace __added__ {
@@ -16,8 +19,8 @@ namespace LLCCEP_vm {
 		double cmp = 0;
 		double regs[32] = {};
 
-		::std::vector<::std::ifstream> inputs;
-		::std::vector<::std::ofstream> outputs;
+		::std::vector<FILE *> files;
+		::std::vector<window> windows;
 	}
 }
 
@@ -276,60 +279,50 @@ static void emulated_swi(LLCCEP_vm::instruction &data)
 
 #if !VM
 		case 7: {
-			if (static_cast<size_t>(LLCCEP_vm::__added__::regs[0]) == 0)) {
-				::std::ifstream in;
-				in.open(LLCCEP_vm::get_mem(static_cast<size_t>(LLCCEP_vm::__added__::regs[1])));
-				LLCCEP_vm::__added__::inputs.push_back(::std::move(in));
-			} else {
-				::std::ofstream out;
-				out.open(LLCCEP_vm::get_mem(static_cast<size_t>(LLCCEP_vm::__added__::regs[0])));
-				LLCCEP_vm::__added__::outputs.push_back(::std::move(out));
-			}
+			::std::string modes[] = {
+				"r",
+				"w",
+				"a"
+			};
+			long long r00 = static_cast<long long>(LLCCEP_vm::__added__::regs[0]);
+
+			bool attrs[2] = {
+				r00 & 0b0100,
+				r00 & 0b1000
+			};
+
+			if (r00 & 0b11 >= 0b11)
+				throw RUNTIME_EXCEPTION("No file mode #3!")
+
+			::std::string mode = modes[r00 & 0b11];
+			if (attrs[0]) 
+				mode += "+";
+
+			if (attrs[1])
+				mode += 'b';
+
+			FILE *fd = fopen(LLCCEP_vm::get_mem(static_cast<long long unsigned>LLCCEP_vm::__added__::regs[1]),
+			                 mode.c_str());
+
+			LLCCEP_vm::__added__::files.push_back(fd);
+			LLCCEP_vm::__added__::regs[1] = *(double *)((void *)&fd);
 			break;
 		}
 
 		case 9: { // close file
-			if (static_cast<size_t>(LLCCEP_vm::__added__::regs[0]) == 0) {
-				if (static_cast<size_t>(LLCCEP_vm::__added__::regs[1]) >= LLCCEP_vm::__added__::inputs.size()) {
-					throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
-						"Overbounding due file accessing: no 'r' file %zu",
-						static_cast<size_t>(LLCCEP_vm::__added__::regs[1])));
-				}
-
-				LLCCEP_vm::__added__::inputs[static_cast<size_t>(LLCCEP_vm::__added__::regs[1])].close();
-			} else {
-				if (static_cast<size_t>(LLCCEP_vm::__added__::regs[1]) >= LLCCEP_vm::__added__::outputs.size()) {
-					throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
-						"Overbounding due file accessing: no 'w' file %zu",
-						static_cast<size_t>(LLCCEP_vm::__added__::regs[1]))));
-				}
-
-				LLCCEP_vm::__added__::outputs[static_cast<size_t>(LLCCEP_vm::__added__::regs[1])].close();
-			}
+			FILE *r00 = *(FILE **)((void *)((double *)(LLCCEP_vm::__added__::regs[0])));
+			fclose(r00);
+			LLCCEP_vm::__added__::files.erase(vec_find(LLCCEP_vm::__added__::files, r00));
 			break;
 		}
 
 		case 10: { // r/w byte to/from file
-			if (static_cast<size_t>(LLCCEP_vm::__added__::regs[0]) == 0) {
-				if (static_cast<size_t>(LLCCEP_vm::__added__::regs[1]) >= LLCCEP_vm::__added__::inputs.size()) {
-					throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
-						"Overbounding due file accessing: no 'r' file %zu",
-						static_cast<size_t>(LLCCEP_vm::__added__::regs[1])));
-				}
+			FILE *r00 = *(FILE **)((void *)((double *)(LLCCEP_vm::__added__::regs[0])));
+			if (DBL_EQ(LLCCEP_vm::__added__::regs[1]))
+				fprintf(r00, "%c", static_cast<unsigned char>(LLCCEP_vm::__added__::regs[2]));
+			else
+				fscanf(r00, "%c", (char *)((void *)&LLCCE_vm::__added__::regs[2]));
 
-				uint8_t val;
-				LLCCEP_vm::__added__::inputs[static_cast<size_t>(LLCCEP_vm::__added__::regs[1])] >> val;
-				LLCCEP_vm::__added__::regs[2] = val;
-			} else {
-				if (static_cast<size_t>(LLCCEP_vm::__added__::regs[1]) >= LLCCEP_vm::__added__::outputs.size()) {
-					throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
-						"Overbounding due file accessing: no 'w' file %zu",
-						static_cast<size_t>(LLCCEP_vm::__added__::regs[1])));
-				}
-
-				LLCCEP_vm::__added__::inputs[static_cast<size_t>(LLCCEP_vm::__added__::regs[1])] <<
-					static_cast<uint8_t>(LLCCEP_vm::__added__::regs[2]);
-			}
 			break;
 		}
 

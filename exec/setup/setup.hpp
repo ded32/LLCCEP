@@ -10,8 +10,8 @@
 namespace LLCCEP_vm {
 	extern ::std::vector<FILE *> dev;
 
-	void setup_vm_resources(config conf, bool vm);
-	void free_vm_resources(bool vm);
+	void setup_vm_resources(config conf);
+	void free_vm_resources();
 }
 
 #endif // SETUP_HPP

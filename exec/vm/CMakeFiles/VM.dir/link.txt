@@ -1,0 +1,1 @@
+/usr/bin/c++   -std=gnu++11 -g -O0    CMakeFiles/VM.dir/main.cpp.o  -o VM -rdynamic libSTDExtras.a libconf.a libsetup.a libsoftcore.a libprog.a libdisplay_driver.a libhdd_driver.a libkb_driver.a libmouse_driver.a libram_driver.a -lSDL2 

@@ -1,0 +1,2 @@
+/usr/bin/ar cr libconf.a  CMakeFiles/conf.dir/home/andrew/shared/Home/Documents/projects/personal/LLCCEP/exec/conf/conf.cpp.o
+/usr/bin/ranlib libconf.a

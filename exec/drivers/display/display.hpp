@@ -22,22 +22,22 @@
 #endif
 
 namespace LLCCEP_vm {
-	bool init_display(::std::string title, uint16_t width, uint16_t height);
+	void init_display(::std::string title, uint16_t width, uint16_t height);
 	bool handle_msg();
 
-	inline void set_clr(uint32_t clr);
-	inline uint32_t get_clr();
+	void set_clr(uint32_t clr);
+	uint32_t get_clr();
 
-	inline void set_pix(uint16_t posX, uint16_t posY);
-	inline uint32_t get_pix(uint16_t posX, uint16_t posY);
+	void set_pix(uint16_t posX, uint16_t posY);
+	uint32_t get_pix(uint16_t posX, uint16_t posY);
 
-	inline unsigned get_host_width();
-	inline unsigned get_host_height();
+	unsigned get_host_width();
+	unsigned get_host_height();
 
-	inline bool get_captured_kb_state(uint8_t id);
-	inline unsigned get_captured_mouse_x();
-	inline unsigned get_captured_mouse_y();
-	inline unsigned get_captured_mouse_buttons_state();
+	bool get_captured_kb_state(uint8_t id);
+	unsigned get_captured_mouse_x();
+	unsigned get_captured_mouse_y();
+	unsigned get_captured_mouse_buttons_state();
 
 	void kill_display();
 }
