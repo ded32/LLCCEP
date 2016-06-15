@@ -1,11 +1,11 @@
-#ifndef RAM_HPP
-#define RAM_HPP
-
 #include <STDExtras.hpp>
 
 #include <cstring>
 #include <cstdlib>
 #include <cerrno>
+#include <cstddef>
+
+#include "ram.hpp"
 
 namespace LLCCEP_vm {
 	namespace __sys__ {
@@ -19,7 +19,7 @@ namespace LLCCEP_vm {
 		if (!__sys__::mem) {
 			throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
 				"Error!\nCan't alloc mem: %s!\n",
-				::std::strerror(errno);
+				::std::strerror(errno)
 			));
 		}
 	}
@@ -32,7 +32,12 @@ namespace LLCCEP_vm {
 			));
 		}
 
-		return __sys__::mem + offset;
+		return (reinterpret_cast<uint8_t *>(__sys__::mem) + offset);
+	}
+
+	size_t get_mem_size()
+	{
+		return __sys__::sizeb;
 	}
 
 	void free_mem()
@@ -41,5 +46,3 @@ namespace LLCCEP_vm {
 			free((void *)__sys__::mem);
 	}
 }
-
-#endif // RAM_HPP

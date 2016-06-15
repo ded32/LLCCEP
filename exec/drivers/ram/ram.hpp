@@ -2,11 +2,13 @@
 #define RAM_HPP
 
 #include <cstring>
+#include <cstddef>
 
 namespace LLCCEP_vm {
 	void allocate_mem(size_t size_b);
 
 	uint8_t *get_mem(size_t offset);
+	size_t get_mem_size();
 
 	template<class T>
 	inline T access_mem_data(size_t id)

@@ -6,7 +6,9 @@
 #include <algorithm>
 #include <cstddef>
 #include <cstdint>
-#include <ifstream>
+#include <fstream>
+
+#include <STDExtras.hpp>
 
 template<typename TYPE>
 std::vector<TYPE> subvector(std::vector<TYPE> &src, size_t id0, size_t id1)
@@ -37,25 +39,25 @@ typename std::vector<TYPE>::const_iterator vec_find(std::vector<TYPE> &vec, TYPE
 }
 
 template<typename TYPE>
-TYPE from_bytes(uint8_t data[sizeof(TYPE)])
+TYPE from_bytes(char data[sizeof(TYPE)])
 {
 	union {
-		TYPE val;
-		uint8_t bytes[sizeof(TYPE)];
-	} res;
+		char bytes[sizeof(TYPE)];
+		TYPE res;
+	} cv;
 
-	memcpy(res.bytes, data, sizeof(TYPE));
-	return res.val;
+	memcpy(cv.bytes, data, sizeof(TYPE));
+	return cv.res;
 }
 
 template<typename TYPE>
-uint8_t *to_bytes(TYPE &data)
+char *to_bytes(TYPE &data)
 {
-	return static_cast<uint8_t *>(&data);
+	return static_cast<char *>(&data);
 }
 
 template<typename char_t>
-::std::basic_ifstream<char_t>::pos_type get_length(::std::basic_ifstream<char_t> &fd)
+typename ::std::basic_ifstream<char_t>::pos_type get_length(::std::basic_ifstream<char_t> &fd)
 {
 	if (fd.fail()) {
 		throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
@@ -64,10 +66,10 @@ template<typename char_t>
 	}
 
 	auto pos = fd.tellg();
-	fd.seekg(0, fd.end);
+	fd.seekg(fd.end);
 	auto res = fd.tellg();
 
-	fd.seekg(0, pos);
+	fd.seekg(pos);
 
 	return res;
 }

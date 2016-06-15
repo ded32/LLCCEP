@@ -1,6 +1,7 @@
 #include <stack>
 #include <cmath>
 #include <fstream>
+#include <cstddef>
 
 #include <STDExtras.hpp>
 
@@ -27,9 +28,9 @@ namespace LLCCEP_vm {
 static double get(LLCCEP_vm::arg &data) 
 {
 	switch (data.type) {
-		case ARG_T_REG:
+		case LLCCEP_vm::ARG_T_REG:
 			if (DBL_AE(data.val, 31) || 
-			    DBL_L(data.val, 0)) {
+			    DBL_LESS(data.val, 0)) {
 				throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
 					"Error!\n"
 					"Overbounding while reading data from register!\n"));
@@ -37,17 +38,17 @@ static double get(LLCCEP_vm::arg &data)
 				return LLCCEP_vm::__added__::regs[static_cast<long long>(data.val)];
 			break;
 
-		case ARG_T_MEM:
-			if (DBL_AE(data.val, get_mem_size()) ||
-			    DBL_L(data.val, 0)) {
+		case LLCCEP_vm::ARG_T_MEM:
+			if (DBL_AE(data.val, LLCCEP_vm::get_mem_size()) ||
+			    DBL_LESS(data.val, 0)) {
 				throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
 					"Error!\n"
 					"Overbouding while reading data from RAM!\n"));
 			} else
-				return access_mem_data<double>(static_cast<long long>(data.val));
+				return LLCCEP_vm::access_mem_data<double>(static_cast<size_t>(data.val));
 			break;
 
-		case ARG_T_VAL:
+		case LLCCEP_vm::ARG_T_VAL:
 			return data.val;
 			break;
 
@@ -63,9 +64,9 @@ static double get(LLCCEP_vm::arg &data)
 static void set(LLCCEP_vm::arg &what, double val)
 {
 	switch (data.type) {
-		case ARG_T_REG:
+		case LLCCEP_vm::ARG_T_REG:
 			if (DBL_AE(data.val, 31) ||
-			    DBL_L(data.val, 0)) {
+			    DBL_LESS(data.val, 0)) {
 				throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
 					"Error!\n"
 					"Overbounding while writing data to register!\n"));
@@ -73,17 +74,17 @@ static void set(LLCCEP_vm::arg &what, double val)
 				LLCCEP_vm::__added__::regs[what.val] = val;
 			break;
 
-		case ARG_T_MEM:
+		case LLCCEP_vm::ARG_T_MEM:
 			if (DBL_AE(data.val, get_mem_size()) ||
-			    DBL_L(data.val, 0)) {
+			    DBL_LESS(data.val, 0)) {
 				throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
 					"Error!\n"
 					"Overbounding while writing data to mem!\n"));
 			} else
-				access_mem_data<double>(static_cast<long long>(data.val), val);
+				LLCCEP_vm::access_mem_data<double>(static_cast<size_t>(data.val), val);
 			break;
 
-		case ARG_T_VAL:
+		case LLCCEP_vm::ARG_T_VAL:
 			throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
 				"Error!\n"
 				"An attempt of writing data to non-memory!\n"));
@@ -103,8 +104,8 @@ static inline void emulated_mov(LLCCEP_vm::instruction &data)
 
 static inline void emulated_mva(LLCCEP_vm::instruction &data)
 {
-	access_mem_data<double>(
-		static_cast<long long unsigned>(get(data.args[0])), 
+	LLCCEP_vm::access_mem_data<double>(
+		static_cast<size_t>(get(data.args[0])), 
 		get(data.args[1]));
 }
 
@@ -228,7 +229,7 @@ static void emulated_swi(LLCCEP_vm::instruction &data)
 		 * ptr - pointer to string being printed
 		 **************************************************************************/
 		case 2:
-			::std::cout << access_mem_data<char *>(static_cast<size_t>(LLCCEP_vm::__added__::regs[0]));
+			::std::cout << LLCCEP_vm::access_mem_data<char *>(static_cast<size_t>(LLCCEP_vm::__added__::regs[0]));
 			break;
 
 		/***************************************************************************
@@ -268,7 +269,7 @@ static void emulated_swi(LLCCEP_vm::instruction &data)
 			::std::cin >> val;
 
 			for (size_t i = 0; i < val.length(); i++)
-				access_mem_data<char>(static_cast<long long unsigned>(LLCCEP_vm::__added__::regs[0] + i, val[i]);
+				LLCCEP_vm::access_mem_data<char>(static_cast<long long unsigned>(LLCCEP_vm::__added__::regs[0] + i, val[i]);
 
 			break;
 		}
@@ -318,7 +319,7 @@ static void emulated_swi(LLCCEP_vm::instruction &data)
 
 		case 10: { // r/w byte to/from file
 			FILE *r00 = *(FILE **)((void *)((double *)(LLCCEP_vm::__added__::regs[0])));
-			if (DBL_EQ(LLCCEP_vm::__added__::regs[1]))
+			if (DBL_EQ(LLCCEP_vm::__added__::regs[1], 0))
 				fprintf(r00, "%c", static_cast<unsigned char>(LLCCEP_vm::__added__::regs[2]));
 			else
 				fscanf(r00, "%c", (char *)((void *)&LLCCE_vm::__added__::regs[2]));

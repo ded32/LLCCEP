@@ -30,7 +30,7 @@ namespace LLCCEP_vm {
 			in >> temp.opcode;
 
 			for (unsigned i = 0; i < 3; i++) {
-				uint8_t data[sizeof(double)] = {};
+				char data[sizeof(double)] = {};
 
 				in.read(data, 1);
 				temp.args[i].type = static_cast<arg_t>(data[0]);
