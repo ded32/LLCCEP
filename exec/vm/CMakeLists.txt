@@ -5,6 +5,14 @@ include(FindPkgConfig)
 
 pkg_search_module(SDL2 required sdl2)
 
+file(WRITE "${CMAKE_SOURCE_DIR}/../selection/selection.hpp" 
+	"#ifndef SELECTION_HPP\n"
+	"#define SELECTION_HPP\n"
+	"\n"
+	"#define VM 1\n"
+	"\n"
+	"#endif // SELECTION_HPP\n")
+
 set(CMAKE_CXX_FLAGS "-std=gnu++11 -g -O0")
 
 include_directories("${CMAKE_SOURCE_DIR}/../../include/")

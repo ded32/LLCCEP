@@ -13,6 +13,7 @@
 #include "./../drivers/display/display.hpp"
 #include "./../drivers/ram/ram.hpp"
 
+#if VM
 static void __vm_load_dev(::LLCCEP_vm::config conf)
 {
 	for (size_t i = 0; i < conf.dev.size(); i++) {
@@ -20,16 +21,23 @@ static void __vm_load_dev(::LLCCEP_vm::config conf)
 		LLCCEP_vm::dev.push_back(tmp);
 	}
 }
+#endif // VM
 
 namespace LLCCEP_vm {
 	::std::vector<FILE *> dev;
 
-	void setup_vm_resources(config conf)
+	void setup_vm_resources(
+#if VM
+	    config conf
+#else
+	    size_t ramS
+#endif
+	)
 	{
 #if VM
-			__vm_load_dev(conf); // Open devices
+			__vm_load_dev(conf);
 
-			if (conf.displayW <= 0 || // Init display
+			if (conf.displayW <= 0 ||
 			    conf.displayH <= 0) {
 				init_display(conf.title.c_str(),  
 				             get_host_width(),
@@ -38,9 +46,11 @@ namespace LLCCEP_vm {
 				init_display(conf.title.c_str(),
 				             conf.displayW, conf.displayH);
 			}
-#endif // VM
 
-		allocate_mem(conf.ramS); // Allocate VM RAM
+		allocate_mem(conf.ramS);
+#else
+		allocate_mem(ramS);
+#endif
 	}
 
 	void free_vm_resources()
@@ -52,7 +62,6 @@ namespace LLCCEP_vm {
 
 			for (size_t i = 0; i < dev.size(); i++)
 				fclose(dev[i]);		
-		}
 #endif // VM
 	}
 }

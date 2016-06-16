@@ -18,14 +18,20 @@
 
 #include "./../../common/def/def_inst.hpp"
 
+#if VM
+#include "./../drivers/display/display.hpp"
+#endif //VM
+
 namespace LLCCEP_vm {
 	namespace __added__ {
 		::std::stack<double> stk;
 		double cmp = 0;
 		double regs[32] = {};
 
+#if !VM
 		::std::vector<FILE *> files;
 		::std::vector<window> windows;
+#endif // VM
 	}
 }
 
@@ -468,9 +474,9 @@ static void emulated_outp(LLCCEP_vm::instruction &data)
 			break;
 
 		case 1: {
-			uint16_t pos[2] = {
-				 static_cast<uint16_t>(get(data.args[1]))        & 0xFFFF,
-				(static_cast<uint16_t>(get(data.args[1])) >> 16) & 0xFFFF
+			int pos[2] = {
+				 static_cast<int>(get(data.args[1]))        & 0xFFFF,
+				(static_cast<int>(get(data.args[1])) >> 16) & 0xFFFF
 			};
 			LLCCEP_vm::set_pix(pos[0], pos[1]);
 
@@ -495,9 +501,9 @@ static void emulated_inp(LLCCEP_vm::instruction &data)
 			break;
 
 		case 1: {
-			uint16_t pos[2] = {
-				 static_cast<uint16_t>(get(data.args[1])         & 0xFFFF,
-				(static_cast<uint16_t>(get(data.args[1])) >> 16) & 0xFFFF;
+			int pos[2] = {
+				 static_cast<int>(get(data.args[1]))        & 0xFFFF,
+				(static_cast<int>(get(data.args[1])) >> 16) & 0xFFFF
 			};
 			set(data.args[2], LLCCEP_vm::get_pix(pos[0], pos[1]));
 			break;
@@ -556,7 +562,19 @@ namespace LLCCEP_vm {
 	void execute(::std::vector<instruction> &data)
 	{
 		double &i = LLCCEP_vm::__added__::regs[14];
+
+#if VM
+		i = 1;
+
+		while (handle_msg()) {
+			if (i <= data.size()) {
+				emulate(data[i - 1]);
+				i++;
+			}
+		}
+#else
 		for (i = 1; i <= data.size(); i++)
 			emulate(data[i - 1]);
+#endif
 	}
 }

@@ -14,7 +14,7 @@
 ({\
 	char *__res__ = new (std::nothrow) char[1024];\
 	assert(__res__);\
-	::std::sprintf(__res__, "Parsing issue:\n%s:%d:\n" fmt, file, line, ##__VA_ARGS__);\
+	::std::sprintf(__res__, "Parsing issue:\n%s:%zu:\n" fmt, file, line, ##__VA_ARGS__);\
 	__res__;\
 })
 
