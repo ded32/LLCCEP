@@ -1,11 +1,7 @@
 *.DS_Store
-
 *.cmake
-
 *.bin
-
+bin
 *.out
-
 *.check_cache
 
-JIT/program/CMakeFiles/CMakeOutput.log

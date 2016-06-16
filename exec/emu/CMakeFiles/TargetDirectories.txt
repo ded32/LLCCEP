@@ -1,0 +1,7 @@
+/home/andrew/shared/Home/Documents/projects/personal/LLCCEP/exec/emu/CMakeFiles/STDExtras.dir
+/home/andrew/shared/Home/Documents/projects/personal/LLCCEP/exec/emu/CMakeFiles/emu.dir
+/home/andrew/shared/Home/Documents/projects/personal/LLCCEP/exec/emu/CMakeFiles/prog.dir
+/home/andrew/shared/Home/Documents/projects/personal/LLCCEP/exec/emu/CMakeFiles/ram_driver.dir
+/home/andrew/shared/Home/Documents/projects/personal/LLCCEP/exec/emu/CMakeFiles/setup.dir
+/home/andrew/shared/Home/Documents/projects/personal/LLCCEP/exec/emu/CMakeFiles/softcore.dir
+/home/andrew/shared/Home/Documents/projects/personal/LLCCEP/exec/emu/CMakeFiles/window.dir

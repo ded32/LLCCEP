@@ -239,7 +239,12 @@ static void emulated_swi(LLCCEP_vm::instruction &data)
 		 * ptr - pointer to string being printed
 		 **************************************************************************/
 		case 2:
-			::std::cout << LLCCEP_vm::access_mem_data<char *>(static_cast<size_t>(LLCCEP_vm::__added__::regs[0]));
+			for (size_t i = LLCCEP_vm::__added__::regs[0]; i < LLCCEP_vm::get_mem_size(); i++) {
+				if (DBL_EQ(LLCCEP_vm::access_mem_data<double>(i), 0))
+					break;
+				else
+					::std::cout << static_cast<uint8_t>(LLCCEP_vm::access_mem_data<double>(i));
+			}
 			break;
 
 		/***************************************************************************

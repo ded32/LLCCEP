@@ -10,7 +10,9 @@ al mov $08, 111 ; o
 al mov $09, 114 ; r
 al mov $10, 108 ; l
 al mov $11, 100 ; d
-al mov $12, 0   ; \0
+al mov $12, 33  ; !
+al mov $13, 13  ; \n
+al mov $14, 0   ; \0
 
 al mov &00, 0
 
