@@ -24,7 +24,7 @@ static void __vm_load_dev(::LLCCEP_vm::config conf)
 namespace LLCCEP_vm {
 	::std::vector<FILE *> dev;
 
-	void setup_vm(config conf)
+	void setup_vm_resources(config conf)
 	{
 #if VM
 			__vm_load_dev(conf); // Open devices

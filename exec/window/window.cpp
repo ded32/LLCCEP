@@ -1,14 +1,19 @@
 #include <SDL2/SDL.h>
 #include <cstdint>
 #include <string>
+#include <vector>
 
-#define INIT_FAIL(expr) \
-if (expr) { \
+#include <STDExtras.hpp>
+
+#include "window.hpp"
+
+#define INIT_FATAL(expr) \
+({if (expr) { \
 	throw RUNTIME_EXCEPTION(CONSTRUCT_MSG( \
 		"Error!\n" \
 		"Can't create window: %s", \
 		SDL_GetError())); \
-}
+}})
 
 #define OPENED_FATAL \
 if (wnd || rnd || running) { \
@@ -27,9 +32,11 @@ if (!wnd || !rnd || !running) { \
 }
 
 namespace LLCCEP_vm {
-	bool __sdl_running__ = false;
-	size_t __windows_n__ = 0;
-	::std::vector<window *> windows;
+	namespace __wnd__ {
+		bool __sdl_running__ = false;
+		size_t focused_id = 0;
+		::std::vector<window *> windows;
+	}
 
 	window::window():
 		wnd(0),
@@ -40,23 +47,27 @@ namespace LLCCEP_vm {
 
 	void window::init(::std::string title,
 	                  uint16_t width,
-	                  uint16_t height)
+	                  uint16_t height,
+	                  uint32_t attrs)
 	{
 		OPENED_FATAL
 
 		if (!__sdl_running__) {
-			INIT_FATAL(SDL_Init(SDL_INIT_EVERYTHING))
-			__sdl_running = true;
+			INIT_FATAL(SDL_Init(SDL_INIT_EVERYTHING));
+			__sdl_running__ = true;
 		}
 
 		wnd = SDL_CreateWindow(title.c_str(), SDL_WINDOWPOS_CENTERED,
 		                       SDL_WINDOWPOS_CENTERED, width, height,
-		                       SDL_WINDOW_SHOWN);
-		INIT_FATAL(!wnd)
+		                       );
+		INIT_FATAL(!wnd);
 
 		rnd = SDL_CreateRenderer(wnd, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
-		INIT_FAIL(!rnd);
+		INIT_FATAL(!rnd);
+	}
 
-		__windows_n__++;
+	void window::handle()
+	{
+		
 	}
 }
