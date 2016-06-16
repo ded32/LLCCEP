@@ -1,2 +1,0 @@
-/usr/bin/ar cr libwindow.a  CMakeFiles/window.dir/home/andrew/shared/Home/Documents/projects/personal/LLCCEP/exec/window/window.cpp.o
-/usr/bin/ranlib libwindow.a
