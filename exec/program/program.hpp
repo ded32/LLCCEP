@@ -19,6 +19,7 @@ namespace LLCCEP_vm {
 	};
 
 	struct instruction {
+		uint8_t cond;
 		uint8_t opcode;
 		arg args[3];
 	};

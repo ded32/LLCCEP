@@ -22,6 +22,7 @@ add_library(ram_driver "${CMAKE_SOURCE_DIR}/../drivers/ram/ram.cpp")
 add_library(window "${CMAKE_SOURCE_DIR}/../window/window.cpp")
 
 target_link_libraries(display_driver ${SDL2_LIBRARIES})
+target_link_libraries(conf "config++")
 
 add_executable(VM "${CMAKE_SOURCE_DIR}/main.cpp")
 target_link_libraries(VM STDExtras conf setup softcore prog

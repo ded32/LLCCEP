@@ -332,10 +332,18 @@ static void emulated_swi(LLCCEP_vm::instruction &data)
 		}
 
 		case 11: { // create window
+			LLCCEP_vm::size sz = {
+				static_cast<int>((static_cast<long>(LLCCEP_vm::__added__::regs[1]) >> 16) & 0xFFFF),
+				static_cast<int>(static_cast<long>(LLCCEP_vm::__added__::regs[1]) & 0xFFFF)
+			};
+			LLCCEP_vm::point pos = {
+				static_cast<int>((static_cast<long>(LLCCEP_vm::__added__::regs[2]) >> 16) & 0xFFFF),
+				static_cast<int>(static_cast<long>(LLCCEP_vm::__added__::regs[2]) & 0xFFFF)
+			};
+
 			LLCCEP_vm::window new_wnd;
-			new_wnd.init(LLCCEP_vm::access_mem_data<char *>(static_cast<size_t>(LLCCEP_vm::__added__::regs[0])),
-			             static_cast<uint16_t>(LLCCEP_vm::__added__::regs[0]),
-			             static_cast<uint16_t>(LLCCEP_vm::__added__::regs[0]));
+			new_wnd.create(LLCCEP_vm::access_mem_data<char *>(static_cast<size_t>(LLCCEP_vm::__added__::regs[0])),
+			               sz, pos, static_cast<uint32_t>(LLCCEP_vm::__added__::regs[3]));
 
 			LLCCEP_vm::__added__::windows.push_back(new_wnd);
 			break;
@@ -348,14 +356,14 @@ static void emulated_swi(LLCCEP_vm::instruction &data)
 					static_cast<size_t>(LLCCEP_vm::__added__::regs[1])));
 			}
 
-			LLCCEP_vm::__added__::windows[static_cast<size_t>(LLCCEP_vm::__added__::regs[0])].close();
+			LLCCEP_vm::__added__::windows[static_cast<size_t>(LLCCEP_vm::__added__::regs[0])].destroy();
 			LLCCEP_vm::__added__::windows.erase(LLCCEP_vm::__added__::windows.begin() + static_cast<size_t>(
 				LLCCEP_vm::__added__::regs[0]));
 
 			break;
 		}
 
-		case 13: { // on-window drawing
+		case 13: { // window stuff
 			size_t id = static_cast<size_t>(LLCCEP_vm::__added__::regs[0]);
 			if (id >= LLCCEP_vm::__added__::windows.size()) {
 				throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
@@ -363,38 +371,7 @@ static void emulated_swi(LLCCEP_vm::instruction &data)
 					static_cast<size_t>(LLCCEP_vm::__added__::regs[0])));
 			}
 
-			switch (static_cast<int64_t>(LLCCEP_vm::__added__::regs[1])) {
-				case 0:
-					LLCCEP_vm::__added__::windows[id].set_clr(static_cast<uint32_t>(
-						LLCCEP_vm::__added__::regs[2]));
-					break;
-
-				case 1:
-					LLCCEP_vm::__added__::regs[2] = LLCCEP_vm::__added__::windows[id].get_clr();
-					break;
-
-				case 2: {
-					uint16_t pos[2] = {
-						 static_cast<uint32_t>(LLCCEP_vm::__added__::regs[2])          & 0xFFFF,
-						(static_cast<uint32_t>(LLCCEP_vm::__added__::regs[2]) >> 0x10) & 0xFFFF
-					};
-					LLCCEP_vm::__added__::windows[id].set_pix(pos[0], pos[1]);
-				}
-
-				case 3: {
-					uint16_t pos[2] = {
-						 static_cast<uint32_t>(LLCCEP_vm::__added__::regs[2])          & 0xFFFF,
-						(static_cast<uint32_t>(LLCCEP_vm::__added__::regs[2]) >> 0x10) & 0xFFFF
-					};
-					LLCCEP_vm::__added__::regs[3] = LLCCEP_vm::__added__::windows[id].get_pix(pos[0], pos[1]);
-				}
-
-				default:
-					throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
-						"Error!\n"
-						"No function %zd of 13th interrupt!\n",
-						static_cast<int64_t>(LLCCEP_vm::__added__::regs[0])));
-			}
+			break;	
 		}
 #endif
 

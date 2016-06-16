@@ -22,8 +22,8 @@
 
 namespace LLCCEP_vm {
 	typedef struct {
-		int X;
-		int Y;
+		int x;
+		int y;
 	} size, point;
 
 	class window {
@@ -50,7 +50,8 @@ namespace LLCCEP_vm {
 		void set_pixel(int x, int y, uint32_t color);
 		uint32_t get_pixel(int x, int y) const;
 
-		void clear(uint32_t clr = get_color());
+		void clear();
+		void clear(uint32_t clr);
 
 		size get_min_size() const;
 		size get_size()     const;

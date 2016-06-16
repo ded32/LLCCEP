@@ -1,2 +1,2 @@
-al mov &00, 48
-al mov &11, 45
+al mov &00, 97
+al swi 0

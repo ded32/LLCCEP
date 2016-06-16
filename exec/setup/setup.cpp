@@ -43,7 +43,7 @@ namespace LLCCEP_vm {
 		allocate_mem(conf.ramS); // Allocate VM RAM
 	}
 
-	void free_vm_resources(bool vm)
+	void free_vm_resources()
 	{
 		free_mem();
 

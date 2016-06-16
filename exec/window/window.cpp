@@ -1,6 +1,10 @@
 #include <SDL2/SDL.h>
 #include <cstdint>
 
+#include <STDExtras.hpp>
+
+#include "window.hpp"
+
 #define INIT_FATAL(expr) \
 ({ \
 if (!(expr)) { \
@@ -9,7 +13,7 @@ if (!(expr)) { \
 		"Window initialization failed: %s", \
 		SDL_GetError())); \
 } \
-})
+});
 
 #define NON_RUNNING_FATAL \
 ({ \
@@ -19,7 +23,7 @@ if (!running || !wnd || !rnd) { \
 		"Window requested beeing running in %s function", \
 		__PRETTY_FUNCTION__)); \
 } \
-})
+});
 
 #define RUNNING_FATAL \
 ({ \
@@ -29,7 +33,7 @@ if (running || wnd || rnd) { \
 		"Window requested not beeing running in %s function!\n", \
 		__PRETTY_FUNCTION__)); \
 } \
-})
+});
 
 namespace LLCCEP_vm {
 	namespace __wnd__ {
@@ -82,7 +86,7 @@ namespace LLCCEP_vm {
 		NON_RUNNING_FATAL
 
 		int id = SDL_GetWindowID(wnd);
-		if (ev.type == SDL_WINDOWEVENT && ev.window.windowID == ID) {
+		if (ev.type == SDL_WINDOWEVENT && ev.window.windowID == id) {
 			switch (ev.window.event) {
 				case SDL_WINDOWEVENT_SHOWN:
 					shown = false;
@@ -172,6 +176,11 @@ namespace LLCCEP_vm {
 		return pix[y * get_size().x + x];
 	}
 
+	void window::clear()
+	{
+		clear(get_color());
+	}
+
 	void window::clear(uint32_t clr)
 	{
 		NON_RUNNING_FATAL
@@ -213,7 +222,7 @@ namespace LLCCEP_vm {
 	{
 		NON_RUNNING_FATAL
 
-		SDL_SetWindowFullScreen(wnd, SDL_WINDOW_FULLSCREEN);
+		SDL_SetWindowFullscreen(wnd, SDL_WINDOW_FULLSCREEN);
 	}
 
 	void window::hide()
@@ -248,7 +257,7 @@ namespace LLCCEP_vm {
 	{
 		NON_RUNNING_FATAL
 
-		SDL_SetWindowGrab(wnd, static_cast<int>(mode));
+		SDL_SetWindowGrab(wnd, static_cast<SDL_bool>(mode));
 	}
 
 	void window::update()
@@ -266,8 +275,8 @@ namespace LLCCEP_vm {
 		SDL_DestroyRenderer(rnd);
 		SDL_DestroyWindow(wnd);
 
-		rnd = false;
-		wnd = false;
+		rnd = 0;
+		wnd = 0;
 		running = false;
 	}
 }

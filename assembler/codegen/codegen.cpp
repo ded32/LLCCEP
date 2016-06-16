@@ -13,7 +13,7 @@ static void __dump_double_as_str(::std::ostream &out, double val)
 {
 	unsigned size = sizeof(double);
 	for (unsigned i = 0; i < size; i++)
-		out << *(uint8_t *)(&val);
+		out << ((uint8_t *)&val)[i];
 }
 
 namespace LLCCEP_ASM {

@@ -74,7 +74,7 @@ int main(int argn, char * const *argv)
 		parse_command_line_params(argn, argv, inputs, output);
 	} catch (::LLCCEP::runtime_exception &exc) {
 		usage();
-		QUITE_ERROR(yes, exc.msg())
+		QUITE_ERROR(yes, "%s", exc.msg())
 	} DEFAULT_HANDLING
 
 	try {
@@ -82,9 +82,9 @@ int main(int argn, char * const *argv)
 			LLCCEP_ASM::compile(inputs[i], out);
 	} catch (::std::ios_base::failure &info) {
 		QUITE_ERROR(yes, "Can't open '%s' for read: "
-		                 "%s\n", inputs[i], info.what());
+		                 "%s\n", inputs[i].c_str(), info.what());
 	} catch (::LLCCEP::runtime_exception &exc) {
-		QUITE_ERROR(yes, exc.msg());
+		QUITE_ERROR(yes, "%s", exc.msg());
 	} DEFAULT_HANDLING
 
 	try {
@@ -96,7 +96,7 @@ int main(int argn, char * const *argv)
 		out_f.close();
 	} catch (::std::ios_base::failure &info) {
 		::std::fprintf(stderr, "Error!\nCan't open '%s' for write: %s",
-		               output, info.what());
+		               output.c_str(), info.what());
 	} catch (...) {
 		::std::fprintf(stderr, "Unknown exception");
 	}

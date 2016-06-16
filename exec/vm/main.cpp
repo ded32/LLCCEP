@@ -38,7 +38,7 @@ bool is_program(char * const str)
 
 void parse_command_line_params(int argn, char * const *argv, ::std::string &cfg, ::std::string &program)
 {
-	for (int i = 0; i < argn; i++) {
+	for (int i = 1; i < argn; i++) {
 		if (is_help(argv[i])) {
 			usage();
 			::std::exit(EXIT_SUCCESS);
@@ -76,7 +76,7 @@ int main(int argn, char * const *argv)
 		parse_command_line_params(argn, argv, cfg, program);
 	} catch (::LLCCEP::runtime_exception &exc) {
 		usage();
-		QUITE_ERROR(yes, "%s", exc.msg())
+		QUITE_ERROR(yes, "%s", exc.what())
 	} DEFAULT_HANDLING
 
 	LLCCEP_vm::config conf = {};
@@ -87,6 +87,8 @@ int main(int argn, char * const *argv)
 		LLCCEP_vm::setup_vm_resources(conf);
 		LLCCEP_vm::execute(prog);
 		LLCCEP_vm::free_vm_resources();
+	} catch (::LLCCEP::runtime_exception &exc) {
+		QUITE_ERROR(yes, "%s", exc.what());
 	} DEFAULT_HANDLING
 
 	return 0;

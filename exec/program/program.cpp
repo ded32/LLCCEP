@@ -17,17 +17,10 @@ namespace LLCCEP_vm {
 				"Can't open %s for read: %s!\n",
 				input.c_str(), ::std::strerror(errno)));
 		}
-
-		if (get_length(in) % 29) {
-			throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
-				"Error!\n"
-				"Binary file %s is invalid or broken.",
-				input.c_str()));
-		}
 		
 		while (!in.eof()) {
 			instruction temp = {};
-			in >> temp.opcode;
+			in >> temp.cond >> temp.opcode;
 
 			for (unsigned i = 0; i < 3; i++) {
 				char data[sizeof(double)] = {};
