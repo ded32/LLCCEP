@@ -1,2 +1,0 @@
-/usr/bin/ar cr libprog.a  CMakeFiles/prog.dir/home/andrew/shared/Home/Documents/projects/personal/LLCCEP/exec/program/program.cpp.o
-/usr/bin/ranlib libprog.a

@@ -1,2 +1,0 @@
-/usr/bin/ar cr libsetup.a  CMakeFiles/setup.dir/home/andrew/shared/Home/Documents/projects/personal/LLCCEP/exec/setup/setup.cpp.o
-/usr/bin/ranlib libsetup.a

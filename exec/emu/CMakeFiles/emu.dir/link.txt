@@ -1,1 +1,0 @@
-/usr/bin/c++   -std=gnu++11 -g -O0    CMakeFiles/emu.dir/main.cpp.o  -o emu -rdynamic libSTDExtras.a libsetup.a libsoftcore.a libprog.a libram_driver.a libwindow.a -lSDL2 
