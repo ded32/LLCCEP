@@ -91,17 +91,17 @@ clean: CMakeFiles/STDExtras.dir/clean
 # Target rules for target CMakeFiles/VM.dir
 
 # All Build rule for target.
+CMakeFiles/VM.dir/all: CMakeFiles/setup.dir/all
+CMakeFiles/VM.dir/all: CMakeFiles/softcore.dir/all
+CMakeFiles/VM.dir/all: CMakeFiles/prog.dir/all
+CMakeFiles/VM.dir/all: CMakeFiles/display_driver.dir/all
 CMakeFiles/VM.dir/all: CMakeFiles/hdd_driver.dir/all
 CMakeFiles/VM.dir/all: CMakeFiles/kb_driver.dir/all
 CMakeFiles/VM.dir/all: CMakeFiles/mouse_driver.dir/all
 CMakeFiles/VM.dir/all: CMakeFiles/ram_driver.dir/all
-CMakeFiles/VM.dir/all: CMakeFiles/prog.dir/all
-CMakeFiles/VM.dir/all: CMakeFiles/display_driver.dir/all
-CMakeFiles/VM.dir/all: CMakeFiles/conf.dir/all
-CMakeFiles/VM.dir/all: CMakeFiles/setup.dir/all
-CMakeFiles/VM.dir/all: CMakeFiles/softcore.dir/all
 CMakeFiles/VM.dir/all: CMakeFiles/window.dir/all
 CMakeFiles/VM.dir/all: CMakeFiles/STDExtras.dir/all
+CMakeFiles/VM.dir/all: CMakeFiles/conf.dir/all
 	$(MAKE) -f CMakeFiles/VM.dir/build.make CMakeFiles/VM.dir/depend
 	$(MAKE) -f CMakeFiles/VM.dir/build.make CMakeFiles/VM.dir/build
 	$(CMAKE_COMMAND) -E cmake_progress_report /home/andrew/shared/Home/Documents/projects/personal/LLCCEP/exec/vm/CMakeFiles  2
