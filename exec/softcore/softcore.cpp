@@ -294,6 +294,34 @@ static void emulated_swi(LLCCEP_vm::instruction &data)
 		 **************************************************************************/
 
 #if !VM
+		/***************************************************************************
+		 * Open file.
+		 *
+		 * Inputs:
+		 * r00 - addition mode chars
+		 * the two lower bits mean main mode data:
+		 * |--[0] - read
+		 * |--[1] - write
+		 * |--[2] - append
+		 *
+		 * The third bit is '+' indicator
+		 * |--r+ open file both for write and read
+		 * |--w+ create empty file and open it both for read and write
+		 * |--a+ open file both for write and read with all output at
+		 * the end of the file
+		 *
+		 * The forth bit is 'b' indicator
+		 * If it's passed, file will be opened as 'binary'
+		 *
+		 * And, as final, r01 is pointer to mem, where path to file is
+		 * contained.
+		 *
+		 * Outputs:
+		 * r01 - ptr
+		 *
+		 * Data used:
+		 * ptr - pointer to file been opened
+		 **************************************************************************/
 		case 7: {
 			::std::string modes[] = {
 				"r",
@@ -325,14 +353,43 @@ static void emulated_swi(LLCCEP_vm::instruction &data)
 			break;
 		}
 
-		case 9: { // close file
+		/***************************************************************************
+		 * Close file
+		 *
+		 * Inputs:
+		 * r00 - ptr
+		 *
+		 * Outputs:
+		 * None
+		 *
+		 * Data used:
+		 * ptr - pointer to file being closed
+		 **************************************************************************/
+		case 9: {
 			FILE *r00 = *(FILE **)((void *)((double *)(&LLCCEP_vm::__added__::regs[0])));
 			fclose(r00);
 			LLCCEP_vm::__added__::files.erase(vec_find(LLCCEP_vm::__added__::files, r00));
 			break;
 		}
 
-		case 10: { // r/w byte to/from file
+
+		/***************************************************************************
+		 * Read/write byte from/to file
+		 *
+		 * Inputs:
+		 * r02 - byte
+		 * r01 - action
+		 * r00 - ptr
+		 *
+		 * Outputs:
+		 * None
+		 *
+		 * Data used:
+		 * action - if zero, byte will be written, else it will be read
+		 * ptr - pointer to file, with which we are working
+		 * byte - byte beeing written/read
+		 **************************************************************************/
+		case 10: {
 			FILE *r00 = *(FILE **)((void *)((double *)(&LLCCEP_vm::__added__::regs[0])));
 			if (DBL_EQ(LLCCEP_vm::__added__::regs[1], 0))
 				fprintf(r00, "%c", static_cast<unsigned char>(LLCCEP_vm::__added__::regs[2]));

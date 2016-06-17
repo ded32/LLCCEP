@@ -76,7 +76,7 @@ int main(int argn, char * const *argv)
 		parse_command_line_params(argn, argv, cfg, program);
 	} catch (::LLCCEP::runtime_exception &exc) {
 		usage();
-		QUITE_ERROR(yes, "%s", exc.what())
+		QUITE_ERROR(yes, "%s", exc.msg())
 	} DEFAULT_HANDLING
 
 	LLCCEP_vm::config conf = {};
@@ -88,7 +88,7 @@ int main(int argn, char * const *argv)
 		LLCCEP_vm::execute(prog);
 		LLCCEP_vm::free_vm_resources();
 	} catch (::LLCCEP::runtime_exception &exc) {
-		QUITE_ERROR(yes, "%s", exc.what());
+		QUITE_ERROR(yes, "%s", exc.msg());
 	} DEFAULT_HANDLING
 
 	return 0;
