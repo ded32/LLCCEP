@@ -25,7 +25,7 @@
 namespace LLCCEP_vm {
 	namespace __added__ {
 		::std::stack<double> stk;
-		double cmp = 0;
+		int cmp = 0b1000;
 		double regs[32] = {};
 
 #if !VM
@@ -397,6 +397,7 @@ static void emulated_swi(LLCCEP_vm::instruction &data)
 		 **************************************************************************/
 		case 9: {
 			FILE *r00 = *(FILE **)((void *)((double *)(&LLCCEP_vm::__added__::regs[0])));
+
 			if (DBL_EQ(LLCCEP_vm::__added__::regs[1], 0))
 				fprintf(r00, "%c", static_cast<uint8_t>(LLCCEP_vm::__added__::regs[2]));
 			else {
@@ -408,7 +409,30 @@ static void emulated_swi(LLCCEP_vm::instruction &data)
 			break;
 		}
 
-		case 10: { // create window
+		case 10: {
+			FILE *r00 = *(FILE **)((void *)((double *)(&LLCCEP_vm::__added__::regs[0])));
+
+			if (DBL_EQ(LLCCEP_vm::__added__::regs[1], 0)) {
+				::std::string tmp = "";
+				for (size_t i = static_cast<size_t>(LLCCEP_vm::__added__::regs[2]);
+				     i < LLCCEP_vm::get_mem_size(); i++)
+					tmp += static_cast<uint8_t>(LLCCEP_vm::access_mem_data<double>(i));
+
+				fprintf(r00, "%s", tmp.c_str());
+			} else {
+				for (size_t i = static_cast<size_t>(LLCCEP_vm::__added__::regs[2]);
+				     (i < LLCCEP_vm::get_mem_size()) && (!feof(r00)); i++) {
+					char c = fgetc(r00);
+					if (isspace(c) || !c)
+						break;
+
+					LLCCEP_vm::access_mem_data<double>(i, c);
+				}
+			}
+			break;
+		}
+
+		case 11: { // create window
 			LLCCEP_vm::size sz = {
 				static_cast<int>((static_cast<long>(LLCCEP_vm::__added__::regs[1]) >> 16) & 0xFFFF),
 				static_cast<int>(static_cast<long>(LLCCEP_vm::__added__::regs[1]) & 0xFFFF)
@@ -426,7 +450,7 @@ static void emulated_swi(LLCCEP_vm::instruction &data)
 			break;
 		}
 
-		case 11: { // delete window
+		case 12: { // delete window
 			if (static_cast<size_t>(LLCCEP_vm::__added__::regs[0]) >= LLCCEP_vm::__added__::windows.size()) {
 				throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
 					"Overbounding due window accessing: no window %zu",
@@ -440,7 +464,7 @@ static void emulated_swi(LLCCEP_vm::instruction &data)
 			break;
 		}
 
-		case 12: { // window stuff
+		case 13: { // window stuff
 			size_t id = static_cast<size_t>(LLCCEP_vm::__added__::regs[0]);
 			if (id >= LLCCEP_vm::__added__::windows.size()) {
 				throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
@@ -462,7 +486,17 @@ static void emulated_swi(LLCCEP_vm::instruction &data)
 
 static inline void emulated_cmp(LLCCEP_vm::instruction &data)
 {
-	LLCCEP_vm::__added__::cmp = get(data.args[0]) - get(data.args[1]);
+	double n0 = get(data.args[0]), n1 = get(data.args[1]);
+	int &val = LLCCEP_vm::__added__::cmp;
+
+	val = 0b1000;
+
+	if (DBL_LESS(n0, n1))
+		val |= 0b0010;
+	if (DBL_ABOVE(n0, n1))
+		val |= 0b0001;
+	if (DBL_EQ(n0, n1))
+		val |= 0b0100;
 }
 
 static inline void emulated_inc(LLCCEP_vm::instruction &data)
@@ -626,7 +660,8 @@ static inline void emulate(LLCCEP_vm::instruction &data)
 			"Invalid opcode: %d", static_cast<int>(data.opcode)));
 	}
 
-	funcs[data.opcode](data);
+	if (LLCCEP_vm::__added__::cmp & data.cond)
+		funcs[data.opcode](data);
 }
 
 namespace LLCCEP_vm {
