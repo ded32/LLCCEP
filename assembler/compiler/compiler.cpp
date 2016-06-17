@@ -32,6 +32,8 @@ namespace LLCCEP_ASM {
 			try {
 				to_lexems(code, program, 
 				          in_path, i);
+			} catch (::LLCCEP::runtime_exception &exc) {
+				throw (exc);
 			} DEFAULT_HANDLING
 	
 			if (!program.size())

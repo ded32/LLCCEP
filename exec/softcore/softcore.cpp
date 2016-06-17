@@ -345,7 +345,13 @@ static void emulated_swi(LLCCEP_vm::instruction &data)
 			if (attrs[1])
 				mode += 'b';
 
-			FILE *fd = fopen(LLCCEP_vm::access_mem_data<char *>(static_cast<size_t>(LLCCEP_vm::__added__::regs[1])),
+			::std::string path = "";
+			for (size_t i = static_cast<size_t>(LLCCEP_vm::__added__::regs[1]); 
+			     i < LLCCEP_vm::get_mem_size(); i++) {
+				path += static_cast<uint8_t>(LLCCEP_vm::access_mem_data<double>(i));
+			}
+
+			FILE *fd = fopen(path.c_str(),
 			                 mode.c_str());
 
 			LLCCEP_vm::__added__::files.push_back(fd);
@@ -365,7 +371,7 @@ static void emulated_swi(LLCCEP_vm::instruction &data)
 		 * Data used:
 		 * ptr - pointer to file being closed
 		 **************************************************************************/
-		case 9: {
+		case 8: {
 			FILE *r00 = *(FILE **)((void *)((double *)(&LLCCEP_vm::__added__::regs[0])));
 			fclose(r00);
 			LLCCEP_vm::__added__::files.erase(vec_find(LLCCEP_vm::__added__::files, r00));
@@ -389,17 +395,20 @@ static void emulated_swi(LLCCEP_vm::instruction &data)
 		 * ptr - pointer to file, with which we are working
 		 * byte - byte beeing written/read
 		 **************************************************************************/
-		case 10: {
+		case 9: {
 			FILE *r00 = *(FILE **)((void *)((double *)(&LLCCEP_vm::__added__::regs[0])));
 			if (DBL_EQ(LLCCEP_vm::__added__::regs[1], 0))
-				fprintf(r00, "%c", static_cast<unsigned char>(LLCCEP_vm::__added__::regs[2]));
-			else
-				fscanf(r00, "%c", (char *)((void *)&LLCCEP_vm::__added__::regs[2]));
+				fprintf(r00, "%c", static_cast<uint8_t>(LLCCEP_vm::__added__::regs[2]));
+			else {
+				uint8_t c = 0;
+				fscanf(r00, "%c", &c);
+				LLCCEP_vm::__added__::regs[2] = c;
+			}
 
 			break;
 		}
 
-		case 11: { // create window
+		case 10: { // create window
 			LLCCEP_vm::size sz = {
 				static_cast<int>((static_cast<long>(LLCCEP_vm::__added__::regs[1]) >> 16) & 0xFFFF),
 				static_cast<int>(static_cast<long>(LLCCEP_vm::__added__::regs[1]) & 0xFFFF)
@@ -417,7 +426,7 @@ static void emulated_swi(LLCCEP_vm::instruction &data)
 			break;
 		}
 
-		case 12: { // delete window
+		case 11: { // delete window
 			if (static_cast<size_t>(LLCCEP_vm::__added__::regs[0]) >= LLCCEP_vm::__added__::windows.size()) {
 				throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
 					"Overbounding due window accessing: no window %zu",
@@ -431,7 +440,7 @@ static void emulated_swi(LLCCEP_vm::instruction &data)
 			break;
 		}
 
-		case 13: { // window stuff
+		case 12: { // window stuff
 			size_t id = static_cast<size_t>(LLCCEP_vm::__added__::regs[0]);
 			if (id >= LLCCEP_vm::__added__::windows.size()) {
 				throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(

@@ -16,4 +16,16 @@ T from_string(::std::string str)
 	return val;
 }
 
+template<typename T>
+::std::string to_string(T data)
+{
+	::std::string val;
+
+	::std::stringstream stream;
+	stream << data;
+	val = stream.str();
+
+	return val;
+}
+
 #endif // CONVERT_HPP

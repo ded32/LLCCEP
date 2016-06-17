@@ -16,7 +16,7 @@
 ({\
 	char *__res__ = new (std::nothrow) char[1024];\
 	assert(__res__);\
-	::std::sprintf(__res__, "Syntax error!\n%s:%d:\n" fmt "\n", file, line, ##__VA_ARGS__);\
+	::std::sprintf(__res__, "Syntax error!\n%s:%zu:\n" fmt "\n", file, line, ##__VA_ARGS__);\
 	__res__;\
 })
 

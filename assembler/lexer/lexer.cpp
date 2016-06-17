@@ -6,6 +6,7 @@
 #include <cassert>
 #include <new>
 
+#include <convert.hpp>
 #include <STDExtras.hpp>
 
 #include "lexer.hpp"
@@ -20,7 +21,7 @@
 
 namespace LLCCEP_ASM {
 	void to_lexems(::std::string data, ::std::vector<lexem> &lex, 
-	               ::std::string file, ::std::size_t line)
+	               ::std::string file, size_t line)
 	{
 		size_t i = 0, l = data.length();
 		lexem curr = {};
@@ -45,6 +46,35 @@ namespace LLCCEP_ASM {
 					curr.val += data[i];
 					i++;
 				}
+			} else if (data[i] == '"') {
+				curr.type = LEX_T_VAL;
+				i++;
+
+				::std::string tmp = "";
+
+				while (data[i] && data[i] != '\n' && data[i] != '"') {
+					tmp += data[i];
+					i++;
+				}
+
+				if (data[i] != '"') {
+					throw RUNTIME_EXCEPTION(PARSE_ISSUE(
+						file.c_str(),
+						line,
+						"Unclosed char declaration: %s\n",
+						tmp.c_str()));
+				}
+
+				if (tmp.length() != 1) {
+					throw RUNTIME_EXCEPTION(PARSE_ISSUE(
+						file.c_str(),
+						line,
+						"Invalid length of char declaration!\n"));
+				}
+
+				i++;
+
+				curr.val = to_string(static_cast<int>(tmp[0]));
 			} else if (isalpha(data[i])) {
 				curr.type = LEX_T_NAME;
 
@@ -64,7 +94,7 @@ namespace LLCCEP_ASM {
 					i++;
 
 				continue;
-			} else if (!data[i] || data[i] == ';') {
+			} else if (!data[i] || data[i] == ';' || data[i] == '#') {
 				break;
 			} else {
 				lex.clear();
