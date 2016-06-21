@@ -1,5 +1,3 @@
-#define VM_EXECUTION
-
 #include <string>
 
 #include <cstdio>

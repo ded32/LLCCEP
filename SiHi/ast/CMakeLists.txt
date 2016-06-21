@@ -1,10 +1,10 @@
 cmake_minimum_required(VERSION 2.6)
 project(ast_unit_test)
 
-set(CMAKE_CXX_FLAGS "-std=c++11 -g -O0")
-set(DotViz "${CMAKE_SOURCE_DIR}/../../third-party/DotViz/libDotViz++.a")
+set(CMAKE_CXX_FLAGS "-std=gnu++11 -g -O0")
+set(DotViz "${CMAKE_SOURCE_DIR}/../../../DotViz/libDotViz++.a")
 
-include_directories("${CMAKE_SOURCE_DIR}/../../third-party/")
+include_directories("${CMAKE_SOURCE_DIR}/../../../DotViz/")
 include_directories("${CMAKE_SOURCE_DIR}/../../include/")
 
 add_library(ast "${CMAKE_SOURCE_DIR}/ast.cpp")

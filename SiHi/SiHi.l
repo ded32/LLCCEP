@@ -60,6 +60,9 @@ void  RET(VOID);
 real  RET(REAL);
 bool  RET(BOOL);
 
+true  RET(TRUE);
+false RET(FALSE);
+
 "<=" RET(OP_CMP_LE);
 ">=" RET(OP_CMP_AE);
 "==" RET(OP_CMP_EQ);

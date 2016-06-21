@@ -4,6 +4,7 @@
 #include <cassert>
 #include <memory>
 
+#include <STDExtras.hpp>
 #include <STLExtras.hpp>
 
 #include "ast.hpp"
@@ -32,7 +33,7 @@ namespace LLCCEP_SiHi {
 
 	ast::~ast()
 	{
-		std::vector<ast *>::const_iterator node = std::vector<ast *>::const_iterator();
+		std::vector<ast *>::iterator node = std::vector<ast *>::iterator();
 
 		for (const auto &child: __children__)
 			if (child)

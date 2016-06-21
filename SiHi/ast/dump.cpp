@@ -1,30 +1,31 @@
 #include <iostream>
 #include <string>
-#include <DotViz/DotViz++.hpp>
+#include <DotViz++.hpp>
 
 #include "ast.hpp"
 
-void __dump_lib_static_only_dump_node(const LLCCEP_SiHi::ast &node, long long unsigned begin)
+void __dump_node(DotViz::DVGraph &graph, LLCCEP_SiHi::ast &tree,
+		 long long unsigned id) 
 {
-	static long long unsigned count = begin + 1;
+	graph.node(++id - 1, tree.get_val());
 
-	DotViz::dvNode(begin, node.get_val());
-
-	for (size_t i = 0; i < node.get_children().size(); i++) {
-		if (node.get_children()[i]) {
-			__dump_lib_static_only_dump_node(*(node.get_children()[i]), count + i);
-			DotViz::dvLink(begin, count + i);
+	for (size_t i = 0; i < tree.get_children().size(); i++) {
+		if (tree.get_children()[i]) {
+			__dump_node(graph, *(tree.get_children()[i]), id + i);
+			graph.link(id - 1, id + i);
 		}
 	}
 }
 
 namespace LLCCEP_SiHi {
-	void dump_tree(::std::string title, const ast &root)
+	void dump_ast(::std::string path, ::std::string name,
+		      ast &tree)
 	{
-		DotViz::dvBegin(title, "AST_dump");
+		DotViz::DVGraph graph;
+		graph.begin(path, name);
 
-		__dump_lib_static_only_dump_node(root, 0);
-
-		DotViz::dvEnd();
+		__dump_node(graph, tree, 0);
+		
+		graph.end();
 	}
 }

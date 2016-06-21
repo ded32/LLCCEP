@@ -44,6 +44,8 @@ int pos_x;
 %token <str> VOID REAL BOOL
 %token <str> OP_LOGIC_AND OP_LOGIC_OR
 
+%token <str> TRUE FALSE
+
 %start main_parsing_unit
 
 %type <ast> primary_expression postfix_expression argument_expression_list
@@ -70,6 +72,8 @@ int pos_x;
 primary_expression: 
 	ID {$$ = new LLCCEP_SiHi::ast({}, ID, $<str>1);}
 	| VAL {$$ = new LLCCEP_SiHi::ast({}, VAL, $<str>1);}
+	| TRUE {$$ = new LLCCEP_SiHi::ast({}, TRUE, $<str>1);}
+	| FALSE {$$ = new LLCCEP_SiHi::ast({}, FALSE, $<str>1);}
 	| LITERAL {$$ = new LLCCEP_SiHi::ast({}, LITERAL, $<str>1);}
 	| '(' expression ')' {$$ = $<ast>2;};
 
