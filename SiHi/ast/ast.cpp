@@ -45,6 +45,9 @@ namespace LLCCEP_SiHi {
 
 	inline bool ast::OK() const
 	{
+		if (!this)
+			return true;
+
 		if (__ancestor__ && vec_find(__ancestor__->__children__, (ast *)this) == __ancestor__->__children__.end()) 
 			PANIC(bool, "Ancestor at %p has no child with %p address!\n", __ancestor__, this)
 

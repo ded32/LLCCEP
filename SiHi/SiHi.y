@@ -2,7 +2,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include <DotViz++.hpp>
+
 #include "ast/ast.hpp"
+#include "ast/dump.hpp"
 #include "ast/node_types.hpp"
 
 #define YY_(str) ((char const *)str)
@@ -11,11 +14,12 @@ int yylex();
 int yyerror(char const *str);
 
 int pos_x;
+LLCCEP_SiHi::ast *__program;
 %}
 
 %union {
 	LLCCEP_SiHi::ast *ast;
-	char *str;
+	const char *str;
 }
 
 %token <str> VAL ID LITERAL 
@@ -371,8 +375,8 @@ jump_statement:
 	| RETURN expression ';' {$$ = new LLCCEP_SiHi::ast({$<ast>2}, RETURN, "return");};
 
 main_parsing_unit: 
-	external_declaration {$$ = $<ast>1;}
-	| main_parsing_unit external_declaration {$$ = new LLCCEP_SiHi::ast({$<ast>1, $<ast>2}, MAIN, "Main");}
+	external_declaration {__program = $$ = $<ast>1;}
+	| main_parsing_unit external_declaration {__program = $$ = new LLCCEP_SiHi::ast({$<ast>1, $<ast>2}, MAIN, "Main");}
 	| {yyerror("syntax error");};
 
 external_declaration:
@@ -399,6 +403,9 @@ int main()
 	yyin = stdin;
 
 	yyparse();
+
+	LLCCEP_SiHi::dump_ast("out.gv", "ast", __program);
+	DotViz::dvRender("out.gv", "out.png");
 
 	return 0;
 }

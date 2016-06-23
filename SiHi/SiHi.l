@@ -7,7 +7,7 @@ alpha [a-zA-Z]
 
 #include "SiHi_parser.hpp"
 
-#define RET(VAL)  {update_pos(); return VAL;};
+#define RET(VAL)  {update_pos(); yylval.str = yytext; return VAL;};
 
 enum comment_type {
         COMMENT_T_SINGLELINE,

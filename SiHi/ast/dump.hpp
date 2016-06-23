@@ -7,7 +7,7 @@
 
 namespace LLCCEP_SiHi {
 	void dump_ast(::std::string path, ::std::string name,
-		       ast &tree);
+		       ast *tree);
 }
 
 #endif // DUMP_HPP

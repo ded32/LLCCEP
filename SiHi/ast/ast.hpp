@@ -16,7 +16,6 @@ namespace LLCCEP_SiHi {
 			::std::string __val__;
 		} __lex_data__;
 
-		size_t dump(size_t begin) const;
 	public:
 		ast();
 		ast(const ast &src);
