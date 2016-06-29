@@ -123,6 +123,7 @@ void gen_off(LLCCEP_JIT::codegen_backend &backend, instruction data)
 
 void gen_nop(LLCCEP_JIT::codegen_backend &backend, instruction data)
 {
+	backend.emit_nop();
 }
 
 void gen_swi(LLCCEP_JIT::codegen_backend &backend, instruction data)
