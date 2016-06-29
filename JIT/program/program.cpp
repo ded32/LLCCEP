@@ -46,6 +46,11 @@ namespace LLCCEP_JIT {
 		emit_data<uint64_t>(src);
 	}
 
+	void program::emit_shl_cl(regID what)
+	{
+		emit({0x48, 0xD3, 0xE0 + what});
+	}
+
 	void program::emit_cvtsd2si(regID dst, regID src)
 	{
 		emit({0xF2, REX_W, 0x0F, 0x2D});

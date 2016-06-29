@@ -128,11 +128,12 @@ void gen_nop(LLCCEP_JIT::codegen_backend &backend, instruction data)
 
 void gen_swi(LLCCEP_JIT::codegen_backend &backend, instruction data)
 {
-	//runtime
+	// runtime(alike-syscall)
 }
 
 void gen_cmp(LLCCEP_JIT::codegen_backend &backend, instruction data)
 {
+
 }
 
 void gen_inc(LLCCEP_JIT::codegen_backend &backend, instruction data)
@@ -192,17 +193,20 @@ void gen_patan(LLCCEP_JIT::codegen_backend &backend, instruction data)
 
 void gen_ldc(LLCCEP_JIT::codegen_backend &backend, instruction data)
 {
-	
+	backend.get_ptr(LLCCEP_JIT::RAX, data.args[0]); // RAX is ptr to res
+	backend.get_imm(LLCCEP_JIT::RBX, data.args[1]);
+	backend.emit_fld_const_reg(LLCCEP_JIT::RBX);
+	backend.emit_fst_reg_ptr(LLCCEP_JIT::RAX);
 }
 
 void gen_outp(LLCCEP_JIT::codegen_backend &backend, instruction data)
 {
-	//runtime
+	return; // emulator runtime doesn't support outp, it's VM feature
 }
 
 void gen_inp(LLCCEP_JIT::codegen_backend &backend, instruction data)
 {
-	//runtime
+	return; // emulator runtime doesn't support inp, it's VM feature
 }
 
 namespace LLCCEP_JIT {

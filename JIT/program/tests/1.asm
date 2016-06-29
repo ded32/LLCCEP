@@ -1,3 +1,3 @@
 use64
 
-and rax, [rax]
+sal rcx, cl

@@ -29,6 +29,8 @@ namespace LLCCEP_JIT {
 		void emit_mov_reg_reg_ptr(regID src, regID dst);
 		void emit_mov_reg_imm(regID dst, uint64_t src);
 
+		void emit_shl_cl(regID what);
+
 		void emit_cvtsd2si(regID dst, regID src);
 
 		void emit_push_reg(regID src);
@@ -41,7 +43,7 @@ namespace LLCCEP_JIT {
 
 		void emit_fld(regID src);
 		void emit_fld_const(fld_const val);
-
+		void emit_fld_const_reg(regID id);
 		void emit_fabs();
 
 		void emit_fadd();
