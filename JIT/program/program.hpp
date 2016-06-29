@@ -29,6 +29,8 @@ namespace LLCCEP_JIT {
 		void emit_mov_reg_reg_ptr(regID src, regID dst);
 		void emit_mov_reg_imm(regID dst, uint64_t src);
 
+		void emit_cvtsd2si(regID dst, regID src);
+
 		void emit_push_reg(regID src);
 		void emit_push_imm(uint64_t src);
 		void emit_pop_reg(regID dst);

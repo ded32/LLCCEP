@@ -1,3 +1,3 @@
 use64
 
-mov rax, [rsp]
+and rax, [rax]
