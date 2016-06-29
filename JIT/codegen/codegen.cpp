@@ -26,7 +26,6 @@ void gen_push(LLCCEP_JIT::codegen_backend &backend, instruction data)
 void gen_pop(LLCCEP_JIT::codegen_backend &backend, instruction data)
 {
 	backend.emit_pop_reg(LLCCEP_JIT::RDX);
-	//check it later
 }
 
 void gen_top(LLCCEP_JIT::codegen_backend &backend, instruction data)
@@ -39,6 +38,85 @@ void gen_top(LLCCEP_JIT::codegen_backend &backend, instruction data)
 void gen_add(LLCCEP_JIT::codegen_backend &backend, instruction data)
 {
 	backend.emit_
+}
+
+void gen_sub(LLCCEP_JIT::codegen_backend &backend, instruction data)
+{
+}
+
+void gen_mul(LLCCEP_JIT::codegen_backend &backend, instruction data)
+{
+}
+
+void gen_and(LLCCEP_JIT::codegen_backend &backend, instruction data)
+{
+}
+
+void gen_or(LLCCEP_JIT::codegen_backend &backend, instruction data)
+{
+}
+
+void gen_xor(LLCCEP_JIT::codegen_backend &backend, instruction data)
+{
+}
+
+void gen_off(LLCCEP_JIT::codegen_backend &backend, instruction data)
+{
+}
+
+void gen_nop(LLCCEP_JIT::codegen_backend &backend, instruction data)
+{
+}
+
+void gen_swi(LLCCEP_JIT::codegen_backend &backend, instruction data)
+{
+	//runtime
+}
+
+void gen_cmp(LLCCEP_JIT::codegen_backend &backend, instruction data)
+{
+}
+
+void gen_inc(LLCCEP_JIT::codegen_backend &backend, instruction data)
+{
+}
+
+void gen_dec(LLCCEP_JIT::codegen_backend &backend, instruction data)
+{
+}
+
+void gen_sqrt(LLCCEP_JIT::codegen_backend &backend, instruction data)
+{
+}
+
+void gen_sin(LLCCEP_JIT::codegen_backend &backend, instruction data)
+{
+}
+
+void gen_cos(LLCCEP_JIT::codegen_backend &backend, instruction data)
+{
+}
+
+void gen_ptan(LLCCEP_JIT::codegen_backend &backend, instruction data)
+{
+}
+
+void gen_patan(LLCCEP_JIT::codegen_backend &backend, instruction data)
+{
+}
+
+void gen_ldc(LLCCEP_JIT::codegen_backend &backend, instruction data)
+{
+}
+
+void gen_outp(LLCCEP_JIT::codegen_backend &backend, instruction data)
+{
+	//runtime
+}
+
+void gen_inp(LLCCEP_JIT::codegen_backend &backend, instruction data)
+{
+	//runtime
 }
 
 namespace LLCCEP_JIT {
