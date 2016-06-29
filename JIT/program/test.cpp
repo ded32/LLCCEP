@@ -6,16 +6,13 @@
 
 void some_func()
 {
-
+	::std::cout << "Hello JIT!";
 }
 
 int main()
 {
 	LLCCEP_JIT::program prog;
-
-	std::cout << std::hex << *(uint64_t *)&some_func << "\n";
-
-	prog.emit_mov_reg_imm(LLCCEP_JIT::RAX, *(uint64_t *)&some_func);
+	prog.emit_mov_reg_imm(LLCCEP_JIT::RAX, (uint64_t)&some_func);
 	prog.emit_call_reg(LLCCEP_JIT::RAX);
 
 	prog.emit_nop();
@@ -24,6 +21,8 @@ int main()
 	auto data = LLCCEP_JIT::make_program(prog);
 	call(data);
 	delete_program(data);
+
+//	prog.dump(true);
 
 	return 0;
 }

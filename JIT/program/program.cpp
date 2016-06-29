@@ -31,7 +31,13 @@ namespace LLCCEP_JIT {
 	void program::emit_mov_reg_ptr_reg(regID dst, regID src)
 	{
 		emit({0x48, 0x89});
-		//emit_rm_field(0b00, dst, src)
+		emit_rm_field(0b00, dst, src);
+	}
+
+	void program::emit_mov_reg_reg_ptr(regID dst, regID src)
+	{
+		emit({0x58, 0xB8});
+		emit_rm_field(0b00, dst, src);
 	}
 
 	void program::emit_mov_reg_imm(regID dst, uint64_t src)
@@ -78,9 +84,11 @@ namespace LLCCEP_JIT {
 		emit({0x9B, 0xDB, 0xE2});
 	}
 
-	void program::emit_fld_esp()
+	void program::emit_fld(LLCCEP_JIT::regID src)
 	{
-		emit({0xDD, 0x04, 0x24});
+		emit({0xDD, src});
+		if (src == RSP)
+			emit(0x24);
 	}
 
 	void program::emit_fld_const(fld_const val)
@@ -138,9 +146,11 @@ namespace LLCCEP_JIT {
 		emit({0xD9, 0xF3});
 	}
 
-	void program::emit_fstp_esp()
+	void program::emit_fstp_reg_ptr(regID dest)
 	{
-		emit({0xDD, 0x1C, 0x24});
+		emit({0xDD, 0x18 + dest});
+		if (dest == RSP)
+			emit(0x24);
 	}
 
 	void program::emit_call_reg(regID id)
