@@ -1,5 +1,15 @@
 #include "codegen.hpp"
 
+static inline void __gen_read_nums(LLCCEP_JIT:::codegen_backend &backend, instruction data)
+{
+	for (int i = 0; i < 2; i++) {
+		backend.get_imm(LLCCEP_JIT::RAX, data.args[i + 1]);
+		backend.emit_push(LLCCEP_JIT::RAX);
+		backend.emit_fld(LLCCEP_JIT::RSP);
+		backend.emit_pop_reg(LLCCEP_JIT::RAX);
+	}
+}
+
 void gen_mov(LLCCEP_JIT::codegen_backend &backend, instruction data)
 {
 	backend.get_ptr(LLCCEP_JIT::RAX, data.args[0]);
@@ -37,19 +47,39 @@ void gen_top(LLCCEP_JIT::codegen_backend &backend, instruction data)
 
 void gen_add(LLCCEP_JIT::codegen_backend &backend, instruction data)
 {
-	backend.emit_
+	__gen_read_nums(backend, data);
+	backend.emit_fadd();
+	backend.get_ptr(LLCCEP_JIT::RAX, data.args[0]);
+	backend.emit_fstp_reg_ptr(LLCCEP_JIT::RAX);
 }
 
 void gen_sub(LLCCEP_JIT::codegen_backend &backend, instruction data)
 {
+	__gen_read_nums(backend, data);
+	backend.emit_fsub();
+	backend.get_ptr(LLCCEP_JIT::RAX, data.args[0]);
+	backend.emit_fstp_reg_ptr(LLCCEP_JIT::RAX);
 }
 
 void gen_mul(LLCCEP_JIT::codegen_backend &backend, instruction data)
 {
+	__gen_read_nums(backend, data);
+	backend.emit_fmul();
+	backend.get_ptr(LLCCEP_JIT::RAX, data.args[0]);
+	backend.emit_fstp_reg_ptr(LLCCEP_JIT::RAX);
+}
+
+void gen_div(LLCCEP_JIT::codegen_backend &backend, instruction data)
+{
+	__gen_read_nums(backend, data);
+	backend.emit_fdiv();
+	backend.get_ptr(LLCCEP_JIT::RAX, data.args[0]);
+	backend.emit_fstp_reg_ptr(LLCCEP_JIT::RAX);
 }
 
 void gen_and(LLCCEP_JIT::codegen_backend &backend, instruction data)
 {
+
 }
 
 void gen_or(LLCCEP_JIT::codegen_backend &backend, instruction data)

@@ -20,7 +20,7 @@ namespace LLCCEP_ASM {
 		{"add",   {LEX_T_MEM, LEX_T_VAL,  LEX_T_VAL}},
 		{"sub",   {LEX_T_MEM, LEX_T_VAL,  LEX_T_VAL}},
 		{"mul",   {LEX_T_MEM, LEX_T_VAL,  LEX_T_VAL}},
-		{"dev",   {LEX_T_MEM, LEX_T_VAL,  LEX_T_VAL}},
+		{"div",   {LEX_T_MEM, LEX_T_VAL,  LEX_T_VAL}},
 		{"and",   {LEX_T_MEM, LEX_T_VAL,  LEX_T_VAL}},
 		{"or",    {LEX_T_MEM, LEX_T_VAL,  LEX_T_VAL}},
 		{"xor",   {LEX_T_MEM, LEX_T_VAL,  LEX_T_NO}},
