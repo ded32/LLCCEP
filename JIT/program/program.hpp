@@ -30,6 +30,7 @@ namespace LLCCEP_JIT {
 		void emit_mov_reg_imm(regID dst, uint64_t src);
 
 		void emit_shl_cl(regID what);
+		void emit_shr_cl(regID what);
 
 		void emit_cvtsd2si(regID dst, regID src);
 
