@@ -39,7 +39,7 @@ static double get(LLCCEP_vm::arg &data)
 {
 	switch (data.type) {
 		case LLCCEP_vm::ARG_T_REG:
-			if (DBL_AE(data.val, 31) || 
+			if (DBL_AE(data.val, 32) || 
 			    DBL_LESS(data.val, 0)) {
 				throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
 					"Error!\n"
@@ -75,7 +75,7 @@ static void set(LLCCEP_vm::arg &data, double val)
 {
 	switch (data.type) {
 		case LLCCEP_vm::ARG_T_REG:
-			if (DBL_AE(data.val, 31) ||
+			if (DBL_AE(data.val, 32) ||
 			    DBL_LESS(data.val, 0)) {
 				throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
 					"Error!\n"
