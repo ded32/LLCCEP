@@ -1,3 +1,3 @@
 use64
 
-shr rax, cl
+mov rax, [rip]

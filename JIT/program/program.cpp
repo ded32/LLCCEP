@@ -36,7 +36,7 @@ namespace LLCCEP_JIT {
 
 	void program::emit_mov_reg_reg_ptr(regID dst, regID src)
 	{
-		emit({0x58, 0xB8});
+		emit({0x58, 0x8B});
 		emit_rm_field(0b00, dst, src);
 	}
 
@@ -55,6 +55,48 @@ namespace LLCCEP_JIT {
 	{
 		emit({0x48, 0xD3, 0xE8 + what});
 	}
+
+	void program::emit_jmp(uint32_t offset)
+	{
+		emit({0xE9});
+		emit_data<uint32_t>(offset);
+	}
+
+#define JCC_BLOCK(cc) \
+({\
+	emit({0x0F, cc});\
+	emit_data<uint32_t>(offset);\
+})
+	void program::emit_jle(uint32_t offset)
+	{
+		JCC_BLOCK(0x8E);
+	}
+
+	void program::emit_jl(uint32_t offset)
+	{
+		JCC_BLOCK(0x8C);
+	}
+
+	void program::emit_jge(uint32_t offset)
+	{
+		JCC_BLOCK(0x8D);
+	}
+
+	void program::emit_jg(uint32_t offset)
+	{
+		JCC_BLOCK(0x8F);
+	}
+
+	void program::emit_je(uint32_t offset)
+	{
+		JCC_BLOCK(0x84);
+	}
+
+	void program::emit_jne(uint32_t offset)
+	{
+		JCC_BLOCK(0x85);
+	}
+#undef JCC_BLOCK
 
 	void program::emit_cvtsd2si(regID dst, regID src)
 	{

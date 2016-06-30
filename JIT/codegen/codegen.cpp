@@ -1,5 +1,14 @@
 #include "codegen.hpp"
 #include "../rex/rex.hpp"
+#include "../runtime/runtime.hpp"
+
+#define EMIT_CONDITION_CHECK(data, size_b) \
+({\
+	backend.emit_mov_reg_imm(LLCCEP_JIT::RAX, data.cond);\
+	backend.emit_mov_reg_imm(LLCCEP_JIT::RBX, backend.get_cmp());\
+	backend.emit_cmp(LLCCEP_JIT::RAX, LLCCEP_JIT::RBX);\
+	backend.emit_cmov_
+});
 
 static inline void __gen_read_nums(LLCCEP_JIT:::codegen_backend &backend, instruction data, int num)
 {
@@ -119,6 +128,7 @@ void gen_xor(LLCCEP_JIT::codegen_backend &backend, instruction data)
 
 void gen_off(LLCCEP_JIT::codegen_backend &backend, instruction data)
 {
+	
 }
 
 void gen_nop(LLCCEP_JIT::codegen_backend &backend, instruction data)

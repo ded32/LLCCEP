@@ -31,6 +31,14 @@ namespace LLCCEP_JIT {
 
 		void emit_shl_cl(regID what);
 		void emit_shr_cl(regID what);
+		
+		void emit_jmp(uint32_t offset);
+		void emit_jle(uint32_t offset);
+		void emit_jl(uint32_t offset);
+		void emit_jge(uint32_t offset);
+		void emit_jg(uint32_t offset);
+		void emit_je(uint32_t offset);
+		void emit_jne(uint32_t offset);
 
 		void emit_cvtsd2si(regID dst, regID src);
 
