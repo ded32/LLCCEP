@@ -44,8 +44,9 @@ static double get(LLCCEP_vm::arg &data)
 				throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
 					"Error!\n"
 					"Overbounding while reading data from register!\n"));
-			} else
+			} else {
 				return LLCCEP_vm::__added__::regs[static_cast<long long>(data.val)];
+			}
 			break;
 
 		case LLCCEP_vm::ARG_T_MEM:
@@ -54,8 +55,9 @@ static double get(LLCCEP_vm::arg &data)
 				throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
 					"Error!\n"
 					"Overbouding while reading data from RAM!\n"));
-			} else
+			} else {
 				return LLCCEP_vm::access_mem_data<double>(static_cast<size_t>(data.val));
+			}
 			break;
 
 		case LLCCEP_vm::ARG_T_VAL:
@@ -65,7 +67,7 @@ static double get(LLCCEP_vm::arg &data)
 		default:
 			throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
 				"Error!\n"
-				"Invalid or damaged binary file!\n"));
+				"Invalid or damaged binary file: invalid reading!\n"));
 	}
 
 	return 0;
@@ -80,8 +82,9 @@ static void set(LLCCEP_vm::arg &data, double val)
 				throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
 					"Error!\n"
 					"Overbounding while writing data to register!\n"));
-			} else
+			} else {
 				LLCCEP_vm::__added__::regs[static_cast<size_t>(data.val)] = val;
+			}
 			break;
 
 		case LLCCEP_vm::ARG_T_MEM:
@@ -90,8 +93,9 @@ static void set(LLCCEP_vm::arg &data, double val)
 				throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
 					"Error!\n"
 					"Overbounding while writing data to mem!\n"));
-			} else
+			} else {
 				LLCCEP_vm::access_mem_data<double>(static_cast<size_t>(data.val), val);
+			}
 			break;
 
 		case LLCCEP_vm::ARG_T_VAL:
@@ -103,7 +107,7 @@ static void set(LLCCEP_vm::arg &data, double val)
 		default:
 			throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
 				"Error!\n"
-				"Invalid or damaged binary file!\n"));
+				"Invalid or damaged binary file: invalid reading!\n"));
 	}
 }
 
@@ -625,12 +629,12 @@ static void emulated_inp(LLCCEP_vm::instruction &data)
 
 static void emulated_goto(LLCCEP_vm::instruction &data)
 {
-	LLCCEP_vm::__added__::pc = get(data.args[0]);
+//	LLCCEP_vm::__added__::pc = get(data.args[0]);
 }
 
 static void emulated_jmp(LLCCEP_vm::instruction &data)
 {
-	LLCCEP_vm::__added__::pc += get(data.args[0]);
+//	LLCCEP_vm::__added__::pc += get(data.args[0]);
 }
 
 static void (*funcs[])(LLCCEP_vm::instruction &data) = {
@@ -659,12 +663,14 @@ static void (*funcs[])(LLCCEP_vm::instruction &data) = {
 	emulated_patan,
 	emulated_ldc,
 	emulated_outp,
-	emulated_inp	
+	emulated_inp,
+	emulated_goto,
+	emulated_jmp	
 };
 
 static inline void emulate(LLCCEP_vm::instruction &data)
 {
-	if (data.opcode > LLCCEP_ASM::INST_NUM) {
+	if (data.opcode >= LLCCEP_ASM::INST_NUM) {
 		throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
 			"Error!\n"
 			"Invalid opcode: %d", static_cast<int>(data.opcode)));
