@@ -49,4 +49,20 @@ namespace LLCCEP_vm {
 
 		__sys__::size = 0;
 	}
+
+	::std::string get_string(size_t pos)
+	{
+		::std::string res = "";
+
+		for (size_t i = pos; access_mem_data<double>(i); i++)
+			res += static_cast<char>(access_mem_data<double>(i));
+
+		return res;
+	}
+
+	void write_string(size_t addr, ::std::string str)
+	{
+		for (size_t i = addr; i - addr < str.length(); i++)
+			access_mem_data<double>(i, static_cast<double>(str[i - addr]));
+	}
 }

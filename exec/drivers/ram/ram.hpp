@@ -3,10 +3,11 @@
 
 #include <cstring>
 #include <cstddef>
+#include <string>
 
 namespace LLCCEP_vm {
 	void allocate_mem(size_t size_b);
-
+	
 	uint8_t *get_mem(size_t offset);
 	size_t get_mem_size();
 
@@ -31,6 +32,9 @@ namespace LLCCEP_vm {
 	}
 
 	void free_mem();
+
+	::std::string get_string(size_t pos);
+	void write_string(size_t addr, ::std::string str);
 }
 
 #endif // RAM_HPP

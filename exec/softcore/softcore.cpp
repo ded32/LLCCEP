@@ -243,12 +243,7 @@ static void emulated_swi(LLCCEP_vm::instruction &data)
 		 * ptr - pointer to string being printed
 		 **************************************************************************/
 		case 2:
-			for (size_t i = LLCCEP_vm::__added__::regs[0]; i < LLCCEP_vm::get_mem_size(); i++) {
-				if (DBL_EQ(LLCCEP_vm::access_mem_data<double>(i), 0))
-					break;
-				else
-					::std::cout << static_cast<uint8_t>(LLCCEP_vm::access_mem_data<double>(i));
-			}
+			::std::cout << LLCCEP_vm::get_string(static_cast<size_t>(LLCCEP_vm::__added__::regs[0]));
 			break;
 
 		/***************************************************************************
@@ -287,9 +282,7 @@ static void emulated_swi(LLCCEP_vm::instruction &data)
 			::std::string val = "";
 			::std::cin >> val;
 
-			for (size_t i = 0; i < val.length(); i++)
-				LLCCEP_vm::access_mem_data<char>(static_cast<size_t>(LLCCEP_vm::__added__::regs[0]) + i, val[i]);
-
+			LLCCEP_vm::write_string(static_cast<size_t>(LLCCEP_vm::__added__::regs[0]), val);
 			break;
 		}
 
@@ -349,11 +342,7 @@ static void emulated_swi(LLCCEP_vm::instruction &data)
 			if (attrs[1])
 				mode += 'b';
 
-			::std::string path = "";
-			for (size_t i = static_cast<size_t>(LLCCEP_vm::__added__::regs[1]); 
-			     i < LLCCEP_vm::get_mem_size(); i++) {
-				path += static_cast<uint8_t>(LLCCEP_vm::access_mem_data<double>(i));
-			}
+			::std::string path = LLCCEP_vm::get_string(static_cast<size_t>(LLCCEP_vm::__added__::regs[1]));
 
 			FILE *fd = fopen(path.c_str(),
 			                 mode.c_str());
@@ -402,9 +391,9 @@ static void emulated_swi(LLCCEP_vm::instruction &data)
 		case 9: {
 			FILE *r00 = *(FILE **)((void *)((double *)(&LLCCEP_vm::__added__::regs[0])));
 
-			if (DBL_EQ(LLCCEP_vm::__added__::regs[1], 0))
+			if (DBL_EQ(LLCCEP_vm::__added__::regs[1], 0)) {
 				fprintf(r00, "%c", static_cast<uint8_t>(LLCCEP_vm::__added__::regs[2]));
-			else {
+			} else {
 				uint8_t c = 0;
 				fscanf(r00, "%c", &c);
 				LLCCEP_vm::__added__::regs[2] = c;
@@ -417,21 +406,20 @@ static void emulated_swi(LLCCEP_vm::instruction &data)
 			FILE *r00 = *(FILE **)((void *)((double *)(&LLCCEP_vm::__added__::regs[0])));
 
 			if (DBL_EQ(LLCCEP_vm::__added__::regs[1], 0)) {
-				::std::string tmp = "";
-				for (size_t i = static_cast<size_t>(LLCCEP_vm::__added__::regs[2]);
-				     i < LLCCEP_vm::get_mem_size(); i++)
-					tmp += static_cast<uint8_t>(LLCCEP_vm::access_mem_data<double>(i));
-
-				fprintf(r00, "%s", tmp.c_str());
+				fprintf(r00, "%s", LLCCEP_vm::get_string(static_cast<size_t>(LLCCEP_vm::__added__::regs[2])).c_str());
 			} else {
-				for (size_t i = static_cast<size_t>(LLCCEP_vm::__added__::regs[2]);
-				     (i < LLCCEP_vm::get_mem_size()) && (!feof(r00)); i++) {
-					char c = fgetc(r00);
+				std::string str = "";
+				char c = 0;
+
+				for (size_t i = 0; !feof(r00); i++) {
+					c = fgetc(r00);
 					if (isspace(c) || !c)
 						break;
 
-					LLCCEP_vm::access_mem_data<double>(i, c);
+					str += c;
 				}
+
+				LLCCEP_vm::write_string(static_cast<size_t>(LLCCEP_vm::__added__::regs[2]), str);
 			}
 			break;
 		}

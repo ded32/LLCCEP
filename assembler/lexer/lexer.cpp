@@ -82,10 +82,10 @@ namespace LLCCEP_ASM {
 					curr.val += data[i];
 					i++;
 				}
-			} else if (isdigit(data[i])) {
+			} else if (isdigit(data[i]) || data[i] == '-' || data[i] == '.') {
 				curr.type = LEX_T_VAL;
 
-				while (isdigit(data[i]) || data[i] == '.') {
+				while (isdigit(data[i]) || data[i] == '.' || data[i] == '-') {
 					curr.val += data[i];
 					i++;
 				}	
