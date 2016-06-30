@@ -158,6 +158,21 @@ void gen_off(LLCCEP_JIT::codegen_backend &backend, instruction data)
 {
 	EMIT_CONDITION_CHECK(data, 0/*TODO: insert size in bytes*/)
 	
+	backend.get_imm(LLCCEP_JIT::RAX, data.args[2]);
+	backend.emit_mov(LLCCEP_JIT::RBX, 0);
+	backend.emit_cmp(LLCCEP_JIT::RAX, LLCCEP_JIT::RBX);
+	backend.emit_jl(/*TODO: insert size of right offset function*/);
+
+	// Right offset
+	backend.emit_mov(LLCCEP_JIT::RCX, LLCCEP_JIT::RAX);
+	backend.get_imm(LLCCEP_JIT::RAX, data.args[1]);
+	backend.emit_shr_cl(LLCCEP_JIT::RAX);
+	backend.emit_jmp(/*TODO: insert size of left offset function*/);
+
+	// Left offset
+	backend.emit_mov(LLCCEP_JIT::RCX, LLCCEP_JIT::RAX);
+	backend.get_imm(LLCCEP_JIT::RAX, data.args[1]);
+	backend.emit_shr_cl(LLCCEP_JIT::RAX);
 }
 
 void gen_nop(LLCCEP_JIT::codegen_backend &backend, instruction data)
@@ -171,7 +186,7 @@ void gen_swi(LLCCEP_JIT::codegen_backend &backend, instruction data)
 {
 	EMIT_CONDITION_CHECK(data, 0/*TODO: insert size in bytes*/)
 
-	// runtime(alike-syscall)
+	// runtime
 }
 
 void gen_cmp(LLCCEP_JIT::codegen_backend &backend, instruction data)
@@ -255,6 +270,35 @@ void gen_outp(LLCCEP_JIT::codegen_backend &backend, instruction data)
 
 void gen_inp(LLCCEP_JIT::codegen_backend &backend, instruction data)
 { }
+
+static auto __codegen_functions[] = {
+	gen_mov,
+	gen_mva,
+	gen_push,
+	gen_pop,
+	gen_top,
+	gen_add,
+	gen_sub,
+	gen_mul,
+	gen_div,
+	gen_and,
+	gen_or,
+	gen_xor,
+	gen_off,
+	gen_nop,
+	gen_swi,
+	gen_cmp,
+	gen_inc,
+	gen_dec,
+	gen_sqrt,
+	gen_sin,
+	gen_cos,
+	gen_ptan,
+	gen_patan,
+	gen_ldc,
+	gen_outp,
+	gen_inp
+};
 
 namespace LLCCEP_JIT {
 	
