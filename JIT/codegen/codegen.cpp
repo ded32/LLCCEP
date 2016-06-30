@@ -30,6 +30,8 @@ void gen_mov(LLCCEP_JIT::codegen_backend &backend, instruction data)
 	backend.get_imm(LLCCEP_JIT::RBX, data.args[1]);
 	backend.emit_mov_reg_ptr_reg(LLCCEP_JIT::RAX,
 				     LLCCEP_JIT::RBX);
+
+	/* TODO: insert here code, for the jumps by mov into r14 */
 }
 
 void gen_mva(LLCCEP_JIT::codegen_backend &backend, instruction data)

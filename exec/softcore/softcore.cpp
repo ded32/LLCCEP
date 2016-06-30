@@ -27,7 +27,7 @@ namespace LLCCEP_vm {
 		::std::stack<double> stk;
 		int cmp = 0b1000;
 		double regs[32] = {};
-
+		double pc = 0;
 #if !VM
 		::std::vector<FILE *> files;
 		::std::vector<window> windows;
@@ -623,6 +623,16 @@ static void emulated_inp(LLCCEP_vm::instruction &data)
 	}
 }
 
+static void emulated_goto(LLCCEP_vm::instruction &data)
+{
+	LLCCEP_vm::__added__::pc = get(data.args[0]);
+}
+
+static void emulated_jmp(LLCCEP_vm::instruction &data)
+{
+	LLCCEP_vm::__added__::pc += get(data.args[0]);
+}
+
 static void (*funcs[])(LLCCEP_vm::instruction &data) = {
 	emulated_mov,
 	emulated_mva,
@@ -667,7 +677,7 @@ static inline void emulate(LLCCEP_vm::instruction &data)
 namespace LLCCEP_vm {
 	void execute(::std::vector<instruction> &data)
 	{
-		double &i = LLCCEP_vm::__added__::regs[14];
+		double &i = LLCCEP_vm::__added__::pc;
 
 #if VM
 		i = 1;
