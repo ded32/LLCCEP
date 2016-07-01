@@ -4,12 +4,12 @@
 
 #define EMIT_CONDITION_CHECK(data, size_b) \
 ({\
-	backend.emit_mov_reg_imm(LLCCEP_JIT::RAX, data.cond);\
-	backend.emit_mov_reg_imm(LLCCEP_JIT::RBX, backend.get_cmp());\
-	backend.emit_and(LLCCEP_JIT::RAX, LLCCEP_JIT::RBX);\
+	backend.emit_mov_reg_imm(LLCCEP_JIT::RAX, data.cond); /*RAX := condition*/\
+	backend.get_cmp(LLCCEP_JIT::RBX));                    /*RBX := compare flag*/\
+	backend.emit_and(LLCCEP_JIT::RAX, LLCCEP_JIT::RBX);   /*Look for matching bits*/\
 	backend.emit_mov(LLCCEP_JIT::RBX, 0);\
 	backend.emit_cmp(LLCCEP_JIT::RAX, LLCCEP_JIT::RBX);\
-	backend.emit_je(size_b);\
+	backend.emit_je(size_b);                              /*If there are no, skip function*/\
 });
 
 static inline void __gen_read_nums(LLCCEP_JIT:::codegen_backend &backend, instruction data, int num)
@@ -301,5 +301,14 @@ static auto __codegen_functions[] = {
 };
 
 namespace LLCCEP_JIT {
-	
+	void codegen_backend::get_cmp(regID reg)
+	{
+		emit_mov_reg_imm(reg, &cmp);
+		emit_mov_reg_reg_ptr(reg, reg);
+	}
+
+	void codegen_backend::get_imm(regID reg, arg data)
+	{
+		
+	}
 }

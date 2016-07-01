@@ -617,12 +617,12 @@ static void emulated_inp(LLCCEP_vm::instruction &data)
 
 static void emulated_goto(LLCCEP_vm::instruction &data)
 {
-//	LLCCEP_vm::__added__::pc = get(data.args[0]);
+	LLCCEP_vm::__added__::pc = get(data.args[0]);
 }
 
 static void emulated_jmp(LLCCEP_vm::instruction &data)
 {
-//	LLCCEP_vm::__added__::pc += get(data.args[0]);
+	LLCCEP_vm::__added__::pc += get(data.args[0]);
 }
 
 static void (*funcs[])(LLCCEP_vm::instruction &data) = {

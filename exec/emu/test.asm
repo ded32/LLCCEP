@@ -11,6 +11,8 @@ al swi 7       # open
 # Writing data
 al mov &00, &01 # ptr 2 file
 
+al mov &03, 0
+
 al mov $00, "H"
 al mov $01, "e"
 al mov $02, "l"
@@ -25,10 +27,13 @@ al mov $10, "l"
 al mov $11, "d"
 al mov $12, "!"
 al mov $13, 10 # '\n'
-
 al mov &02, 00  # ptr 2 mem 
 al mov &01, 0   # write mode
 al swi 10       # write
+al inc &03
+al cmp &03, 5
+ls jmp -19
+
 
 #Close file
 al swi 8
