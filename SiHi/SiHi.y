@@ -126,4 +126,39 @@ low_level_boolean_expression: lowest_level_boolean_expression
 
 lowest_level_boolean_expression: expression
                                | lowest_level_boolean_expression '^' lowest_level_boolean_expression;
+
+class_declaration: class_prototype class_body;
+
+class_prototype: CLASS ID;
+
+class_body: class_members_list;
+
+class_members_list: class_member
+                  | class_members_list class_member;
+
+class_member: class_property
+            | class_method;
+
+class_property: access_mode variable_declaration;
+
+class_method: access_mode function_declaration;
+
+access_mode: PUBLIC
+           | PRIVATE
+           | PROTECTED;
+
+enum_declaration: enum_prototype enum_body;
+
+enum_prototype: ENUM ID
+              | ENUM;
+
+enum_body: '{' enum_members_list  '}';
+
+enum_members_list: enum_member
+                 | enum_members_list ',' enum_member;
+
+enum_member: ID
+           | ID '=' expression;
+
+variable_declaration: VAR variable_names_list;
 %%
