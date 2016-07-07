@@ -45,7 +45,8 @@ expression: assignment_expression
           | cased_expression
           | math_expression
           | boolean_expression
-          | '(' expression ')';
+          | '(' expression ')'
+          | expression '.' expression;
 
 assignment_expression: rvalue
                      | lvalue assignment_operator assignment_expression;
