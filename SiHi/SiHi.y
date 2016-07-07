@@ -75,7 +75,8 @@ assignment_operator: '='
                    | SHL_EQ
                    | SHR_EQ;
 
-invoke_expression: ID '(' function_invoke_arguments_list ')';
+invoke_expression: ID '(' function_invoke_arguments_list ')'
+                 : ID '.' invoke_expression;
 
 function_invoke_arguments_list: expression_list;
 
