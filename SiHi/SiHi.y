@@ -44,6 +44,7 @@ expression: assignment_expression
           | looped_expression
           | cased_expression
           | math_expression
+          | boolean_expression
           | '(' expression ')';
 
 assignment_expression: rvalue
@@ -115,4 +116,14 @@ low_level_math_operator: '*'
                        | '/';
 
 
+boolean_expression: top_level_boolean_expression;
+
+top_level_boolean_expression: low_level_boolean_expression
+                            | top_level_boolean_expression '&' top_level_boolean_expression;
+
+low_level_boolean_expression: lowest_level_boolean_expression
+                            | low_level_boolean_expression '|' low_level_boolean_expression;
+
+lowest_level_boolean_expression: expression
+                               | lowest_level_boolean_expression '^' lowest_level_boolean_expression;
 %%
