@@ -368,29 +368,72 @@ parameter_type_list: parameter_list {
                                                      PARAM_TYPE_LIST);
                    };
 
-parameter_list: parameter_declaration
-	      | parameter_list ',' parameter_declaration;
+parameter_list: parameter_declaration {
+                      $$ = $<ast>1;
+	      } | parameter_list ',' parameter_declaration {
+                      $$ = new LLCCEP_SiHi::ast({$<ast>1, $<ast>3},
+                                                ",",
+                                                PARAMETER_LIST);
+              };
 
-parameter_declaration: declaration_specifiers declarator
-	             | declaration_specifiers abstract_declarator
-	             | declaration_specifiers;
+parameter_declaration: declaration_specifiers declarator {
+		             $$ = new LLCCEP_SiHi::ast({$<ast>1, $<ast>2},
+                                                       "Parameter declaration",
+                                                       PARAMETER_DECLARATION);
+		     } | declaration_specifiers abstract_declarator {
+                             $$ = new LLCCEP_SiHi::ast({$<ast>1, $<ast>2},
+                                                       "Parameter declaration",
+                                                       PARAMETER_DECLARATION);
+                     } | declaration_specifiers {
+                             $$ = new LLCCEP_SiHi::ast({$<ast>1},
+                                                       "Parameter declaration",
+                                                       PARAMETER_DECLARATION);
+                     };
 
-identifier_list: ID
-	       | identifier_list ',' ID;
+identifier_list: ID {
+	               $$ = new LLCCEP_SiHi::ast({},
+                                                 $<string>1,
+                                                 ID);
+	       } | identifier_list ',' ID {
+                       $$ = new LLCCEP_SiHi::ast({$<ast>1, new LLCCEP_SiHi::ast({}, $<string>2, ID)},
+                                                 ",",
+                                                 IDENTIFIER_LIST);
+               };
 
-type_name: specifier_qualifier_list
-	 | specifier_qualifier_list abstract_declarator;
+type_name: specifier_qualifier_list {
+	         $$ = $<ast>1;
+	 } | specifier_qualifier_list abstract_declarator {
+                 $$ = new LLCCEP_SiHi::ast({$<ast>1, $<ast>2},
+                                           "typename",
+                                           TYPENAME);
+         };
 
-abstract_declarator: pointer
- 	           | direct_abstract_declarator
-	           | pointer direct_abstract_declarator;
+abstract_declarator: pointer {
+		           $$ = $<ast>1;
+ 	           } | direct_abstract_declarator {
+                           $$ = $<ast>1;
+	           } | pointer direct_abstract_declarator {
+                           $$ = new LLCCEP_SiHi::ast({$<ast>1, $<ast>2},
+                                                     "Abstract declarator",
+                                                     ABSTRACT_DECLARATOR);
+                   };
 
-direct_abstract_declarator: '(' abstract_declarator ')'
-	                  | '[' ']'
-	                  | '[' constant_expression ']'
- 	                  | direct_abstract_declarator '[' ']'
-	                  | direct_abstract_declarator '[' constant_expression ']'
- 	                  | '(' ')'
+direct_abstract_declarator: '(' abstract_declarator ')' {
+			          $$ = $<ast>2;
+	                  } | '[' ']' {
+                                  $$ = new LLCCEP_SiHi::ast({}, 
+                                                            "[]",
+                                                            DIRECT_ABSTRACT_DECLARATOR);
+	                  } | '[' constant_expression ']' {
+                                  $$ = new LLCCEP_SiHi::ast({$<ast>2},
+                                                            "[]",
+                                                            DIRECT_ABSTRACT_DECLARATOR);
+                          } | direct_abstract_declarator '[' ']' {
+                                  $$ = new LLCCEP_SiHi::ast({$<ast>1},
+                                                            "[]",
+                                                            DIRECT_ABSTRACT_DECLARATOR);
+                          } | direct_abstract_declarator '[' constant_expression ']' {
+                          } | '(' ')'
 	                  | '(' parameter_type_list ')'
 	                  | direct_abstract_declarator '(' ')'
 	                  | direct_abstract_declarator '(' parameter_type_list ')';
@@ -451,12 +494,31 @@ function_definition: function_prototype compound_statement;
 
 function_prototype: function_name function_args function_type;
 
-function_name: FUNCTION ID;
+function_name: FUNCTION ID {
+	             $$ = new LLCCEP_SiHi::ast({},
+                                               $<string>2,
+                                               ID);
+	     };
 
-function_args: 
-             | '(' ')'
-             | '(' parameter_type_list ')';
+function_args: {
+	             $$ = new LLCCEP_SiHi::ast({},
+                                               "Function arguments",
+                                               FUNCTION_ARGUMENTS);
+             } | '(' ')' {
+                     $$ = new LLCCEP_SiHi::ast({},
+                                               "Function arguments",
+                                               FUNCTION_ARGUMENTS);
+             } | '(' parameter_type_list ')' {
+                     $$ = new LLCCEP_SiHi::ast({$<ast>2},
+                                               "Function arguments",
+                                               FUNCTION_ARGUMENTS);
+             };
 
-function_type:
-             | ARROW type_specifier;
+function_type: {
+	             $$ = new LLCCEP_SiHi::ast({},
+                                               "empty",
+                                               EMPTY);
+             } | ARROW type_specifier {
+                     $$ = $<ast>2;
+             };
 %%
