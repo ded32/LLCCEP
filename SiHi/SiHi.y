@@ -322,27 +322,51 @@ type_specifier: EMPTY {
                                                 STRING);
 	      } | ID {
                       $$ = new LLCCEP_SiHi::ast({},
-                                                "id",
-                                                ID);
+                                                "typename: " + $<string>1,
+                                                TYPENAME);
               };
 
-declarator: pointer direct_declarator
-	  | direct_declarator;
+declarator: pointer direct_declarator {
+	          $$ = new LLCCEP_SiHi::ast({$<ast>1, $<ast>2},
+                                            "declarator",
+                                            DECLARATOR);
+	  } | direct_declarator {
+                  $$ = $<ast>1;
+          };
 
-direct_declarator: ID
- 	         | '(' declarator ')'
-	         | direct_declarator '[' constant_expression ']'
-	         | direct_declarator '[' ']'
-	         | direct_declarator '(' parameter_type_list ')'
-	         | direct_declarator '(' identifier_list ')'
-	         | direct_declarator '(' ')';
+direct_declarator: ID {
+		         $$ = new LLCCEP_SiHi::ast({}, 
+                                                   "id: " + $<string>1, 
+                                                   ID);
+ 	         } | '(' declarator ')' {
+                         $$ = $<ast>2;
+                 } | direct_declarator '[' constant_expression ']' {
+                         $$ = new LLCCEP_SiHi::ast({$<ast>1, $<ast>3},
+                                                   "[]",
+                                                   ARRAY_DECLARATION);
+                 } | direct_declarator '[' ']' {
+                         $$ = new LLCCEP_SiHi::ast({$<ast>1},
+                                                   "[]",
+                                                   ARRAY_DECLARATION);
+	         } | direct_declarator '(' parameter_type_list ')' {
+                 } | direct_declarator '(' identifier_list ')' {
+	         } | direct_declarator '(' ')' {
+                 };
 
-pointer: '*'
-       | '*' pointer;
+pointer: '*' {
+                 $$ = new LLCCEP_SiHi::ast({}, "*", POINTER);
+       } | '*' pointer {
+                 $$ = new LLCCEP_SiHi::ast({}, "*", POINTER);
+       };
 
 
-parameter_type_list: parameter_list
-	           | parameter_list ',' VARARG;
+parameter_type_list: parameter_list {
+		           $$ = $<ast>1;
+	           } | parameter_list ',' VARARG {
+                           $$ = new LLCCEP_SiHi::ast({$<ast>1, new LLCCEP_SiHi::ast({}, "vararg", VARARG)}, 
+                                                     ",",
+                                                     PARAM_TYPE_LIST);
+                   };
 
 parameter_list: parameter_declaration
 	      | parameter_list ',' parameter_declaration;
