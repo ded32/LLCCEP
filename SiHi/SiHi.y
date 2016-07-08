@@ -76,46 +76,95 @@ argument_expression_list: assignment_expression {
 unary_expression: postfix_expression {
                         $$ = $<ast>1;
                 } | INCREMENT unary_expression {
-
+                        $$ = new LLCCEP_SiHi::ast({$<ast>2}, 
+                                                  "++",
+                                                  INCREMENT);
                 } | DECREMENT unary_expression {
-	        } | unary_operator cast_expression;
+                        $$ = new LLCCEP_SiHi::ast({$<ast>2},
+                                                  "--",
+                                                  DECREMENT);
+	        } | unary_operator cast_expression {
+		        $$ = $1;
+                        $$->insert_child($<ast>2);
+		};
 
-unary_operator: '&'
-	      | '@'
-	      | '+'
-	      | '-'
-	      | '~'
-	      | NOT;
+unary_operator: '&' {
+                      $$ = new LLCCEP_SiHi::ast({}, "&", '&');
+	      } | '@' {
+                      $$ = new LLCCEP_SiHi::ast({}, "@", '@');
+              } | '+' {
+                      $$ = new LLCCEP_SiHi::ast({}, "+", '+');
+              } | '-' {
+                      $$ = new LLCCEP_SiHi::ast({}, "-", '-');
+              } | '~' {
+                      $$ = new LLCCEP_SiHi::ast({}, "~", '~');
+	      } | NOT {
+                      $$ = new LLCCEP_SiHi::ast({}, "Not", NOT);
+              };
 
-cast_expression: unary_expression
-	       | REINTERPRET_CAST '<' type_name '>' '(' cast_expression ')';
+cast_expression: unary_expression {
+                       $$ = $<ast>1;
+	       } | REINTERPRET_CAST '<' type_name '>' '(' cast_expression ')' {
+                       $$ = new LLCCEP_SiHi::ast({$<ast>3, $<ast>6}, "reinterpret_cast", REINTERPRET_CAST);
+               };
 
-multiplicative_expression: cast_expression
- 	                 | multiplicative_expression multiplicative_operator cast_expression;
+multiplicative_expression: cast_expression {
+                                  $$ = $<ast>1;
+                         } | multiplicative_expression multiplicative_operator cast_expression {
+                                  $$ = $<ast>2; 
+                                  $$->insert_child($<ast>1); 
+                                  $$->insert_child($<ast>3);
+                         };
 
-multiplicative_operator: '*'
-                       | '/'
-                       | '%';
+multiplicative_operator: '*' {
+                               $$ = new LLCCEP_SiHi::ast({}, "*", '*');
+                       } | '/' {
+                               $$ = new LLCCEP_SiHi::ast({}, "/", '/');
+                       } | '%' {
+                               $$ = new LLCCEP_SiHi::ast({}, "%", '%');
+                       };
 
-additive_expression: multiplicative_expression
-	           | additive_expression additive_operator multiplicative_expression;
+additive_expression: multiplicative_expression {
+                           $$ = $<ast>1;
+                   } | additive_expression additive_operator multiplicative_expression {
+                           $$ = $<ast>2;
+                           $$->insert_child($<ast>1);
+                           $$->insert_child($<ast>3);
+                   };
 
-additive_operator: '+'
-                 | '-';
+additive_operator: '+' {
+                         $$ = new LLCCEP_SiHi::ast({}, "+", '+');
+                 } | '-' {
+                         $$ = new LLCCEP_SiHi::ast({}, "-", '-');
+                 };
 
-shift_expression: additive_expression
-	        | shift_expression shift_operator additive_expression;
+shift_expression: additive_expression {
+                         $$ = $<ast>1;
+	        } | shift_expression shift_operator additive_expression {
+                         $$ = $<ast>2;
+                         $$->insert_child($<ast>1);
+                         $$->insert_child($<ast>3);
+                };
 
-shift_operator: SHL
-              | SHR;
+shift_operator: SHL {
+                      $$ = new LLCCEP_SiHi::ast({}, "<<", SHL);
+              } | SHR {
+                      $$ = new LLCCEP_SiHi::ast({}, ">>", SHR);
+              };
 
-relational_expression: shift_expression
-	             | relational_expression relational_operator shift_expression;
+relational_expression: shift_expression {
+                             $$ = $<ast>1;
+	             } | relational_expression relational_operator shift_expression {
+                             $$ = $<ast>2;
+                             $$->insert_child($<ast>1);
+                             $$->insert_child($<ast>3);
+                     };
 
-relational_operator: '<'
-                   | '>'
-                   | LESS_EQUAL
-                   | ABOVE_EQUAL;
+relational_operator: '<' {
+                           $$ = new LLCCEP_SiHi::ast({}, "<", '<');
+                   } | '>' {
+                   } | LESS_EQUAL {
+                   } | ABOVE_EQUAL;
 
 equality_expression: relational_expression
 	| equality_expression equilaty_operator relational_expression;
