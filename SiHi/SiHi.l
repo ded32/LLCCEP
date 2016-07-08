@@ -1,18 +1,23 @@
+alpha [a-zA-Z]
+digit [0-9]
+
 %{
 #include <stdio.h>
 
 #ifndef YY_PARSER_EXISTS
 size_t yycharno = 0;
+#define RET(val) ({update(); printf("%s ", #val);})
+#else
+#define RET(val) ({update(); return val;})
 #endif // YY_PARSER_EXISTS
 
 static inline void update(void);
 
-#define RET(val) ({update(); printf("%s", #val);});
 %}
 
 %%
-"#".*             {update();}
 "#begin".*?"#end" {update();}
+"#".*             {update();}
 [ \n\r\t]         {update();}
 
 "->" {RET(ARROW);}
@@ -26,7 +31,7 @@ static inline void update(void);
 "-"  {RET('-');}
 "*"  {RET('*');}
 "/"  {RET('/');}
-"%"  {RET('%')}
+"%"  {RET('%');}
 "**" {RET(EXP);}
 "&"  {RET('&');}
 "|"  {RET('|');}
@@ -53,7 +58,7 @@ function  {RET(FUNCTION);}
 class     {RET(CLASS);}
 enum      {RET(ENUM);}
 public    {RET(PUBLIC);}
-private   {RET(PRIVATE)}
+private   {RET(PRIVATE);}
 protected {RET(PROTECTED);}
 var       {RET(VAL);}
 Real      {RET(REAL);}
@@ -62,7 +67,10 @@ String    {RET(STRING);}
 Nil       {RET(NIL);}
 
 ({alpha}|"_")({alpha}|{digit}|"_")* {RET(ID);}
+{digit}+("."{digit}*)?              {RET(NUMBER);}
+\"(\\.|[^\\"])*\"                   {RET(LITERAL);}
 
+. {RET(UNKNOWN);}
 %%
 
 static inline void update(void)
@@ -74,7 +82,7 @@ static inline void update(void)
 			yycharno = 0;
 			break;
 
-		case '\t'
+		case '\t':
 			yycharno += 8;
 			break;
 
