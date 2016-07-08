@@ -163,8 +163,12 @@ relational_expression: shift_expression {
 relational_operator: '<' {
                            $$ = new LLCCEP_SiHi::ast({}, "<", '<');
                    } | '>' {
+                           $$ = new LLCCEP_SiHi::ast({}, ">", '>');
                    } | LESS_EQUAL {
-                   } | ABOVE_EQUAL;
+                           $$ = new LLCCEP_SiHi::ast({}, "<=", LESS_EQUAL);
+                   } | ABOVE_EQUAL {
+                           $$ = new LLCCEP_SiHi::ast({}, ">=", ABOVE_EQUAL);
+                   };
 
 equality_expression: relational_expression
 	| equality_expression equilaty_operator relational_expression;
