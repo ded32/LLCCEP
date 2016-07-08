@@ -170,62 +170,161 @@ relational_operator: '<' {
                            $$ = new LLCCEP_SiHi::ast({}, ">=", ABOVE_EQUAL);
                    };
 
-equality_expression: relational_expression
-	| equality_expression equilaty_operator relational_expression;
+equality_expression: relational_expression {
+		           $$ = $<ast>1;
+	           } | equality_expression equilaty_operator relational_expression {
+                           $$ = $<ast>2;
+                           $$->insert_child($<ast>1);
+                           $$->insert_child($<ast>3);
+                   };
 
-equality_operator: EQUALS
-                   NOT_EQUALS;
+equality_operator: EQUALS {
+		         $$ = new LLCCEP_SiHi::ast({}, "==", EQUALS);
+                 } | NOT_EQUALS {
+                         $$ = new LLCCEP_SiHi::ast({}, "!=", NOT_EQUALS);
+                 };
 
-and_expression: equality_expression
-	      | and_expression '&' equality_expression;
+and_expression: equality_expression {
+	              $$ = $<ast>1;
+	      } | and_expression '&' equality_expression {
+                      $$ = new LLCCEP_SiHi::ast({$<ast>1, $<ast>3},
+                                                "&",
+                                                '&');
+              };
 
-exclusive_or_expression: and_expression
-  	               | exclusive_or_expression '^' and_expression;
+exclusive_or_expression: and_expression {
+		               $$ =$<ast>1;
+  	               } | exclusive_or_expression '^' and_expression {
+                               $$ = new LLCCEP_SiHi::ast({$<ast>1, $<ast>3},
+                                                         "^",
+                                                         '^');
+                       };
 
-inclusive_or_expression: exclusive_or_expression
- 	               | inclusive_or_expression '|' exclusive_or_expression;
+inclusive_or_expression: exclusive_or_expression {
+		               $$ = $<ast>1;
+ 	               } | inclusive_or_expression '|' exclusive_or_expression {
+                               $$ = new LLCCEP_SiHi::ast({$<ast>1, $<ast>3},
+                                                         "|",
+                                                         '|');
+                       };
 
-conditional_expression: inclusive_or_expression
-	              | logical_or_expression DONE expression UNLESS conditional_expression;
+conditional_expression: inclusive_or_expression {
+		              $$ = $1;
+	              } | logical_or_expression DONE expression UNLESS conditional_expression { 
+                              $$ = new LLCCEP_SiHi::ast({$<ast>1, $<ast>3, $<ast>5},
+                                                        "if -- else");
+                      };
 
-assignment_expression: conditional_expression
-	             | unary_expression assignment_operator assignment_expression;
+assignment_expression: conditional_expression {
+		             $$ = $<ast>1;
+	             } | unary_expression assignment_operator assignment_expression {
+                             $$ = $<ast>2;
+                             $$->insert_child($<ast>1);
+                             $$->insert_child($<ast>3);
+                     };
 
-assignment_operator: '='
-	           | MUL_ASSIGN
-	           | DIV_ASSIGN
-	           | MOD_ASSIGN
-	           | ADD_ASSIGN
-	           | SUB_ASSIGN
-	           | SHL_ASSIGN
-	           | SHR_ASSIGN
-	           | AND_ASSIGN
-	           | XOR_ASSIGN
-	           | OR_ASSIGN;
+assignment_operator: '=' {
+		           $$ = new LLCCEP_SiHi::ast({},
+                                                     "=",
+                                                     '=');
+	           } | MUL_ASSIGN {
+                           $$ = new LLCCEP_SiHi::ast({},
+                                                     "*=",
+                                                     MUL_ASSIGN);
+	           } | DIV_ASSIGN {
+                           $$ = new LLCCEP_SiHi::ast({},
+                                                     "/=",
+                                                     DIV_ASSIGN);
+	           } | MOD_ASSIGN {
+                           $$ = new LLCCEP_SiHi::ast({},
+                                                     "%=",
+                                                     MOD_ASSIGN);
+	           } | ADD_ASSIGN {
+                           $$ = new LLCCEP_SiHi::ast({},
+                                                     "+=",
+                                                     ADD_ASSIGN);
+	           } | SUB_ASSIGN {
+                           $$ = new LLCCEP_SiHi::ast({},
+                                                     "-=",
+                                                     SIB_ASSIGN);
+	           } | SHL_ASSIGN {
+                           $$ = new LLCCEP_SiHi::ast({},
+                                                     "<<=",
+                                                     SHL_ASSIGN);
+	           } | SHR_ASSIGN {
+                           $$ = new LLCCEP_SiHi::ast({},
+                                                     ">>=",
+                                                     SHR_ASSIGN);
+	           } | AND_ASSIGN {
+                           $$ = new LLCCEP_SiHi::ast({},
+                                                     "&=",
+                                                     AND_ASSIGN);
+	           } | XOR_ASSIGN {
+                           $$ = new LLCCEP_SiHi::ast({},
+                                                     "^=",
+                                                     XOR_ASSIGN);
+	           } | OR_ASSIGN {
+                           $$ = new LLCCEP_SiHi::ast({},
+                                                     "|=",
+                                                     OR_ASSIGN);
+                   };
 
-expression: assignment_expression
-  	  | expression ',' assignment_expression;
+expression: assignment_expression {
+	          $$ = $<ast>1;
+  	  } | expression ',' assignment_expression {
+                  $$ = new LLCCEP_SiHi::ast({$<ast>1, $<ast>3},
+                                            ",", ',');
+          };
 
-constant_expression: conditional_expression;
+constant_expression: conditional_expression {
+		           $$ = $<ast>1;
+		   };
 
-declaration: declaration_specifiers
-   	   | declaration_specifiers init_declarator_list;
+declaration: declaration_specifiers {
+	           $$ = $<ast>1;
+   	   } | declaration_specifiers init_declarator_list {
+                   $$ = new LLCCEP_SiHi::ast({$<ast>1, $<ast>2}, 
+                                             "declaration",
+                                             DECLARATION);
+           };
  
-declaration_specifiers: type_specifier
-	              | type_specifier declaration_specifiers
-	              | type_qualifier
-	              | type_qualifier declaration_specifiers;
+declaration_specifiers: type_specifier {
+		              $$ = $<ast>1;
+		      };
 
-init_declarator_list: init_declarator
-	            | init_declarator_list ',' init_declarator;
+init_declarator_list: init_declarator {
+		            $$ = $<ast>1;
+	            } | init_declarator_list ',' init_declarator {
+                            $$ = new LLCCEP_SiHi::ast({$<ast>1, $<ast>3},
+                                                      ",",
+                                                      ',');
+                    };
 
-init_declarator: declarator
-	       | declarator '=' initializer;
+init_declarator: declarator {
+	               $$ = <ast>1;
+	       } | declarator '=' initializer {
+                       $$ = new LLCCEP_SiHi::ast({$<ast>1, $<ast>3},
+                                                 "=",
+                                                 '=');
+               };
 
-type_specifier: EMPTY
-   	      | REAL
-	      | STRING
-	      | ID;
+type_specifier: EMPTY {
+	              $$ = new LLCCEP_SiHi::ast({},
+                                                "empty",
+                                                EMPTY);
+   	      } | REAL {
+                      $$ = new LLCCEP_SiHi::ast({},
+                                                "real",
+                                                REAL);
+	      } | STRING {
+                      $$ = new LLCCEP_SiHi::ast({},
+                                                "string",
+                                                STRING);
+	      } | ID {
+                      $$ = new LLCCEP_SiHi::ast({},
+                                                "id",
+                                                ID);
+              };
 
 declarator: pointer direct_declarator
 	  | direct_declarator;
@@ -282,8 +381,8 @@ initializer_list: initializer
 statement: labeled_statement
 	 | compound_statement
 	 | expression_statement
-	 | selection_statement
-	 | loop_statement
+	 | branched_statement
+	 | looped_statement
 	 | jump_statement;
 
 labeled_statement: ID ':' statement
@@ -304,11 +403,11 @@ statement_list: statement
 expression_statement: PASS
   	            | expression;
 
-selection_statement: IF expression statement
+branched_statement: IF expression statement
 	           | IF expression statement ELSE statement
 	           | CASE expression statement;
 
-iteration_statement: LOOP expression statement
+looped_statement: LOOP expression statement
  	           | LOOP expression ';' expression statement
 	           | LOOP expression_statement ';' expression_statement ';' expression statement;
 
