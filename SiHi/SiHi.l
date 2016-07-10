@@ -35,6 +35,9 @@ next             {RET(NEXT);}
 stop             {RET(STOP);}
 return           {RET(RETURN);}
 function         {RET(FUNCTION);}
+done             {RET(DONE);}
+unless           {RET(UNLESS);}
+vararg           {RET(VARARG);}
 
 "->"  {RET(ARROW);}
 "++"  {RET(INCREMENT);}
@@ -55,6 +58,31 @@ function         {RET(FUNCTION);}
 "&="  {RET(AND_ASSIGN);}
 "^="  {RET(XOR_ASSIGN);}
 "|="  {RET(OR_ASSIGN);}
+
+"<"   {RET('<');}
+">"   {RET('>');}
+"!"   {RET('!');}
+"("   {RET('<');}
+")"   {RET(')');}
+"{"   {RET('{');}
+"}"   {RET('}');}
+"["   {RET('[');}
+"]"   {RET(']');}
+","   {RET(',');}
+"."   {RET('.');}
+";"   {RET(';');}
+"@"   {RET('@');}
+"&"   {RET('&');}
+"|"   {RET('|');}
+"^"   {RET('^');}
+"+"   {RET('+');}
+"-"   {RET('-');}
+"*"   {RET('*');}
+"/"   {RET('/');}
+"%"   {RET('%');}
+"~"   {RET('~');}
+"="   {RET('=');}
+":"   {RET(':');}
 
 ({alpha}|"_")({alpha}|{digit}|"_")* {RET(ID);}
 {digit}+("."{digit}*)?              {RET(NUMBER);}

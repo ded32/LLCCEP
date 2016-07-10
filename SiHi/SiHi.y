@@ -13,8 +13,7 @@
 %token <string> ADD_ASSIGN SUB_ASSIGN SHL_ASSIGN SHR_ASSIGN AND_ASSIGN
 %token <string> XOR_ASSIGN OR_ASSIGN EMPTY REAL STRING OTHER PASS
 %token <string> IF ELSE CASE LOOP JUMP NEXT STOP RETURN FUNCTION
-
-%type 
+%token <string> DONE UNLESS VARARG
 
 %%
 primary_expression: ID {
@@ -336,7 +335,7 @@ declarator: pointer direct_declarator {
 
 direct_declarator: ID {
 		         $$ = new LLCCEP_SiHi::ast({}, 
-                                                   "id: " + $<string>1, 
+                                                   $<string>1, 
                                                    ID);
  	         } | '(' declarator ')' {
                          $$ = $<ast>2;
