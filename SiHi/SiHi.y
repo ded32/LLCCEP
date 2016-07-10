@@ -8,11 +8,11 @@
 }
 
 %token <string> ID NUMBER LITERAL ARROW INCREMENT DECREMENT
-%token <string> NOT REINTERPRET_CAST SHL SHR LESS_EQUAL ABOVE_EQUAL
+%token <string> REINTERPRET_CAST SHL SHR LESS_EQUAL ABOVE_EQUAL
 %token <string> EQUALS NOT_EQUALS MUL_ASSIGN DIV_ASSIGN MOD_ASSIGN
 %token <string> ADD_ASSIGN SUB_ASSIGN SHL_ASSIGN SHR_ASSIGN AND_ASSIGN
 %token <string> XOR_ASSIGN OR_ASSIGN EMPTY REAL STRING OTHER PASS
-%token <string> IF ELSE CASE LOOP JUMP NEXT STOP RETURN FUNCTION ARROW
+%token <string> IF ELSE CASE LOOP JUMP NEXT STOP RETURN FUNCTION
 
 %type 
 
@@ -98,8 +98,8 @@ unary_operator: '&' {
                       $$ = new LLCCEP_SiHi::ast({}, "-", '-');
               } | '~' {
                       $$ = new LLCCEP_SiHi::ast({}, "~", '~');
-	      } | NOT {
-                      $$ = new LLCCEP_SiHi::ast({}, "Not", NOT);
+	      } | '!' {
+                      $$ = new LLCCEP_SiHi::ast({}, "!", '!');
               };
 
 cast_expression: unary_expression {
