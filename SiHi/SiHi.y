@@ -543,29 +543,88 @@ expression_statement: PASS {
                             $$ = $<ast>1;
                     };
 
-branched_statement: IF expression statement
-	           | IF expression statement ELSE statement
-	           | CASE expression statement;
+labeled_statement_list: labeled_statement {
+                              $$ = $<ast>1;
+                      } | labeled_statement_list labeled_statement {
+                              $$ = new LLCCEP_SiHi::ast({$<ast>1, $<ast>2},
+                                                        "Labeled statement list",
+                                                        LABELED_STATEMENT_LIST);
+                      };
 
-looped_statement: LOOP expression statement
- 	           | LOOP expression ';' expression statement
-	           | LOOP expression_statement ';' expression_statement ';' expression statement;
+branched_statement: IF expression statement {
+                           $$ = new LLCCEP_SiHi::ast({$<ast>2, $<ast>3},
+                                                     "if",
+                                                     IF)
+                   } | IF expression statement ELSE statement {
+                           $$ = new LLCCEP_SiHi::ast({$<ast>2, $<ast>3, $<ast>4}.
+                                                     "if -- else",
+                                                     IF);
+                   } | CASE expression '{' labeled_statement_list '}' {
+                           $$ = new LLCCEP_SiHi::ast({$<ast>2, $<ast>4},
+                                                     "case",
+                                                     CASE);
+                   };
 
-jump_statement: JUMP ID
-              | NEXT
-	      | STOP
-	      | RETURN
-	      | RETURN expression;
+looped_statement: LOOP expression statement {
+                        $$ = new LLCCEP_SiHi::ast({$<ast>2, $<ast>3},
+                                                  "loop",
+                                                  LOOP);
+                } | LOOP expression ';' expression statement {
+                        $$ = new LLCCEP_SiHi::ast({$<ast>2, $<ast>4, $<ast>5},
+                                                  "loop",
+                                                  LOOP);
+	        | LOOP expression_statement ';' expression_statement ';' expression statement {
+                        $$ = new LLCCEP_SiHi::ast({$<ast>2, $<ast>4, $<ast>6, $<ast>7},
+                                                  "loop",
+                                                  LOOP);
+                };
 
-translation_unit: external_declaration
-	        | translation_unit external_declaration;
+jump_statement: JUMP ID {
+                      $$ = new LLCCEP_SiHi::ast({new LLCCEP_SiHi::ast({}, $<string>2, ID)},
+                                                "jump",
+                                                JUMP);
+              } | NEXT {
+                      $$ = new LLCCEP_SiHi::ast({},
+                                                "next",
+                                                NEXT);
+              } | STOP {
+                      $$ = new LLCCEP_SiHi::ast({},
+                                                "stop",
+                                                STOP);
+              } | RETURN {
+                      $$ = new LLCCEP_SiHi::ast({},
+                                                "return",
+                                                RETURN);
+	      } | RETURN expression {
+                      $$ = new LLCCEP_SiHi::ast({$<ast>2},
+                                                "return",
+                                                RETURN);
+              };
 
-external_declaration: function_definition
- 	            | declaration;
+translation_unit: external_declaration {
+                        $$ = $<ast>1;
+                } | translation_unit external_declaration {
+                        $$ = new LLCCEP_SiHi::ast({$<ast>1, $<ast>2},
+                                                  "external declaration list",
+                                                  EXTERNAL_DECLARATION_LIST);
+                };
 
-function_definition: function_prototype compound_statement;
+external_declaration: function_definition {
+                            $$ = $<ast>1;
+                    } | declaration {
+                            $$ = $<ast>1;
+                    };
 
-function_prototype: function_name function_args function_type;
+function_definition: function_prototype compound_statement {
+                           $$ = new LLCCEP_SiHi::ast({$<ast>1, $<ast>2},
+                                                     "function definition");
+                   };
+
+function_prototype: function_name function_args function_type {
+                           $$ = new LLCCEP_SiHi::ast({$<ast>1, $<ast>2, $<ast>3},
+                                                     "function prototype",
+                                                     FUNCTION_PROTOTYPE);
+                  };
 
 function_name: FUNCTION ID {
 	             $$ = new LLCCEP_SiHi::ast({},
