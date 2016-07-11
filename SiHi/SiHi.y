@@ -15,6 +15,22 @@
 %token <string> IF ELSE CASE LOOP JUMP NEXT STOP RETURN FUNCTION
 %token <string> DONE UNLESS VARARG
 
+%type <ast> primary_expression postfix_expression argument_expression_list
+%type <ast> unary_expression unary_operator cast_expression multiplicative_expression
+%type <ast> multiplicative_operator additive_expression additive_operator
+%type <ast> shift_expression shift_operator relational_expression
+%type <ast> relational_operator equality_expression equality_operator and_expression
+%type <ast> exclusive_or_expression inclusive_or_expression conditional_expression
+%type <ast> assignment_expression assignment_operator expression constant_expression
+%type <ast> declaration declaration_specifiers init_declarator_list init_declarator
+%type <ast> type_specifier declarator direct_declarator pointer parameter_type_list
+%type <ast> parameter_list parameter_declaration identifier_list type_name
+%type <ast> abstract_declarator direct_abstract_declarator initializer initializer_list
+%type <ast> statement labeled_statement compound_statement declaration_statement
+%type <ast> declaration_statement_list expression_statement branched_statement
+%type <ast> looped_statement jump_statement translation_unit external_declaration
+%type <ast> function_definition function_prototype function_name function_args function_type
+
 %%
 primary_expression: ID {
                             $$ = new LLCCEP_SiHi::ast({}, 
@@ -171,7 +187,7 @@ relational_operator: '<' {
 
 equality_expression: relational_expression {
 		           $$ = $<ast>1;
-	           } | equality_expression equilaty_operator relational_expression {
+	           } | equality_expression equality_operator relational_expression {
                            $$ = $<ast>2;
                            $$->insert_child($<ast>1);
                            $$->insert_child($<ast>3);
@@ -209,7 +225,7 @@ inclusive_or_expression: exclusive_or_expression {
 
 conditional_expression: inclusive_or_expression {
 		              $$ = $1;
-	              } | logical_or_expression DONE expression UNLESS conditional_expression { 
+	              } | inclusive_or_expression DONE expression UNLESS conditional_expression { 
                               $$ = new LLCCEP_SiHi::ast({$<ast>1, $<ast>3, $<ast>5},
                                                         "if -- else");
                       };
@@ -399,10 +415,8 @@ identifier_list: ID {
                                                  IDENTIFIER_LIST);
                };
 
-type_name: specifier_qualifier_list {
-	         $$ = $<ast>1;
-	 } | specifier_qualifier_list abstract_declarator {
-                 $$ = new LLCCEP_SiHi::ast({$<ast>1, $<ast>2},
+type_name: abstract_declarator {
+                 $$ = new LLCCEP_SiHi::ast({$<ast>1},
                                            "typename",
                                            TYPENAME);
          };
@@ -432,39 +446,69 @@ direct_abstract_declarator: '(' abstract_declarator ')' {
                                                             "[]",
                                                             DIRECT_ABSTRACT_DECLARATOR);
                           } | direct_abstract_declarator '[' constant_expression ']' {
-                          } | '(' ')'
-	                  | '(' parameter_type_list ')'
-	                  | direct_abstract_declarator '(' ')'
-	                  | direct_abstract_declarator '(' parameter_type_list ')';
+                                  $$ = new LLCCEP_SiHi::ast({$<ast>1, $<ast>2},
+                                                            "[]",
+                                                            DIRECT_ABSTRACT_DECLARATOR);
+                          } | '(' ')' {
+                                  $$ = new LLCCEP_SiHi::ast({},
+                                                            "()",
+                                                            DIRECT_ABSTRACT_DECLARATOR);
+                          } | '(' parameter_type_list ')' {
+                                  $$ = new LLCCEP_SiHi::ast({$<ast>2},
+                                                            "()",
+                                                            DIRECT_ABSTRACT_DECLARATOR);
+                          } | direct_abstract_declarator '(' ')' {
+                                  $$ = new LLCCEP_SiHi::ast({$<ast>1},
+                                                            "()",
+                                                            DIRECT_ABSTRACT_DECLARATOR);
+                          } | direct_abstract_declarator '(' parameter_type_list ')' {
+                                  $$ = new LLCCEP_SiHi::ast({$<ast>1},
+                                                            "()",
+                                                            DIRECT_ABSTRACT_DECLARATOR);
+                          };
 
-initializer: assignment_expression
-	   | '{' initializer_list '}'
-	   | '{' initializer_list ',' '}';
+initializer: assignment_expression {
+                   $$ = $<ast>1;
+           } | '{' initializer_list '}' {
+                   $$ = new LLCCEP_SiHi::ast({$<ast>2},
+                                             "{}",
+                                             INITIALIZER);
+           };
 
-initializer_list: initializer
-	        | initializer_list ',' initializer;
+initializer_list: initializer {
+                        $$ = $<ast>1;
+                } | initializer_list ',' initializer {
+                        $$ = new LLCCEP_SiHi::ast({$<ast>1, $<ast>3},
+                                                  ",",
+                                                  INITIALIZER_LIST);
+                };
 
-statement: labeled_statement
-	 | compound_statement
-	 | expression_statement
-	 | branched_statement
-	 | looped_statement
-	 | jump_statement;
+statement: labeled_statement {
+                 $$ = $<ast>1;
+	 } | compound_statement {
+                 $$ = $<ast>1;
+         } | expression_statement {
+                 $$ = $<ast>1;
+	 } | branched_statement {
+                 $$ = $<ast>1;
+         } | looped_statement {
+                 $$ = $<ast>1;
+	 } | jump_statement {
+                 $$ = $<ast>1;
+         };
 
 labeled_statement: ID ':' statement
   	         | constant_expression ':' statement
 	         | OTHER ':' statement;
 
 compound_statement: '{' '}'
-	          | '{' statement_list '}'
-	          | '{' declaration_list '}'
-	          | '{' declaration_list statement_list '}';
+	          | '{' declaration_statement_list '}';
 
-declaration_list: declaration
-	        | declaration_list declaration;
+declaration_statement: declaration
+                     | statement;
 
-statement_list: statement
-	      | statement_list statement;
+declaration_statement_list: declaration_statement
+                          | declaration_statement_list declaration_statement;
 
 expression_statement: PASS
   	            | expression;
