@@ -573,7 +573,7 @@ looped_statement: LOOP expression statement {
                         $$ = new LLCCEP_SiHi::ast({$<ast>2, $<ast>4, $<ast>5},
                                                   "loop",
                                                   LOOP);
-	        | LOOP expression_statement ';' expression_statement ';' expression statement {
+	        } | LOOP expression_statement ';' expression_statement ';' expression statement {
                         $$ = new LLCCEP_SiHi::ast({$<ast>2, $<ast>4, $<ast>6, $<ast>7},
                                                   "loop",
                                                   LOOP);
