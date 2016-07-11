@@ -4,9 +4,11 @@ digit [0-9]
 %{
 #include <stdio.h>
 
+#include "SiHi_parser.hpp"
+
 #ifndef YY_PARSER_EXISTS
 size_t yycharno = 0;
-#define RET(val) ({update(); printf("%s ", #val);})
+#define RET(val) ({update(); yylval.string = yytext; return val;})
 #else
 #define RET(val) ({update(); return val;})
 #endif // YY_PARSER_EXISTS

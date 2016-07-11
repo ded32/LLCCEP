@@ -30,6 +30,7 @@
 %type <ast> declaration_statement_list expression_statement branched_statement
 %type <ast> looped_statement jump_statement translation_unit external_declaration
 %type <ast> function_definition function_prototype function_name function_args function_type
+%type <ast> labeled_statement_list
 
 %%
 primary_expression: ID {
