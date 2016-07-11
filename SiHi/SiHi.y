@@ -497,21 +497,51 @@ statement: labeled_statement {
                  $$ = $<ast>1;
          };
 
-labeled_statement: ID ':' statement
-  	         | constant_expression ':' statement
-	         | OTHER ':' statement;
+labeled_statement: ID ':' statement {
+                         $$ = new LLCCEP_SiHi::ast({new LLCCEP_SiHi::ast({}, $<string>1, ID), $<ast>3},
+                                                   ":",
+                                                   ':');
+                 } | constant_expression ':' statement {
+                         $$ = new LLCCEP_SiHi::ast({$<ast>1, $<ast>3},
+                                                   ":",
+                                                   ':');
+                 } | OTHER ':' statement {
+                         $$ = new LLCCEP_SiHi::ast({new LLCCEP_SiHi::ast({}, "other", OTHER), $<ast>3},
+                                                   ":",
+                                                   ':');
+                 };
 
-compound_statement: '{' '}'
-	          | '{' declaration_statement_list '}';
+compound_statement: '{' '}' {
+                          $$ = new LLCCEP_SiHi::ast({},
+                                                    "Compound statement",
+                                                    COMPOUND_STATEMENT);
+                  } | '{' declaration_statement_list '}' {
+                          $$ = new LLCCEP_SiHi::ast({$<ast>2},
+                                                    "Compound statement",
+                                                    COMPOUND_STATEMENT);
+                  };
 
-declaration_statement: declaration
-                     | statement;
+declaration_statement: declaration {
+                             $$ = $<ast>1;
+                     } | statement {
+                             $$ = $<ast>1;
+                     };
 
-declaration_statement_list: declaration_statement
-                          | declaration_statement_list declaration_statement;
+declaration_statement_list: declaration_statement {
+                                  $$ = $<ast>1;
+                          } | declaration_statement_list declaration_statement {
+                                  $$ = new LLCCEP_SiHi::ast({$<ast>1, $<ast>2},
+                                                            "Declaration|statement list",
+                                                            DECLARATION_STATEMENT_LIST);
+                          };
 
-expression_statement: PASS
-  	            | expression;
+expression_statement: PASS {
+                            $$ = new LLCCEP_SiHi::ast({},
+                                                      "pass",
+                                                      PASS);
+                    } | expression {
+                            $$ = $<ast>1;
+                    };
 
 branched_statement: IF expression statement
 	           | IF expression statement ELSE statement
