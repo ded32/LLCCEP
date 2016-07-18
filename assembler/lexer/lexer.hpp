@@ -13,7 +13,8 @@ namespace LLCCEP_ASM {
 		LEX_T_NAME    = 3,
 		LEX_T_NO      = 4,
 		LEX_T_COND    = 5,
-		LEX_T_INVALID = 6
+		LEX_T_COLON   = 6,
+		LEX_T_INVALID = 7,
 	};
 
 	struct lexem {

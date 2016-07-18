@@ -28,8 +28,10 @@ namespace LLCCEP_ASM {
 		while (i < l) {
 			curr.pos.file = file;
 			curr.pos.line = line;
-			
-			if (data[i] == '&') {
+			if (data[i] == ':') {
+				curr.type = LEX_T_COLON;
+				i++;
+			} else if (data[i] == '&') {
 				curr.type = LEX_T_REG;
 				i++;
 

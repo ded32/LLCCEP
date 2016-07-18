@@ -38,8 +38,9 @@ namespace LLCCEP_ASM {
 		{"ldc",   {LEX_T_MEM,  LEX_T_VAL,  LEX_T_NO}},
 		{"outp",  {LEX_T_VAL,  LEX_T_VAL,  LEX_T_NO}},
 		{"inp",   {LEX_T_VAL,  LEX_T_MEM,  LEX_T_NO}},
-		{"goto",  {LEX_T_COND, LEX_T_VAL,   LEX_T_NO}},
-		{"jmp",   {LEX_T_COND, LEX_T_VAL,   LEX_T_NO}}
+		{"call",  {LEX_T_COND, LEX_T_VAL,   LEX_T_NO}},
+		{"jmp",   {LEX_T_COND, LEX_T_VAL,   LEX_T_NO}},
+		{"ret",   {LEX_T_NO,   LEX_T_NO,    LEX_T_NO}}
 	};
 }
 
