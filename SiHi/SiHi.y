@@ -1,10 +1,11 @@
 %{
+#include <string>
 #include "ast/ast.hpp"
 %}
 
 %union {
-	LLCCEP_SiHi::ast tree;
-	const char *string;
+	LLCCEP_SiHi::ast ast;
+	::std::string string;
 }
 
 %token <string> ID NUMBER LITERAL ARROW INCREMENT DECREMENT

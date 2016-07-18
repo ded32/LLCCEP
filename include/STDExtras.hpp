@@ -10,6 +10,7 @@
 
 #include <cstdio>
 #include <cstdlib>
+#include <stddef.h>
 #include <climits>
 #include <stdexcept>
 #include <cstdint>
@@ -44,25 +45,26 @@
 		::std::exit(EXIT_SUCCESS); \
 });
 
-#define CONSTRUCT_MSG(fmt, ...) \
+#define CONSTRUCT_MSG_nodelete(fmt, ...) \
 ({ \
-	::std::stringstream __res; \
-	char __str[MAX_EXC_BUF_SIZE] = ""; \
+	char *__str = new char[MAX_EXC_BUF_SIZE]; \
 	::std::sprintf(__str, fmt, ##__VA_ARGS__); \
-	__res << __str; \
-	\
-	__res.str().c_str(); \
+	__str; \
 })
-	
+
+#define CONSTRUCT_MSG(fmt, ...) \
+CONSTRUCT_MSG_nodelete(fmt, ##__VA_ARGS__), true
+
 namespace LLCCEP {
 	class runtime_exception: public ::std::runtime_error {
 		char __text__[MAX_EXC_BUF_SIZE];
 	public:
 		runtime_exception();
-		runtime_exception(const char file[PATH_MAX], 
-		                  uint64_t line, 
+		runtime_exception(const char file[PATH_MAX],
+		                  size_t line, 
 		                  const char function[512], 
-		                  const char msg[1024] = "",
+		                  const char *msg = 0,
+				  bool freemsg = false,
 		                  runtime_exception *cause = 0);
 
 		virtual ~runtime_exception() throw();

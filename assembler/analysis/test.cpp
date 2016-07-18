@@ -24,7 +24,7 @@ int main()
 			if (lex.size())
 				LLCCEP_ASM::analyze(lex);
 		} catch (::LLCCEP::runtime_exception &exc) {
-			QUITE_ERROR(yes, exc.msg());
+			QUITE_ERROR(yes, "%s", exc.msg());
 		} catch (...) {
 			::std::fprintf(stderr, "Unknown exception");
 		}
