@@ -2,7 +2,6 @@
 #define LINKER_HPP
 
 #include <vector>
-#include <pair>
 #include <utility>
 #include <string>
 

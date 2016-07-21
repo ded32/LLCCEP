@@ -16,16 +16,6 @@
 
 #define ANALYSIS_ISSUE(file, line, fmt, ...) CONSTRUCT_MSG("Analysis issue!\n%s:" size_t_pf ":\n" fmt "\n", file, line, ##__VA_ARGS__)
 
-static ::std::string __static_only_mnemonics[] = {
-	"register",
-	"memory address",
-	"value",
-	"name",
-	"none",
-	"condition",
-	"invalid"
-};
-
 namespace LLCCEP_ASM {
 	int64_t is_cond(::std::string str)
 	{
@@ -87,8 +77,8 @@ namespace LLCCEP_ASM {
 					"Conflicting types for %u argument of '%s' instruction:\n"
 					"%s is requested, but %s is given",
 					i, lex[0].val.c_str(), 
-					__static_only_mnemonics[INSTRUCTIONS[pos_inst].types[i - 1]].c_str(),
-					__static_only_mnemonics[lex[i].type].c_str()))
+					get_lexem_typename(INSTRUCTIONS[pos_inst].types[i - 1]).c_str(),
+					get_lexem_typename(lex[i].type).c_str()))
 			}
 		}
 	}

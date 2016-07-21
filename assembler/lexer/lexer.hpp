@@ -14,7 +14,7 @@ namespace LLCCEP_ASM {
 		LEX_T_NO      = 4,
 		LEX_T_COND    = 5,
 		LEX_T_COLON   = 6,
-		LEX_T_INVALID = 7,
+		LEX_T_INVALID = 7
 	};
 
 	struct lexem {
@@ -29,6 +29,7 @@ namespace LLCCEP_ASM {
 
 	void to_lexems(::std::string str, ::std::vector<lexem> &lex, 
 	               ::std::string file, size_t line);
+	::std::string get_lexem_typename(lexem lex);
 }
 
 #endif // LEXER_HPP

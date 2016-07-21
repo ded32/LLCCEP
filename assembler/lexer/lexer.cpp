@@ -126,6 +126,27 @@ namespace LLCCEP_ASM {
 			curr.pos.line = 0;
 		}
 	}
+	
+	::std::string get_lexem_typename(lexem lex)
+	{
+		::std::string names = {
+			"register",
+			"memory address",
+			"numeric value",
+		 	"none",
+			"condition",
+			"colon",
+			"invalid"
+		};
+
+		int id = static_cast<int>(lex.type);
+		if (id < 0 || id > 7) {
+			throw RUNTIME_EXCEPTION(COSTRUCT_MSG(
+						"Typename id overflow"))
+		}
+
+		return names[id];
+	}
 }
 
 #undef PARSE_ISSUE
