@@ -1,1 +1,0 @@
-/usr/bin/c++   -g -O0 -std=c++11   CMakeFiles/asm_analysis.dir/test.cpp.o  -o asm_analysis -rdynamic liblexer.a libanalysis.a libSTD_EXT.a 

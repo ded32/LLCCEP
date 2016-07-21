@@ -1,2 +1,0 @@
-/usr/bin/ar qc libSTD_EXT.a  CMakeFiles/STD_EXT.dir/home/andrew/Documents/personal/projects/LLCCEP/lib/STDExtras.cpp.o
-/usr/bin/ranlib libSTD_EXT.a

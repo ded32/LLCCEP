@@ -129,10 +129,11 @@ namespace LLCCEP_ASM {
 	
 	::std::string get_lexem_typename(lexem lex)
 	{
-		::std::string names = {
+		::std::string names[] = {
 			"register",
 			"memory address",
 			"numeric value",
+			"name",
 		 	"none",
 			"condition",
 			"colon",
@@ -141,7 +142,7 @@ namespace LLCCEP_ASM {
 
 		int id = static_cast<int>(lex.type);
 		if (id < 0 || id > 7) {
-			throw RUNTIME_EXCEPTION(COSTRUCT_MSG(
+			throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
 						"Typename id overflow"))
 		}
 
