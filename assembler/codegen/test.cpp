@@ -20,7 +20,7 @@ int main()
 	
 			std::getline(std::cin, str);
 			LLCCEP_ASM::to_lexems(str, lex, "stdin", 0);
-			LLCCEP_ASM::op *prep = prepare_op(lex);
+			LLCCEP_ASM::op prep = prepare_op(lex);
 			dump_bitset(std::cout, prep);
 		} catch (::LLCCEP::runtime_exception &exc) {
 			QUITE_ERROR(yes, exc.msg())

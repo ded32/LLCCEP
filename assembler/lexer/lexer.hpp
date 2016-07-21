@@ -29,7 +29,7 @@ namespace LLCCEP_ASM {
 
 	void to_lexems(::std::string str, ::std::vector<lexem> &lex, 
 	               ::std::string file, size_t line);
-	::std::string get_lexem_typename(lexem lex);
+	::std::string get_lexem_typename(lex_t type);
 }
 
 #endif // LEXER_HPP

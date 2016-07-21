@@ -14,12 +14,11 @@ namespace LLCCEP_ASM {
 
 	struct op {
 		uint8_t instruction;
-		uint8_t condition;
 		arg args[3];
 	};
 
-	op *prepare_op(::std::vector<lexem> &lex);
-	void dump_bitset(::std::ostream &out, op *addr);
+	op prepare_op(::std::vector<lexem> &lex);
+	void dump_bitset(::std::ostream &out, op addr);
 }
 
 #endif // CODEGEN_HPP

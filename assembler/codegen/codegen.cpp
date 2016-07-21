@@ -9,15 +9,8 @@
 #include "../lexer/lexer.hpp"
 #include "../analysis/analysis.hpp"
 
-static void __dump_double_as_str(::std::ostream &out, double val)
-{
-	unsigned size = sizeof(double);
-	for (unsigned i = 0; i < size; i++)
-		out << ((uint8_t *)&val)[i];
-}
-
 namespace LLCCEP_ASM {
-	op *prepare_op(::std::vector<lexem> &lex)
+	op prepare_op(::std::vector<lexem> &lex)
 	{
 		try {
 			analyze(lex);
@@ -25,42 +18,39 @@ namespace LLCCEP_ASM {
 			throw (exc);
 		} DEFAULT_HANDLING
 
-		op *res = new (std::nothrow) op;
-		assert(res);
-		::std::memset(res, 0, sizeof(*res));
+		op res = op{};
 
 		for (unsigned i = 0; i < 3; i++)
-			res->args[i].type = LEX_T_INVALID;
+			res.args[i].type = LEX_T_INVALID;
 		
-		res->condition = is_cond(lex[0].val);
-		res->instruction = is_inst(lex[1].val);
+		res.instruction = is_inst(lex[1].val);
 
 		try {
-			for (size_t i = 2; i < lex.size(); i++) {
-				res->args[i - 2].type = lex[i].type;
-				res->args[i - 2].value = ::std::stod(lex[i].val);
+			for (size_t i = 1; i < lex.size(); i++) {
+				res.args[i - 1].type = lex[i].type;
+				res.args[i - 1].value = ::std::stod(lex[i].val);
 			}
 		} catch (::std::invalid_argument &exc) {
-			for (unsigned i = 0; i < 5; i++)
-				::std::cerr << lex[i].type << " " << lex[i].val << ::std::endl;
-
 			throw (exc);
 		} DEFAULT_HANDLING
 
 		return res;
 	}
 
-	void dump_bitset(::std::ostream& out, op *addr)
+	void dump_bitset(::std::ostream& out, op data)
 	{
-		assert(addr);
 		assert(!out.fail());
 
-		out << addr->condition
-		    << addr->instruction;
+		auto dump_double = [](::std::ostream &out, double val) {
+			for (unsigned i = 0; i < sizeof(double); i++)
+				out << ((uint8_t *)&val)[i];
+		};
+
+		out << data.instruction;
 
 		for (size_t i = 0; i < 3; i++) {
-			out << static_cast<uint8_t>(addr->args[i].type);
-			__dump_double_as_str(out, addr->args[i].value);
+			out << static_cast<uint8_t>(data.args[i].type);
+			dump_double(out, data.args[i].value);
 		}
 	}
 }
