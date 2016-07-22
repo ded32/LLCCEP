@@ -1,3 +1,9 @@
+call @al, print
+mov &00, 0
+swi 2
+swi 0
+
+print:
 mov $00, "H" ; H
 mov $01, "e" ; e
 mov $02, "l" ; l
@@ -13,7 +19,4 @@ mov $11, "d" ; d
 mov $12, "!" ; !
 mov $13, 10  ; \n
 mov $14, 0   ; \0
-
-mov &00, 0
-
-swi 2
+ret

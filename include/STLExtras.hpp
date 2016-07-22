@@ -6,9 +6,15 @@
 #include <algorithm>
 #include <cstddef>
 #include <cstdint>
+#include <cstring>
 #include <fstream>
+#include <typeinfo>
+
+#include <errno.h>
 
 #include <STDExtras.hpp>
+
+#define TYPEHASH(t) typeid(t).hash_code()
 
 template<typename TYPE>
 std::vector<TYPE> subvector(std::vector<TYPE> &src, size_t id0, size_t id1)
@@ -72,6 +78,29 @@ typename ::std::basic_ifstream<char_t>::pos_type get_length(::std::basic_ifstrea
 	fd.seekg(pos);
 
 	return res;
+}
+
+template<typename TYPE>
+void reopen_file(TYPE &f, std::string path)
+{
+	if (TYPEHASH(TYPE) != TYPEHASH(::std::ifstream) &&
+	    TYPEHASH(TYPE) != TYPEHASH(::std::ofstream)) {
+		throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
+					"%s type is not allowed to use in"
+					"reopen_file() function!\n",
+					typeid(TYPE).name()))
+	}
+
+	f.close();
+	f.clear();
+
+	f.open(path);	
+	if (f.fail()) {
+		throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
+					"Error!\n"
+					"File '%s' reopening failed: %s",
+					path.c_str(), ::std::strerror(errno)));
+	}
 }
 
 #endif // STLEXTRAS_HPP

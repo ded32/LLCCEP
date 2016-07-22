@@ -15,13 +15,20 @@
 #define LINKER_ISSUE(file, line, fmt, ...) CONSTRUCT_MSG("Linking issue:\n%s:" size_t_pf ":\n" fmt "\n", file, line, ##__VA_ARGS__)
 
 namespace LLCCEP_ASM {
+	bool is_label(::std::vector<lexem> lex)
+	{
+		return lex.size() == 2 &&
+		       lex[0].type == LEX_T_NAME &&
+		       lex[1].type == LEX_T_COLON;
+	}
+
 	void make_labels_associative_table(
 			::std::vector<::std::pair<lexem, size_t> > &associative_table,
 			::std::vector<lexem> lex,
 			size_t iteration)
 	{
 		auto associative_pair = [lex, iteration]() -> ::std::pair<lexem, size_t> {
-			if (lex.size() < 2 || lex[1].type != LEX_T_COLON)
+			if (!is_label(lex))
 				return ::std::make_pair(lexem{}, 0);
 
 			if (lex.size() > 2) {
@@ -32,7 +39,7 @@ namespace LLCCEP_ASM {
 					lex[0].val.c_str()))
 			}
 
-			return ::std::make_pair(lex[0], iteration);		
+			return ::std::make_pair(lex[0], iteration);
 		};
 
 		auto pair = associative_pair();

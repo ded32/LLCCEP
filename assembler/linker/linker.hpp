@@ -10,6 +10,7 @@
 #include "../lexer/lexer.hpp"
 
 namespace LLCCEP_ASM {
+	bool is_label(::std::vector<lexem> lex);
 	void make_labels_associative_table(
 			::std::vector<::std::pair<lexem, size_t> > &associative_table,
 			::std::vector<lexem> lex,

@@ -13,6 +13,7 @@
 #include <stddef.h>
 
 #include <STDExtras.hpp>
+#include <STLExtras.hpp>
 
 #include "../lexer/lexer.hpp"
 #include "../linker/linker.hpp"
@@ -31,24 +32,26 @@ namespace LLCCEP_ASM {
 		::std::vector<::std::pair<lexem, size_t> > labels_table;
 
 		try {
-			for (size_t i = 1; !in.eof(); i++) {
-				::std::string code = "";
-				::std::getline(in, code);
-				size_t old = labels_table.size();
+			for (int pass = 0; pass < 2; pass++) {
+				for (size_t i = 1; !in.eof(); i++) {
+					::std::string code = "";
 
-				to_lexems(code, program, in_path, i);
-				make_labels_associative_table(labels_table, program, i);
+					program.clear();
+					::std::getline(in, code);
+					to_lexems(code, program, in_path, i);
 
-				if (!program.size() || labels_table.size() != old)
-					continue;
+					if (!pass) {
+						make_labels_associative_table(labels_table, program, i);
+						continue;
+					} else if (program.size() && !is_label(program)) {
+						substitute_labels_with_addresses(labels_table, program);
 
-				substitute_labels_with_addresses(labels_table, program);
+						LLCCEP_ASM::op prep = prepare_op(program);
+						dump_bitset(out, prep);
+					}
+				}
 
-				LLCCEP_ASM::op prep = prepare_op(program);
-				dump_bitset(out, prep);
-			
-				code.clear();
-				program.clear();
+				reopen_file(in, in_path);
 			}
 		} catch (::LLCCEP::runtime_exception &exc) {
 			throw (exc);
