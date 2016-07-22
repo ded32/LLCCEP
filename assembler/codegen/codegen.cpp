@@ -23,7 +23,7 @@ namespace LLCCEP_ASM {
 		for (unsigned i = 0; i < 3; i++)
 			res.args[i].type = LEX_T_INVALID;
 		
-		res.instruction = is_inst(lex[1].val);
+		res.instruction = is_inst(lex[0].val);
 
 		try {
 			for (size_t i = 1; i < lex.size(); i++) {

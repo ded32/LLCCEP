@@ -14,7 +14,7 @@
 
 #include "./../program/program.hpp"
 #include "./../selection/selection.hpp"
-#include "./../window/window.hpp"
+//#include "./../window/window.hpp"
 
 #include "./../../common/def/def_inst.hpp"
 
@@ -25,12 +25,15 @@
 namespace LLCCEP_vm {
 	namespace __added__ {
 		::std::stack<double> stk;
+		::std::stack<size_t> call;
+
 		int cmp = 0b1000;
 		double regs[32] = {};
-		double pc = 0;
+		size_t pc = 0;
+		bool quit = false;
 #if !VM
 		::std::vector<FILE *> files;
-		::std::vector<window> windows;
+//		::std::vector<window> windows;
 #endif // VM
 	}
 }
@@ -60,6 +63,7 @@ static double get(LLCCEP_vm::arg &data)
 			}
 			break;
 
+		case LLCCEP_vm::ARG_T_COND:
 		case LLCCEP_vm::ARG_T_VAL:
 			return data.val;
 			break;
@@ -153,7 +157,7 @@ static inline void emulated_mul(LLCCEP_vm::instruction &data)
 	set(data.args[0], get(data.args[1]) * get(data.args[2]));
 }
 
-static inline void emulated_dev(LLCCEP_vm::instruction &data)
+static inline void emulated_div(LLCCEP_vm::instruction &data)
 {
 	set(data.args[0], get(data.args[1]) / get(data.args[2]));
 }
@@ -211,7 +215,7 @@ static void emulated_swi(LLCCEP_vm::instruction &data)
 		 * chr - characted being printed
 		 **************************************************************************/
 		case 0:
-			::std::cout << static_cast<unsigned char>(LLCCEP_vm::__added__::regs[0]);
+			::std::printf("%c", static_cast<unsigned char>(LLCCEP_vm::__added__::regs[0]));
 			break;
 
 		/***************************************************************************
@@ -283,6 +287,11 @@ static void emulated_swi(LLCCEP_vm::instruction &data)
 			::std::cin >> val;
 
 			LLCCEP_vm::write_string(static_cast<size_t>(LLCCEP_vm::__added__::regs[0]), val);
+			break;
+		}
+
+		case 5: {
+			LLCCEP_vm::__added__::quit = true;
 			break;
 		}
 
@@ -424,7 +433,7 @@ static void emulated_swi(LLCCEP_vm::instruction &data)
 			break;
 		}
 
-		case 11: { // create window
+/*		case 11: { // create window
 			LLCCEP_vm::size sz = {
 				static_cast<int>((static_cast<long>(LLCCEP_vm::__added__::regs[1]) >> 16) & 0xFFFF),
 				static_cast<int>(static_cast<long>(LLCCEP_vm::__added__::regs[1]) & 0xFFFF)
@@ -465,7 +474,7 @@ static void emulated_swi(LLCCEP_vm::instruction &data)
 			}
 
 			break;	
-		}
+		}*/
 #endif
 
 		default:
@@ -615,14 +624,30 @@ static void emulated_inp(LLCCEP_vm::instruction &data)
 	}
 }
 
-static void emulated_goto(LLCCEP_vm::instruction &data)
+static void emulated_call(LLCCEP_vm::instruction &data)
 {
-	LLCCEP_vm::__added__::pc = get(data.args[0]);
+	if (static_cast<size_t>(get(data.args[0])) & LLCCEP_vm::__added__::cmp) {
+		LLCCEP_vm::__added__::call.push(LLCCEP_vm::__added__::pc);
+		LLCCEP_vm::__added__::pc = static_cast<size_t>(
+				get(data.args[1]));
+	}
 }
 
 static void emulated_jmp(LLCCEP_vm::instruction &data)
 {
-	LLCCEP_vm::__added__::pc += get(data.args[0]);
+	LLCCEP_vm::__added__::pc = static_cast<size_t>(get(data.args[0]));
+}
+
+static void emulated_ret(LLCCEP_vm::instruction &data) 
+{
+	if (!LLCCEP_vm::__added__::call.size()) {
+		throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
+			"Error!\n"
+			"Already at the top of call stack!\n"));
+	}
+
+	LLCCEP_vm::__added__::pc = LLCCEP_vm::__added__::call.top();
+	LLCCEP_vm::__added__::call.pop();
 }
 
 static void (*funcs[])(LLCCEP_vm::instruction &data) = {
@@ -634,7 +659,7 @@ static void (*funcs[])(LLCCEP_vm::instruction &data) = {
 	emulated_add,
 	emulated_sub,
 	emulated_mul,
-	emulated_dev,
+	emulated_div,
 	emulated_and,
 	emulated_or,
 	emulated_xor,
@@ -652,8 +677,9 @@ static void (*funcs[])(LLCCEP_vm::instruction &data) = {
 	emulated_ldc,
 	emulated_outp,
 	emulated_inp,
-	emulated_goto,
-	emulated_jmp	
+	emulated_call,
+	emulated_jmp,
+	emulated_ret	
 };
 
 static inline void emulate(LLCCEP_vm::instruction &data)
@@ -664,14 +690,13 @@ static inline void emulate(LLCCEP_vm::instruction &data)
 			"Invalid opcode: %d", static_cast<int>(data.opcode)));
 	}
 
-	if (LLCCEP_vm::__added__::cmp & data.cond)
-		funcs[data.opcode](data);
+	funcs[data.opcode](data);
 }
 
 namespace LLCCEP_vm {
 	void execute(::std::vector<instruction> &data)
 	{
-		double &i = LLCCEP_vm::__added__::pc;
+		size_t &i = LLCCEP_vm::__added__::pc;
 
 #if VM
 		i = 1;
@@ -683,7 +708,7 @@ namespace LLCCEP_vm {
 			}
 		}
 #else
-		for (i = 1; i <= data.size(); i++)
+		for (i = 1; i <= data.size() && !LLCCEP_vm::__added__::quit; i++)
 			emulate(data[i - 1]);
 #endif
 	}

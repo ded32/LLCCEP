@@ -20,13 +20,13 @@ namespace LLCCEP_vm {
 		
 		while (!in.eof()) {
 			instruction temp = {};
-			in >> temp.cond >> temp.opcode;
+			in >> temp.opcode;
 
 			for (unsigned i = 0; i < 3; i++) {
 				char data[sizeof(double)] = {};
 
 				in.read(data, 1);
-				temp.args[i].type = static_cast<arg_t>(data[0]);
+				temp.args[i].type = static_cast<arg_t>(*data);
 
 				in.read(data, sizeof(double));
 				temp.args[i].val = from_bytes<double>(data);

@@ -6,11 +6,11 @@
 
 namespace LLCCEP_vm {
 	enum arg_t: uint8_t {
-		ARG_T_REG = 0,
-		ARG_T_MEM = 1,
-		ARG_T_VAL = 2,
-		ARG_T_NO  = 4,
-		ARG_T_INV = 5
+		ARG_T_REG  = 0,
+		ARG_T_MEM  = 1,
+		ARG_T_VAL  = 2,
+		ARG_T_NO   = 4,
+		ARG_T_COND = 5,
 	};
 
 	struct arg {
@@ -19,7 +19,6 @@ namespace LLCCEP_vm {
 	};
 
 	struct instruction {
-		uint8_t cond;
 		uint8_t opcode;
 		arg args[3];
 	};

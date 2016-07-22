@@ -23,10 +23,9 @@ add_library(setup "${CMAKE_SOURCE_DIR}/../setup/setup.cpp")
 add_library(softcore "${CMAKE_SOURCE_DIR}/../softcore/softcore.cpp")
 add_library(prog "${CMAKE_SOURCE_DIR}/../program/program.cpp")
 add_library(ram_driver "${CMAKE_SOURCE_DIR}/../drivers/ram/ram.cpp")
-add_library(window "${CMAKE_SOURCE_DIR}/../window/window.cpp")
+#add_library(window "${CMAKE_SOURCE_DIR}/../window/window.cpp")
 
 target_link_libraries(window ${SDL2_LIBRARIES})
 
 add_executable(emu "${CMAKE_SOURCE_DIR}/main.cpp")
-target_link_libraries(emu STDExtras setup softcore prog ram_driver window)
-
+target_link_libraries(emu STDExtras setup softcore prog ram_driver)
