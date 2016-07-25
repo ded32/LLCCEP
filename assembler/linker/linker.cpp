@@ -49,9 +49,10 @@ namespace LLCCEP_ASM {
 		for (const auto &i: associative_table) {
 			if (i.first.val == pair.first.val) {
 				throw RUNTIME_EXCEPTION(LINKER_ISSUE(
-						i.first.pos.file.c_str(), i.first.pos.line, 
-						"'%s' label is declared both at " size_t_pf " and " size_t_pf "lines", 
-						i.first.val.c_str(), i.first.pos.line, pair.first.pos.line))
+						i.first.pos.file.c_str(), i.first.pos.line,  
+						"'%s' label is declared both at %s:" size_t_pf " and %s:" size_t_pf, 
+						i.first.val.c_str(), i.first.pos.file.c_str(), i.first.pos.line, 
+						pair.first.pos.file.c_str(), pair.first.pos.line))
 			}
 		}
 

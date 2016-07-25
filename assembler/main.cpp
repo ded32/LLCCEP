@@ -78,8 +78,7 @@ int main(int argn, char * const *argv)
 	} DEFAULT_HANDLING
 
 	try {
-		for (i = 0; i < inputs.size(); i++)
-			LLCCEP_ASM::compile(inputs[i], out);
+		LLCCEP_ASM::compile(inputs, out);
 	} catch (::std::ios_base::failure &info) {
 		QUITE_ERROR(yes, "Can't open '%s' for read: "
 		                 "%s\n", inputs[i].c_str(), info.what());
