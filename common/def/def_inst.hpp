@@ -42,6 +42,8 @@ namespace LLCCEP_ASM {
 		{"jmp",   {LEX_T_COND, LEX_T_VAL,   LEX_T_NO}},
 		{"ret",   {LEX_T_NO,   LEX_T_NO,    LEX_T_NO}}
 	};
+
+	::std::string get_mnemonic_by_opcode(uint8_t op);
 }
 
 #endif // DEF_INST_HPP
