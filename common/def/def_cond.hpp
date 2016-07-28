@@ -15,6 +15,8 @@ namespace LLCCEP_ASM {
 		{"ls", 0b0010},
 		{"av", 0b0001}
 	};
+
+	::std::string get_condition_mnemonic(uint8_t bin);
 }
 
 #endif // DEF_COND_HPP
