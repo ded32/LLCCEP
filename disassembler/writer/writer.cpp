@@ -9,8 +9,8 @@
 {
 	auto out_arg = [&out](LLCCEP_DisASM::arg arg, bool comma) {
 		if (comma)
-			out << ','
-		out << ' '
+			out << ',';
+		out << ' ';
 
 		char prefixes[] = {
 			'&', '$', '\0', '\0', '\0', '@', ':', '\0'
@@ -42,7 +42,6 @@
 	};
 
 	out << get_mnemonic_by_opcode(inst.opcode) << " ";
-	for (unsigned i = 0; i < 3) {
-
-	}
+	for (unsigned i = 0; i < 3; i++)
+		out_arg(inst.args[i], i);
 }
