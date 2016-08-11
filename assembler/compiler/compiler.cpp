@@ -45,6 +45,9 @@ namespace LLCCEP_ASM {
 							make_labels_associative_table(labels_table, program, i);
 							continue;
 						} else if (program.size() && !is_label(program)) {
+                            if (vec_find(labels_table, "_main") == labels_table.end())
+                                throw RUNTIME_EXCEPTION(CONSTRUCT_MSG("Error!\n'_main' was not declared in this scope!"))
+                            
 							substitute_labels_with_addresses(labels_table, program);
 
 							LLCCEP_ASM::op prep = prepare_op(program);
