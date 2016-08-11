@@ -59,7 +59,8 @@ namespace LLCCEP_ASM {
 				}
 				
 				out.seekp(0);
-				bit_dump(out, to_string(labels_table[vec_find(labels_table, "main")]));
+				out << static_cast<uint8_t>(sizeof(size_t))
+				    << to_bytes(labels_table[vec_find(labels_table, "main")]));
 				
 				in.close();
 			}
