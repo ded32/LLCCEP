@@ -60,7 +60,7 @@ namespace LLCCEP_ASM {
 				
 				out.seekp(0);
 				out << static_cast<uint8_t>(sizeof(size_t))
-				    << to_bytes(labels_table[vec_find(labels_table, "main")]));
+				    << to_bytes(labels_table[vec_find(labels_table, "_main")]));
 				
 				in.close();
 			}
