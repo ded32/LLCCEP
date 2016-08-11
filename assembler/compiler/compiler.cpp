@@ -57,6 +57,11 @@ namespace LLCCEP_ASM {
 
 					reopen_file(in, f);
 				}
+				
+				out.seekp(0);
+				bit_dump(out, to_string(labels_table[vec_find(labels_table, "main")]));
+				
+				in.close();
 			}
 		} catch (::LLCCEP::runtime_exception &exc) {
 			throw (exc);
