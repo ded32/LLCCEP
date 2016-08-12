@@ -1,4 +1,4 @@
-#ifndef CONVERT_HPP
+#ifndef CONVERT_HPP 
 #define CONVERT_HPP
 
 #include <string>
@@ -29,28 +29,28 @@ template<typename T>
 	return val;
 }
 
-template<typename T>
-::std::vector<uint8_t> to_bytes(T val)
+template<typename TYPE>
+TYPE from_bytes(uint8_t data[sizeof(TYPE)])
 {
 	union {
-		char bytes[sizeof(T)];
-		T typed;
-	} res;
+		uint8_t bytes[sizeof(TYPE)];
+		TYPE res;
+	} cv;
 
-	memcpy(res.typed, val, sizeof(T));
-	return ::std::vector(res.bytes, res.bytes + sizeof(T));
+	memcpy(cv.bytes, data, sizeof(TYPE));
+	return cv.res;
 }
 
-template<typename T>
-T from_bytes(char *b)
+template<typename TYPE>
+::std::vector<uint8_t> to_bytes(TYPE data)
 {
 	union {
-		char bytes[sizeof(T)];
-		T typed;
-	} res;
+		TYPE val;
+		uint8_t bytes[sizeof(TYPE)];
+	} cv;
 
-	memcpy(res.bytes, b, sizeof(T));
-	return res.typed;
+	memcpy(&cv.val, &data, sizeof(TYPE));
+	return ::std::vector<uint8_t>(cv.bytes, cv.bytes + sizeof(TYPE));
 }
 
 #endif // CONVERT_HPP

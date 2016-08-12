@@ -14,6 +14,7 @@
 
 #include <STDExtras.hpp>
 #include <STLExtras.hpp>
+#include <convert.hpp>
 
 #include "../lexer/lexer.hpp"
 #include "../linker/linker.hpp"
@@ -24,7 +25,17 @@ namespace LLCCEP_ASM {
 	{	
 		::std::vector<lexem> program;
 		::std::vector<::std::pair<lexem, size_t> > labels_table;
-
+		
+#define ITERATOR_T ::std::vector<::std::pair<lexem, size_t> >::iterator
+		auto find_main = [&labels_table] {
+			for (ITERATOR_T it = labels_table.begin(); it < labels_table.end(); it++)
+				if ((*it).first.val == "_main")
+					return it;
+					
+			return labels_table.end();
+		};
+#undef ITERATOR_T
+		
 		try {
 			for (const auto &f: in_paths) {
 				::std::ifstream in(f);
@@ -42,12 +53,20 @@ namespace LLCCEP_ASM {
 						to_lexems(code, program, f, i);
 
 						if (!pass) {
-							make_labels_associative_table(labels_table, program, i);
+							size_t sz = labels_table.size();
+							make_labels_associative_table(labels_table, program, i - 1); // Map label, if exists to current line
+							
+							if (labels_table.size() != sz || !program.size())
+								i--;
+							
 							continue;
 						} else if (program.size() && !is_label(program)) {
-							if (vec_find(labels_table, "_main") == labels_table.end())
-								throw RUNTIME_EXCEPTION(CONSTRUCT_MSG("Error!\n'_main' was not declared in this scope!"))
-                            
+							if (find_main() == labels_table.end()) {
+								throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
+									"Error!\n"
+									"'_main', required as entry point, was not declared in this scope\n"))
+							}
+
 							substitute_labels_with_addresses(labels_table, program);
 
 							LLCCEP_ASM::op prep = prepare_op(program);
@@ -58,12 +77,12 @@ namespace LLCCEP_ASM {
 					reopen_file(in, f);
 				}
 				
-				out.seekp(0);
-				out << static_cast<uint8_t>(sizeof(size_t))
-				    << to_bytes(labels_table[vec_find(labels_table, "_main")]));
-				
 				in.close();
 			}
+
+			out.seekp(0);
+			out << static_cast<uint8_t>(sizeof(size_t));
+			dump_bytes(out, to_bytes((*(find_main())).second));
 		} catch (::LLCCEP::runtime_exception &exc) {
 			throw (exc);
 		} DEFAULT_HANDLING

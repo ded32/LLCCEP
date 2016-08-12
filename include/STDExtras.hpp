@@ -15,6 +15,7 @@
 #include <stdexcept>
 #include <cstdint>
 #include <sstream>
+#include <vector>
 
 #if defined(__linux__)
 #include <linux/limits.h>
@@ -90,5 +91,7 @@ catch (::std::exception &exc) {\
 	FATAL_ERROR(yes, "default catch block", "unknown "\
  	            "exception type");\
 }
+
+void dump_bytes(::std::ostream &out, ::std::vector<uint8_t> list);
 
 #endif // STDEXTRAS_HPP

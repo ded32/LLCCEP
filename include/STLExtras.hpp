@@ -17,7 +17,7 @@
 #define TYPEHASH(t) typeid(t).hash_code()
 
 template<typename TYPE>
-std::vector<TYPE> subvector(std::vector<TYPE> &src, size_t id0, size_t id1)
+::std::vector<TYPE> subvector(::std::vector<TYPE> &src, size_t id0, size_t id1)
 {
 	typename std::vector<TYPE>::const_iterator first = src.begin() + id0;
 	typename std::vector<TYPE>::const_iterator last = src.begin() + id1;
@@ -26,7 +26,7 @@ std::vector<TYPE> subvector(std::vector<TYPE> &src, size_t id0, size_t id1)
 }
 
 template<typename TYPE>
-std::vector<TYPE> init2vec(std::initializer_list<TYPE> src)
+::std::vector<TYPE> init2vec(::std::initializer_list<TYPE> src)
 {
 	std::vector<TYPE> res(src.begin(), src.end());
 	return res;
@@ -42,24 +42,6 @@ template<typename TYPE>
 typename ::std::vector<TYPE>::iterator vec_find(::std::vector<TYPE> &vec, TYPE srch)
 {
 	return find(vec.begin(), vec.end(), srch);
-}
-
-template<typename TYPE>
-TYPE from_bytes(char data[sizeof(TYPE)])
-{
-	union {
-		char bytes[sizeof(TYPE)];
-		TYPE res;
-	} cv;
-
-	memcpy(cv.bytes, data, sizeof(TYPE));
-	return cv.res;
-}
-
-template<typename TYPE>
-char *to_bytes(TYPE &data)
-{
-	return static_cast<char *>(&data);
 }
 
 template<typename char_t>

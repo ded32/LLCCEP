@@ -5,9 +5,10 @@
 #include <cassert>
 #include <stdexcept>
 #include <sstream>
+#include <vector>
 
 #if defined(__linux__)
-#	include <linux/limits.h>
+#include <linux/limits.h>
 #endif // linux
 
 #include <STDExtras.hpp>
@@ -70,6 +71,12 @@ namespace LLCCEP {
 	{
 		return runtime_error::what();	
 	}
+}
+
+void dump_bytes(::std::ostream &out, ::std::vector<uint8_t> list)
+{
+	for (const auto &i: list)
+		out.put(i);
 }
 
 #undef MAKE_EXCEPTION_MESSAGE

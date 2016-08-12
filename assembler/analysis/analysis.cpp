@@ -43,7 +43,7 @@ namespace LLCCEP_ASM {
 		if (size < required) {
 			throw RUNTIME_EXCEPTION(ANALYSIS_ISSUE(
 				"undefined", 
-				0, 
+				static_cast<size_t>(0),
 				"No instruction!"))
 		}
 

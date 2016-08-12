@@ -87,10 +87,10 @@ namespace LLCCEP_ASM {
 				}
 
 				curr.val = temporary;
-			} else if (isalpha(data[i])) {
+			} else if (isalpha(data[i]) || data[i] == '_') {
 				curr.type = LEX_T_NAME;
 
-				while (isalnum(data[i])) {
+				while (isalnum(data[i]) || data[i] == '_') {
 					curr.val += data[i];
 					i++;
 				}
