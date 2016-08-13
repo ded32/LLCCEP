@@ -18,8 +18,11 @@ namespace LLCCEP_vm {
 				input.c_str(), ::std::strerror(errno)));
 		}
 		
+		size_t off = 0;
+		size_t goto;
+		
 		while (!in.eof()) {
-			instruction temp = {};
+			instruction temp = instruction{};
 			in >> temp.opcode;
 
 			for (unsigned i = 0; i < 3; i++) {

@@ -45,6 +45,11 @@ namespace LLCCEP_ASM {
 				}
 
 				for (int pass = 0; pass < 2; pass++) {
+					if (pass) {
+						out << static_cast<uint8_t>(sizeof(size_t));
+						dump_bytes(out, to_bytes((*(find_main())).second));
+					}
+
 					for (size_t i = 1; !in.eof(); i++) {
 						::std::string code = "";
 
@@ -79,10 +84,6 @@ namespace LLCCEP_ASM {
 				
 				in.close();
 			}
-
-			out.seekp(0);
-			out << static_cast<uint8_t>(sizeof(size_t));
-			dump_bytes(out, to_bytes((*(find_main())).second));
 		} catch (::LLCCEP::runtime_exception &exc) {
 			throw (exc);
 		} DEFAULT_HANDLING

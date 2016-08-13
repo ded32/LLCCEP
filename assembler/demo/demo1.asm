@@ -1,8 +1,8 @@
 print:
-mov &00, "A"
-swi 2
-ret
+mov &00, "a"    ; &00 := 'a'
+swi 5           ; print &00
+ret             ; exit subroutine
 
-_main:
-call @al, print
-ret
+_main:          ; entry point
+call @al, print ; call to function, prints 'a'
+ret             ; exit program
