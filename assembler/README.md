@@ -58,15 +58,21 @@ Instructions list:
 Registers:
 There are 32 registers: from 00 to 31.
 The determination of register looks like: &id, where id is register id.
-Register can be specified as both destination and source.
+Register can specify both destination and source.
 
 Memory:
 Memory addressing comes from zero, as traditional.
 To specify memory address you need to write: $off, where off is offset from the memory
 beginning in memory elements.
-Memory address can be specified as both destination and source.
+Memory address can specify both destination and source.
 
 Numbers:
 Numbers are only floating-point with double percision.
 So, they're 8-bytes in length and they are chosen as memory elements.
-Numbers can be only specified as a source.
+Numbers can only specify a source.
+
+Labels:
+You can place labels everywhere you want. Both before instructions and other labels.
+Every label name will be replaced with the address of instruction after it.
+So, label name becomes a number, when you place it as an argument.
+As the consequence, label name can only specify a source.
