@@ -4,7 +4,7 @@
 #include <QWidget>
 #include <QPixmap>
 #include <QPen>
-#include <QBrush>
+#include <QPainter>
 
 namespace LLCCEP_exec {
 	class renderer: public QWidget {
@@ -18,7 +18,7 @@ namespace LLCCEP_exec {
 		
 		void setAffineTransformData(
 			double translateX, double translateY,
-			double rotateX, double rotateY,
+			double rotate,
 			double scaleX, double scaleY);
 		void setPen(const QPen &pen);
 		void setAntialiased(bool antialiased);
@@ -27,7 +27,8 @@ namespace LLCCEP_exec {
 		QPainter &painter() const;
 		
 	protected:
-		void paintEvent(QPaintEvent *event) const Q_DECL_OVERRIDE;
+		virtual void paintEvent(QPaintEvent *event) Q_DECL_OVERRIDE;
+		virtual void resizeEvent(QResizeEvent *event) Q_DECL_OVERRIDE;
 		bool OK() const;
 		
 	private:
