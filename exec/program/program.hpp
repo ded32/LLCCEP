@@ -23,7 +23,13 @@ namespace LLCCEP_vm {
 		arg args[3];
 	};
 
-	void read_program(::std::string input, ::std::vector<instruction> &program);
+	struct program_data {
+		size_t offset;
+		size_t size;
+	};
+
+	program_data read_program_data(::std::ifstream input);
+	void get_instruction_by_id(::std::ifstream input, size_t id);
 }
 
 #endif // PROGRAM_HPP

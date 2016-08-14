@@ -7,20 +7,19 @@
 #include <STDExtras.hpp>
 #include <STLExtras.hpp>
 
-#include "./../drivers/ram/ram.hpp"
+#include <QWidget>
 
 #include "softcore.hpp"
 #include "fp.hpp"
 
+#include "./../drivers/ram/ram.hpp"
 #include "./../program/program.hpp"
 #include "./../selection/selection.hpp"
-//#include "./../window/window.hpp"
-
 #include "./../../common/def/def_inst.hpp"
 
 #if VM
 #include "./../drivers/display/display.hpp"
-#endif //VM
+#endif // VM
 
 namespace LLCCEP_vm {
 	namespace __added__ {
@@ -33,7 +32,7 @@ namespace LLCCEP_vm {
 		bool quit = false;
 #if !VM
 		::std::vector<FILE *> files;
-//		::std::vector<window> windows;
+		::std::vector<QWidget> windows;
 #endif // VM
 	}
 }
@@ -298,7 +297,6 @@ static void emulated_swi(LLCCEP_vm::instruction &data)
 		/***************************************************************************
 		 * Only emulator interrupts[sys calls]
 		 **************************************************************************/
-
 #if !VM
 		/***************************************************************************
 		 * Open file.
@@ -432,49 +430,11 @@ static void emulated_swi(LLCCEP_vm::instruction &data)
 			}
 			break;
 		}
-
-/*		case 11: { // create window
-			LLCCEP_vm::size sz = {
-				static_cast<int>((static_cast<long>(LLCCEP_vm::__added__::regs[1]) >> 16) & 0xFFFF),
-				static_cast<int>(static_cast<long>(LLCCEP_vm::__added__::regs[1]) & 0xFFFF)
-			};
-			LLCCEP_vm::point pos = {
-				static_cast<int>((static_cast<long>(LLCCEP_vm::__added__::regs[2]) >> 16) & 0xFFFF),
-				static_cast<int>(static_cast<long>(LLCCEP_vm::__added__::regs[2]) & 0xFFFF)
-			};
-
-			LLCCEP_vm::window new_wnd;
-			new_wnd.create(LLCCEP_vm::access_mem_data<char *>(static_cast<size_t>(LLCCEP_vm::__added__::regs[0])),
-			               sz, pos, static_cast<uint32_t>(LLCCEP_vm::__added__::regs[3]));
-
-			LLCCEP_vm::__added__::windows.push_back(new_wnd);
+			
+		case 11: {
+			
 			break;
 		}
-
-		case 12: { // delete window
-			if (static_cast<size_t>(LLCCEP_vm::__added__::regs[0]) >= LLCCEP_vm::__added__::windows.size()) {
-				throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
-					"Overbounding due window accessing: no window %zu",
-					static_cast<size_t>(LLCCEP_vm::__added__::regs[1])));
-			}
-
-			LLCCEP_vm::__added__::windows[static_cast<size_t>(LLCCEP_vm::__added__::regs[0])].destroy();
-			LLCCEP_vm::__added__::windows.erase(LLCCEP_vm::__added__::windows.begin() + static_cast<size_t>(
-				LLCCEP_vm::__added__::regs[0]));
-
-			break;
-		}
-
-		case 13: { // window stuff
-			size_t id = static_cast<size_t>(LLCCEP_vm::__added__::regs[0]);
-			if (id >= LLCCEP_vm::__added__::windows.size()) {
-				throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
-					"Overbounding due window accessing: no window %zu",
-					static_cast<size_t>(LLCCEP_vm::__added__::regs[0])));
-			}
-
-			break;	
-		}*/
 #endif
 
 		default:
