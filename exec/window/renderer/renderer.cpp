@@ -18,7 +18,7 @@ LLCCEP_exec::renderer::renderer(QWidget *parent = 0):
 	setAutoFillBackground(true);
 }
 
-virtual ~renderer() const
+LLCCEP_exec::renderer::~renderer()
 {
 	delete _painter;
 	delete _pix;

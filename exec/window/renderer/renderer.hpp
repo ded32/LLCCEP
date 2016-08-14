@@ -12,7 +12,7 @@ namespace LLCCEP_exec {
 		
 	public:
 		renderer(QWidget *parent = 0);
-		virtual ~renderer() const Q_DECL_OVERRIDE;
+		virtual ~renderer() Q_DECL_OVERRIDE;
 		
 		void begin(int sX, int sY);
 		
