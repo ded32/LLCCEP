@@ -23,7 +23,8 @@ namespace LLCCEP_exec {
 		void setPen(const QPen &pen);
 		void setAntialiased(bool antialiased);
 		void lock();
-		
+		void end();
+
 		QPainter &painter() const;
 		
 	protected:

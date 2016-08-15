@@ -25,11 +25,7 @@ LLCCEP_exec::renderer::renderer(QWidget *parent /*= 0*/):
 
 LLCCEP_exec::renderer::~renderer()
 {
-	delete _painter;
-	delete _pix;
-	_started = false;
-
-	QWidget::~QWidget();
+	end();
 }
 
 void LLCCEP_exec::renderer::begin(int sX, int sY)
@@ -81,6 +77,17 @@ void LLCCEP_exec::renderer::lock()
 	Q_ASSERT(OK());
 }
 
+void LLCCEP_exec::renderer::end()
+{
+	delete _painter;
+	delete _pix;
+	_painter = 0;
+	_pix = 0;
+	_started = false;
+	_antialiased = false;
+	_locked = false;
+}
+
 QPainter &LLCCEP_exec::renderer::painter() const
 {
 	Q_ASSERT(OK());
@@ -105,6 +112,8 @@ void LLCCEP_exec::renderer::paintEvent(QPaintEvent *event)
 
 void LLCCEP_exec::renderer::resizeEvent(QResizeEvent *event)
 {
+	// resize pixmap, if was initialized and new size is greater
+
 	if (!OK()) // if setup wasn't already proceeded, don't do the actions
 		return;
 
