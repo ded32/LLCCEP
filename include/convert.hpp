@@ -30,10 +30,10 @@ template<typename T>
 }
 
 template<typename TYPE>
-TYPE from_bytes(uint8_t data[sizeof(TYPE)])
+TYPE from_bytes(char data[sizeof(TYPE)])
 {
 	union {
-		uint8_t bytes[sizeof(TYPE)];
+		char bytes[sizeof(TYPE)];
 		TYPE res;
 	} cv;
 

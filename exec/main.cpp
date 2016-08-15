@@ -6,14 +6,15 @@
 #include <STDExtras.hpp>
 #include <convert.hpp>
 
-#include "./../setup/setup.hpp"
-#include "./../softcore/softcore.hpp"
+#include "program/program.hpp"
+#include "softcore/softcore.hpp"
+#include "mm/mm.hpp"
 
 void usage()
 {
 	::std::fprintf(stderr, "Usage:\n"
 	                       "--help/--usage show help(this text)\n"
-	                       "-r number after is amount of RAM being allocated, in bytes\n"
+			       "-r number after is amount of RAM being allocated, in memory elements\n"
 	                       "-p everything after is program storage\n"
 	                       "If none config or command-line params are given, this help is shown.\n");
 }
@@ -77,24 +78,25 @@ int main(int argn, char * const *argv)
 		return EINVAL;
 	}
 
-	::std::vector<::std::string> program;
+	::std::vector<::std::string> programs;
 	size_t ramS = 0;
-	::std::vector<LLCCEP_vm::instruction> prog;
+	LLCCEP_exec::memoryManager mm;
 
 	try {
-		parse_command_line_params(argn, argv, ramS, program);
+		parse_command_line_params(argn, argv, ramS, programs);
 	} catch (::LLCCEP::runtime_exception &exc) {
 		usage();
 		QUITE_ERROR(yes, "%s", exc.msg())
 	} DEFAULT_HANDLING
 
 	try {
-		for (size_t i = 0; i < program.size(); i++)
-			LLCCEP_vm::read_program(program[i], prog);
+		mm.allocateElements(ramS);
 
-		LLCCEP_vm::setup_vm_resources(ramS);
-		LLCCEP_vm::execute(prog);
-		LLCCEP_vm::free_vm_resources();
+		for (size_t i = 0; i < programs.size(); i++) {
+
+		}
+
+		mm.freeElements();
 	} catch (::LLCCEP::runtime_exception &exc) {
 		QUITE_ERROR(yes, "%s", exc.msg());
 	} DEFAULT_HANDLING

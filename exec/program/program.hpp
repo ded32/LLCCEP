@@ -4,7 +4,7 @@
 #include <vector>
 #include <fstream>
 
-namespace LLCCEP_vm {
+namespace LLCCEP_exec {
 	enum arg_t: uint8_t {
 		ARG_T_REG  = 0,
 		ARG_T_MEM  = 1,
@@ -25,11 +25,12 @@ namespace LLCCEP_vm {
 
 	struct program_data {
 		size_t offset;
+		size_t main_id;
 		size_t size;
 	};
 
-	program_data read_program_data(::std::ifstream input);
-	void get_instruction_by_id(::std::ifstream input, size_t id);
+	program_data read_program_data(::std::ifstream &input);
+	instruction get_instruction_by_id(::std::ifstream &input, program_data data, size_t id);
 }
 
 #endif // PROGRAM_HPP
