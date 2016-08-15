@@ -5,7 +5,7 @@
 
 int main(int argn, char **argv)
 {
-    QApplication app(argn, argv);
+	QApplication app(argn, argv);
 
 	LLCCEP_exec::window wnd;
 	wnd.resize(800, 640);
@@ -17,5 +17,5 @@ int main(int argn, char **argv)
 	for (double i = 0; i * i < 640; i += 0.001)
 		wnd.painter().drawPoint(i, i * i);
 
-    return app.exec();
+	return app.exec();
 }

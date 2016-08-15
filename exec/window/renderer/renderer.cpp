@@ -3,6 +3,7 @@
 #include <QPen>
 #include <QBrush>
 #include <QtGlobal>
+#include <QFont>
 #include <QPainter>
 #include <QPaintEvent>
 #include <QResizeEvent>
@@ -30,9 +31,14 @@ LLCCEP_exec::renderer::~renderer()
 
 void LLCCEP_exec::renderer::begin(int sX, int sY)
 {
-	_pix = new QPixmap(sX, sY);
-	_painter = new QPainter(_pix);
+	_pix = new (::std::nothrow) QPixmap(sX, sY);
+	_painter = new (::std::nothrow) QPainter(_pix);
+	Q_ASSERT(_pix && _painter);
+
 	_painter->setPen(QPen(Qt::white, 1));
+	_painter->setBrush(QBrush(Qt::transparent));
+	_painter->setFont(QFont("Courier")); // Cross-platform monospace font
+
 	_started = true;
 }
 
@@ -95,6 +101,13 @@ QPainter &LLCCEP_exec::renderer::painter() const
 	return *_painter;
 }
 
+QImage LLCCEP_exec::renderer::getImage() const
+{
+	Q_ASSERT(OK());
+
+	return _pix->toImage();
+}
+
 void LLCCEP_exec::renderer::paintEvent(QPaintEvent *event)
 {
 	(void)event;
@@ -121,8 +134,35 @@ void LLCCEP_exec::renderer::resizeEvent(QResizeEvent *event)
 	    w1 = event->size().width(), h1 = event->size().height();
 
 	if (w1 > w0 || h1 > h0) {
-		QPixmap *newPixmap = new QPixmap(::std::max(w0, w1), ::std::max(h0, h1));
-		QPainter *newPainter = new QPainter(newPixmap);
+		QPixmap *newPixmap = new (::std::nothrow) QPixmap(::std::max(w0, w1), ::std::max(h0, h1));
+		QPainter *newPainter = new (::std::nothrow) QPainter(newPixmap);
+
+		Q_ASSERT(newPixmap && newPainter);
+		Q_ASSERT(_pix && _painter);
+
+		newPainter->setBackground(_painter->background());
+		newPainter->setBackgroundMode(_painter->backgroundMode());
+		newPainter->setBrush(_painter->brush());
+		newPainter->setBrushOrigin(_painter->brushOrigin());
+		newPainter->setClipPath(_painter->clipPath());
+		newPainter->setClipRect(_painter->clipBoundingRect());
+		newPainter->setClipRegion(_painter->clipRegion());
+		newPainter->setClipping(_painter->hasClipping());
+		newPainter->setCompositionMode(_painter->compositionMode());
+		newPainter->setFont(_painter->font());
+		newPainter->setLayoutDirection(_painter->layoutDirection());
+		newPainter->setMatrix(_painter->matrix());
+		newPainter->setMatrixEnabled(_painter->matrixEnabled());
+		newPainter->setOpacity(_painter->opacity());
+		newPainter->setPen(_painter->pen());
+		newPainter->setRenderHints(_painter->renderHints());
+		newPainter->setTransform(_painter->transform());
+		newPainter->setViewport(_painter->viewport());
+		newPainter->setViewTransformEnabled(_painter->viewTransformEnabled());
+		newPainter->setWindow(_painter->window());
+		newPainter->setWorldMatrix(_painter->worldMatrix());
+		newPainter->setWorldMatrixEnabled(_painter->worldMatrixEnabled());
+		newPainter->setWorldTransform(_painter->worldTransform());
 
 		newPainter->drawPixmap(0, 0, *_pix);
 

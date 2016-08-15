@@ -1,208 +1,161 @@
-#include <SDL2/SDL.h>
+#include <QPen>
+#include <QBrush>
+#include <QColor>
+#include <QPixmap>
+#include <QFont>
+#include <QPainter>
+#include <QPaintEvent>
+#include <QKeyEvent>
+
 #include <cstdio>
+#include <cstdarg>
 #include <string>
 
-#include <STDExtras.hpp>
+#include "./../../window/window.hpp"
 
 #include "display.hpp"
 
-#define INIT_FAIL(cond) \
-({ \
-	if (cond) { \
-		throw RUNTIME_EXCEPTION(CONSTRUCT_MSG( \
-			"Error!\n" \
-			"Can't init display: %s!\n", \
-			SDL_GetError())); \
-	} \
-});
+LLCCEP_exec::display::display():
+	window(),
+	_char(0),
+	_line(0),
+	_startedText(0),
+	_textPainter(0),
+	_textMap(0)
+{ }
 
-#define RUNNING_FATAL \
-({ \
-	if (::LLCCEP_vm::__sys__::window || ::LLCCEP_vm::__sys__::renderer) { \
-		throw RUNTIME_EXCEPTION(CONSTRUCT_MSG( \
-			"Error!\n" \
-			"Rendering suite already exists!\n")); \
-	} \
-});
+void LLCCEP_exec::display::start(::std::string title, int width, int height)
+{
+	setFixedSize(width, height);
+	show();
+	setWindowTitle(QString(title.c_str()));
 
-#define NON_RUNNING_FATAL \
-({ \
-	if (!(::LLCCEP_vm::__sys__::window && ::LLCCEP_vm::__sys__::renderer)) { \
-		throw RUNTIME_EXCEPTION(CONSTRUCT_MSG( \
-			"Error!\n" \
-			"No rendering suite for display!\n")); \
-	} \
-});
+	begin(width, height);
+	setAntialiased(true);
 
-namespace LLCCEP_vm {
-	namespace __sys__ {
-		SDL_Window *window = 0;
-		SDL_Renderer *renderer = 0;
+	_textMap = new (::std::nothrow) QPixmap(width, height);
+	_textPainter = new (::std::nothrow) QPainter(_textMap);
+	Q_ASSERT(_textMap && _textPainter);
 
-		namespace __kb__ {
-			bool keys[256] = {};
+	_startedText = true;
+}
+
+void LLCCEP_exec::display::setColor(COLORREF color)
+{
+	setPen(QPen(QColor(color), 1));
+}
+
+COLORREF LLCCEP_exec::display::getColor() const
+{
+	QColor clr = painter().pen().color();
+	return RGB(clr.red(), clr.green(), clr.blue());
+}
+
+void LLCCEP_exec::display::drawPoint(int x, int y)
+{
+	painter().drawPoint(x, y);
+}
+
+COLORREF LLCCEP_exec::display::getPointColor(int x, int y) const
+{
+	QPixmap pix = QPixmap::grabWidget(window::QWidget::window(), x, y, x, y);
+	return pix.toImage().pixel(0, 0);
+}
+
+bool LLCCEP_exec::display::getKeyboardButtonState(uint8_t id) const
+{
+	return _kb[id];
+}
+
+int LLCCEP_exec::display::getMouseButtonsState() const
+{
+	return _mouseButtons;
+}
+
+int LLCCEP_exec::display::getMouseX() const
+{
+	return _mousePos.x();
+}
+
+int LLCCEP_exec::display::getMouseY() const
+{
+	return _mousePos.y();
+}
+
+void LLCCEP_exec::display::printOut(::std::string str)
+{
+	Q_ASSERT(OK());
+
+	int _width = _textPainter->window().width(),
+	    _height = _textPainter->window().height();
+	for (size_t i = 0; i < str.length(); i++) {
+		if (i && i % 80)
+			_line++;
+
+		if (_line == 40) {
+			QPixmap *map = new (::std::nothrow) QPixmap(_width, _height);
+			QPainter *newMapPainter = new (::std::nothrow) QPainter(map);
+			Q_ASSERT(map && newMapPainter);
+
+			newMapPainter->drawPixmap(0, 0, _width, _height,
+						 *_textMap, 0, _height / 40,
+						 _width, _height - _height / 40);
+
+			_textPainter->fillRect(_textPainter->window(), QBrush(Qt::black));
+			_textPainter->drawPixmap(_textPainter->window(), *map);
+
+			delete newMapPainter;
+			delete map;
 		}
 
-		namespace __mouse__ {
-			int x = 0;
-			int y = 0;
-			uint32_t buttons = 0;
-		}
+		_textPainter->drawText(_char * width() / 80, _line * height() / 40, width() / 80, height() / 40,
+				       0, QString(str[i]));
+
+		_char++;
 	}
 
-	void init_display(::std::string title, uint16_t width, uint16_t height)
-	{
-		RUNNING_FATAL
+	Q_ASSERT(OK());
+}
 
-		__sys__::window = SDL_CreateWindow(title.c_str(), SDL_WINDOWPOS_CENTERED,
-		                                   SDL_WINDOWPOS_CENTERED, width, height,
-		                                   SDL_WINDOW_SHOWN);
-		INIT_FAIL(!__sys__::window)
+void LLCCEP_exec::display::writeOut(::std::string fmt, ...)
+{
+	va_list args;
+	va_start(args, fmt);
 
-		__sys__::renderer = SDL_CreateRenderer(__sys__::window, -1,
-		                                       SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
-		INIT_FAIL(!__sys__::renderer)
+	char buffer[1024 * 8] = ""; // 8KB
+	vsnprintf(buffer, sizeof(buffer) - 1, fmt.c_str(), args);
 
-		set_clr(RGB(0x0, 0x0, 0x0));
-		SDL_RenderClear(__sys__::renderer);
+	printOut(buffer);
+
+	va_end(args);
+}
+
+void LLCCEP_exec::display::paintEvent(QPaintEvent *event)
+{
+	if (OK()) {
+		QPixmap *pix = new (::std::nothrow)
+			       QPixmap(painter().window().width(),
+				       painter().window().height());
+		QPainter *paint = new (::std::nothrow) QPainter(pix);
+		Q_ASSERT(pix && paint);
+
+		paint->drawImage(QPoint(0, 0), getImage());
+		painter().drawPixmap(0, 0, *_textMap);
+
+		delete paint;
+		delete pix;
 	}
 
-	bool handle_msg() 
-	{
-		NON_RUNNING_FATAL
+	window::paintEvent(event);
+}
 
-		SDL_Event ev = {};
+void LLCCEP_exec::display::keyEvent(QKeyEvent *event)
+{
+	printOut(event->text().toStdString());
+	window::keyEvent(event);
+}
 
-		while (SDL_PollEvent(&ev)) {
-			switch (ev.type) {
-				case SDL_QUIT:
-					return false;
-					break;
-
-				case SDL_KEYDOWN:
-					__sys__::__kb__::keys[ev.key.keysym.scancode] = true;
-					break;
-
-				case SDL_KEYUP:
-					__sys__::__kb__::keys[ev.key.keysym.scancode] = false;
-					break;
-
-				case SDL_MOUSEMOTION:
-					__sys__::__mouse__::x = ev.motion.x;
-					__sys__::__mouse__::y = ev.motion.y;
-					__sys__::__mouse__::buttons = ev.motion.state;
-					break;
-
-				case SDL_MOUSEBUTTONDOWN:
-					__sys__::__mouse__::x = ev.button.x;
-					__sys__::__mouse__::y = ev.button.y;
-					__sys__::__mouse__::buttons |= ev.button.button;
-					break;
-
-				case SDL_MOUSEBUTTONUP:
-					__sys__::__mouse__::x = ev.button.x;
-					__sys__::__mouse__::y = ev.button.y;
-					__sys__::__mouse__::buttons &= ~(ev.button.button);
-					break;
-
-				default:
-					break;
-			}
-
-			SDL_RenderPresent(__sys__::renderer);
-			SDL_UpdateWindowSurface(__sys__::window);
-		}
-
-		return true;
-	}
-
-	void set_clr(uint32_t clr)
-	{
-		NON_RUNNING_FATAL
-
-		SDL_SetRenderDrawColor(__sys__::renderer,
-		                       RGBA_R(clr),
-		                       RGBA_G(clr),
-		                       RGBA_B(clr),
-		                       RGBA_A(clr));
-	}
-
-	uint32_t get_clr()
-	{
-		NON_RUNNING_FATAL
-
-		uint32_t res = 0;
-		SDL_GetRenderDrawColor(__sys__::renderer,
-		                       ((uint8_t *)&res) + 3 * sizeof(uint8_t),
-		                       ((uint8_t *)&res) + 2 * sizeof(uint8_t),
-		                       ((uint8_t *)&res) + 1 * sizeof(uint8_t),
-		                       ((uint8_t *)&res) + 0 * sizeof(uint8_t));
-
-		return res;
-	}
-
-	void set_pix(uint16_t posX, uint16_t posY)
-	{
-		NON_RUNNING_FATAL
-
-		SDL_RenderDrawPoint(__sys__::renderer, posX, posY);
-	}
-
-	uint32_t get_pix(uint16_t posX, uint16_t posY)
-	{
-		NON_RUNNING_FATAL
-
-		SDL_Surface *sfc = SDL_GetWindowSurface(__sys__::window);
-		uint32_t *pix = (uint32_t *)sfc->pixels;
-
-		return pix[(posY * sfc->w) + posX];
-	}
-
-	unsigned get_host_width()
-	{
-		SDL_DisplayMode mode = {};
-		SDL_GetCurrentDisplayMode(0, &mode);
-
-		return mode.w;
-	}
-
-	unsigned get_host_height()
-	{
-		SDL_DisplayMode mode = {};
-		SDL_GetCurrentDisplayMode(0, &mode);
-
-		return mode.h;
-	}
-
-	bool get_captured_kb_state(uint8_t id)
-	{
-		return __sys__::__kb__::keys[id]; 
-	}
-
-	unsigned get_captured_mouse_x()
-	{
-		return __sys__::__mouse__::x;
-	}
-
-	unsigned get_captured_mouse_y()
-	{
-		return __sys__::__mouse__::y;
-	}
-
-	unsigned get_captured_mouse_buttons_state()
-	{
-		return __sys__::__mouse__::buttons;
-	}
-
-	void kill_display()
-	{
-		NON_RUNNING_FATAL
-
-		SDL_DestroyRenderer(__sys__::renderer);
-		SDL_DestroyWindow(__sys__::window);
-		SDL_Quit();
-
-		__sys__::window = 0;
-		__sys__::renderer = 0;
-	}
+bool LLCCEP_exec::display::OK() const
+{
+	return window::OK() && _startedText && _textPainter && _textMap;
 }

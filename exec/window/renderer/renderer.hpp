@@ -26,6 +26,7 @@ namespace LLCCEP_exec {
 		void end();
 
 		QPainter &painter() const;
+		QImage getImage() const;
 		
 	protected:
 		virtual void paintEvent(QPaintEvent *event) Q_DECL_OVERRIDE;

@@ -1,13 +1,16 @@
+#include <QApplication>
+
 #include "display.hpp"
 
-int main()
+int main(int argn, char **argv)
 {
-	LLCCEP_vm::init_display("test", 800, 640);
+	QApplication app(argn, argv);
 
-	LLCCEP_vm::set_clr(RGB(0xFF, 0xFF, 0xFF));
-	LLCCEP_vm::set_pix(0, 0);
+	LLCCEP_exec::display display;
+	display.start("Test QT Display", 800, 640);
 
-	while (LLCCEP_vm::handle_msg());
+	for (double i = 0; i * i < 640; i += 0.001)
+		display.drawPoint(i, i * i);
 
-	LLCCEP_vm::kill_display();
+	return app.exec();
 }

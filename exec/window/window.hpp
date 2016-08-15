@@ -3,6 +3,9 @@
 
 #include <QWidget>
 #include <QCloseEvent>
+#include <QKeyEvent>
+#include <QMouseEvent>
+#include <QPoint>
 #include "renderer/renderer.hpp"
 
 namespace LLCCEP_exec {
@@ -14,6 +17,12 @@ namespace LLCCEP_exec {
 
 	protected:
 		virtual void closeEvent(QCloseEvent *event) Q_DECL_OVERRIDE;
+		virtual void keyEvent(QKeyEvent *event);
+		virtual void mouseEvent(QMouseEvent *event);
+
+		bool _kb[0xFF + 1];
+		QPoint _mousePos;
+		int _mouseButtons;
 	};
 }
 
