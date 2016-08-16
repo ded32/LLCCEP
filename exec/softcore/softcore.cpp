@@ -308,6 +308,18 @@ void LLCCEP_exec::softcore::emulated_swi(LLCCEP_exec::instruction data)
 		}
 	};
 
+	auto getWindowByID = [](size_t id) {
+		if (id) {
+			throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
+				"Error!\n"
+				"Overbounding while access to windows:"
+				"no window with " size_t_pf " ID!\n",
+				id))
+		}
+
+		return _windows[id];
+	};
+
 	auto checkf = [](FILE *fd, size_t function) {
 		if (!fd) {
 			throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
@@ -316,6 +328,13 @@ void LLCCEP_exec::softcore::emulated_swi(LLCCEP_exec::instruction data)
 				"Interrupt 0:" size_t_pf "!\n",
 				function));
 		}
+	};
+
+	auto noFunction = [](size_t interrupt) {
+		throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
+			"Error!\n"
+			"No function " size_t_pf " of " size_t_pf " interrupt.\n",
+			static_cast<size_t>(_regs[1]), interrupt));
 	};
 
 	switch (static_cast<size_t>(get(data.args[0]))) {
@@ -474,6 +493,16 @@ void LLCCEP_exec::softcore::emulated_swi(LLCCEP_exec::instruction data)
 			}
 		}
 
+		/**************************************************
+		 * Open file.
+		 *
+		 * r01 will be pointer to opened file.
+		 *
+		 * r02 -- pointer to path's string
+		 * r03 -- pointer to format's string
+		 *
+		 * In case of fail, an exception will be thrown.
+		 *************************************************/
 		case 3: {
 			::std::string path = _mm->getString(static_cast<size_t>(_regs[2]));
 			::std::string fmt = _mm->getString(static_cast<size_t>(_regs[3]));
@@ -491,6 +520,11 @@ void LLCCEP_exec::softcore::emulated_swi(LLCCEP_exec::instruction data)
 			break;
 		}
 
+		/*************************************************
+		 * Close file.
+		 *
+		 * r01 -- pointer to file being closed.
+		 ************************************************/
 		case 4: {
 			FILE *fd = reinterpret_cast<FILE *>(*reinterpret_cast<void **>(&_regs[1]));
 			checkf(fd, 4);
@@ -499,7 +533,146 @@ void LLCCEP_exec::softcore::emulated_swi(LLCCEP_exec::instruction data)
 
 			break;
 		}
+
+		default: {
+			noFunction(0);
 		}
+		}
+
+		break;
+	}
+
+	/**************************************************
+	 * Windows stuff
+	 *************************************************/
+	case 1: {
+		/**************************************************
+		 * Function selection
+		 *************************************************/
+		switch (static_cast<size_t>(_regs[0])) {
+		/**************************************************
+		 * Create window
+		 *
+		 * r01 -- width of new window
+		 * r02 -- height of new window
+		 * r03 -- pointer to window title string
+		 * r04 -- window flags
+		 *
+		 * r05 will be window's id.
+		 *************************************************/
+		case 0: {
+			LLCCEP_exec::window *wnd = new (::std::nothrow) LLCCEP_exec::window;
+			if (!wnd) {
+				throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
+					"Error!\n"
+					"Can't allocate memory for window: %s",
+					::std::strerror(errno)));
+			}
+
+			wnd->resize(static_cast<size_t>(_regs[1]),
+				    static_cast<size_t>(_regs[2]));
+			wnd->setWindowTitle(_mm->getString(static_cast<size_t>(_regs[3])).c_str());
+			wnd->show();
+			wnd->setWindowFlags(static_cast<size_t>(_regs[4]));
+
+			if (static_cast<size_t>(_regs[4]) & Qt::MSWindowsFixedSizeDialogHint) {
+				wnd->setFixedSize(static_cast<size_t>(_regs[1]),
+						  static_cast<size_t>(_regs[2]));
+			}
+
+			_regs[5] = _windows.size();
+			_windows.push_back(wnd);
+
+			break;
+		}
+
+		case 1: {
+			LLCCEP_exec::window *wnd = getWindowByID(static_cast<size_t>(_regs[1]));
+			wnd->painter().drawPoint(static_cast<int>(_regs[2]), static_cast<size_t>(_regs[3]));
+
+			break;
+		}
+
+		case 2: {
+			LLCCEP_exec::window *wnd = getWindowByID(static_cast<size_t>(_regs[1]));
+			wnd->painter().setPen(QColor(static_cast<QRgb>(_regs[2])));
+
+			break;
+		}
+
+		case 3: {
+			LLCCEP_exec::window *wnd = getWindowByID(static_cast<size_t>(_regs[1]));
+			wnd->close();
+			delete wnd;
+			_windows.erase(_windows.begin() + static_cast<size_t>(_regs[1]));
+
+			break;
+		}
+
+		case 4: {
+			LLCCEP_exec::window *wnd = getWindowByID(static_cast<size_t>(_regs[1]));
+			_regs[3] = wnd->getKeyboardButtonState((static_cast<size_t>(_regs[2]) > 0xFF)?
+							       (0):
+							       (static_cast<size_t>(_regs[2])));
+			_regs[4] = wnd->getMousePos().x();
+			_regs[5] = wnd->getMousePos().y();
+			_regs[6] = wnd->getMouseButtons();
+
+			break;
+		}
+
+		case 5: {
+			LLCCEP_exec::window *wnd = getWindowByID(static_cast<size_t>(_regs[1]));
+			_regs[2] = wnd->pos().x();
+			_regs[3] = wnd->pos().y();
+			_regs[4] = wnd->size().width();
+			_regs[5] = wnd->size().height();
+
+			break;
+		}
+
+		case 6: {
+			LLCCEP_exec::window *wnd = getWindowByID(static_cast<size_t>(_regs[1]));
+
+			wnd->resize(static_cast<int>(_regs[2]),
+				    static_cast<int>(_regs[3]));
+			break;
+		}
+
+		case 7: {
+			LLCCEP_exec::window *wnd = getWindowByID(static_cast<size_t>(_regs[1]));
+
+			wnd->move(static_cast<int>(_regs[2]),
+				  static_cast<int>(_regs[3]));
+			break;
+		}
+
+		case 8: {
+			LLCCEP_exec::window *wnd = getWindowByID(static_cast<size_t>(_regs[1]));
+
+			wnd->setWindowTitle(_mm->getString(static_cast<size_t>(_regs[2])));
+			break;
+		}
+
+		case 9: {
+			LLCCEP_exec::window *wnd = getWindowByID(static_cast<size_t>(_regs[1]));
+
+			wnd->setWindowFlags(static_cast<size_t>(_regs[2]));
+			break;
+		}
+
+		default: {
+			noFunction(1);
+		}
+		}
+
+		break;
+	}
+
+	/**************************************************
+	 * Sound stuff
+	 *************************************************/
+	case 2: {
 
 		break;
 	}

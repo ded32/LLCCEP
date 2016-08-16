@@ -63,8 +63,7 @@ namespace LLCCEP_exec {
 		double _regs[32];
 		double _pc;
 
-		::std::vector<FILE *>_files;
-		::std::vector<window>_windows;
+		::std::vector<window *> _windows;
 		memoryManager *_mm;
 		codeReader *_reader;
 		int _ready;

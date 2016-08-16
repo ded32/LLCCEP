@@ -11,6 +11,21 @@ LLCCEP_exec::window::window():
 	renderer()
 { }
 
+bool LLCCEP_exec::window::getKeyboardButtonState(uint8_t id)
+{
+	return _kb[id];
+}
+
+QPoint LLCCEP_exec::window::getMousePos()
+{
+	return _mousePos;
+}
+
+int LLCCEP_exec::window::getMouseButtons()
+{
+	return _mouseButtons;
+}
+
 void LLCCEP_exec::window::closeEvent(QCloseEvent *event)
 {
 	(void)event;

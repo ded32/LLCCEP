@@ -15,6 +15,10 @@ namespace LLCCEP_exec {
 	public:
 		window();
 
+		bool getKeyboardButtonState(uint8_t id);
+		QPoint getMousePos();
+		int getMouseButtons();
+
 	protected:
 		virtual void closeEvent(QCloseEvent *event) Q_DECL_OVERRIDE;
 		virtual void keyEvent(QKeyEvent *event);
