@@ -10,7 +10,7 @@ namespace LLCCEP_ASM {
 		lex_t types[3];
 	};
 
-	static const int INST_NUM = 29;
+	static const int INST_NUM = 27;
 	static const inst INSTRUCTIONS[] = {
 		{"mov",   {LEX_T_MEM,  LEX_T_VAL,  LEX_T_NO}},
 		{"mva",   {LEX_T_VAL,  LEX_T_VAL,  LEX_T_NO}},

@@ -1,7 +1,11 @@
+#include <QApplication>
+
 #include <string>
 
 #include <cstdio>
 #include <cstring>
+#include <cstdlib>
+#include <cerrno>
 
 #include <STDExtras.hpp>
 #include <convert.hpp>
@@ -40,7 +44,7 @@ bool is_sys(char * const str)
 	return is_program(str) || is_help(str) || is_mem(str);
 }
 
-void parse_command_line_params(int argn, char * const *argv, size_t &ramS, ::std::vector<::std::string> &program)
+void parse_command_line_params(int argn, char **argv, size_t &ramS, ::std::string &program)
 {
 	for (int i = 1; i < argn; i++) {
 		if (is_help(argv[i])) {
@@ -57,12 +61,7 @@ void parse_command_line_params(int argn, char * const *argv, size_t &ramS, ::std
 			if (i >= argn)
 				throw RUNTIME_EXCEPTION("Sudden end after '-p' option!\n");
 
-			while (i < argn && !is_sys(argv[i])) {
-				program.push_back(argv[i]);
-				i++;
-			}
-
-			i--;
+			program = argv[i];
 		} else {
 			throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
 				"Unexpected to '%s'!\n",
@@ -71,32 +70,45 @@ void parse_command_line_params(int argn, char * const *argv, size_t &ramS, ::std
 	}
 }
 
-int main(int argn, char * const *argv)
+int main(int argn, char **argv)
 {
+	QCoreApplication app(argn, argv);
+
 	if (argn < 2) {
 		usage();
 		return EINVAL;
 	}
 
-	::std::vector<::std::string> programs;
+	::std::string program;
 	size_t ramS = 0;
 	LLCCEP_exec::memoryManager mm;
+	LLCCEP_exec::codeReader cr;
 
 	try {
-		parse_command_line_params(argn, argv, ramS, programs);
+		parse_command_line_params(argn, argv, ramS, program);
 	} catch (::LLCCEP::runtime_exception &exc) {
 		usage();
 		QUITE_ERROR(yes, "%s", exc.msg())
 	} DEFAULT_HANDLING
 
 	try {
+		LLCCEP_exec::softcore sc;
+
+		// Init codeReader
+		cr.initializeInputFile(program);
+		cr.readProgramHeader();
+		// Init memoryManager
 		mm.allocateElements(ramS);
+		// Init softcore
+		sc.setMm(&mm);
+		sc.setCodeReader(&cr);
 
-		for (size_t i = 0; i < programs.size(); i++) {
+		sc.executeProgram();
 
-		}
-
+		// Release memoryManager data
 		mm.freeElements();
+		// Release codeReader data
+		cr.closeInput();
 	} catch (::LLCCEP::runtime_exception &exc) {
 		QUITE_ERROR(yes, "%s", exc.msg());
 	} DEFAULT_HANDLING

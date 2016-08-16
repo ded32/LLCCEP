@@ -15,6 +15,11 @@ namespace LLCCEP_exec {
 		::std::string getString(size_t offset);
 		void writeString(size_t offset, ::std::string str);
 
+		size_t getMemSize() const;
+
+		double operator[](size_t id) const;
+		double &operator[](size_t id);
+
 	protected:
 		bool OK() const;
 

@@ -6,6 +6,7 @@
 
 #include <STDExtras.hpp>
 #include <STLExtras.hpp>
+#include <os-specific.hpp>
 
 #include "softcore.hpp"
 #include "fp.hpp"
@@ -14,6 +15,10 @@
 #include "./../window/window.hpp"
 #include "./../program/program.hpp"
 #include "./../../common/def/def_inst.hpp"
+
+#if defined(__GNUC__) || defined(__clang__)
+#pragma GCC diagnostic ignored "-Wgnu-array-member-paren-init"
+#endif
 
 LLCCEP_exec::softcore::softcore():
 	_stk(),
@@ -24,7 +29,7 @@ LLCCEP_exec::softcore::softcore():
 	_files(),
 	_windows(),
 	_mm(),
-	_prog(),
+	_reader(),
 	_ready(false),
 	_quit(false)
 { }
@@ -32,21 +37,30 @@ LLCCEP_exec::softcore::softcore():
 LLCCEP_exec::softcore::~softcore()
 { }
 
-void LLCCEP_exec::softcore::setProgram(LLCCEP_exec::program_data prog)
+void LLCCEP_exec::softcore::setMm(LLCCEP_exec::memoryManager *mm)
 {
-	_prog = prog;
-	_ready = true;
+	_mm = mm;
+	_ready |= 0b10;
+}
+
+void LLCCEP_exec::softcore::setCodeReader(LLCCEP_exec::codeReader *reader)
+{
+	_reader = reader;
+	_ready |= 0b01;
 }
 
 void LLCCEP_exec::softcore::executeProgram()
 {
-	if (!_ready) {
+	if (_ready != 0b11) {
 		throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
 			"Error!\n"
 			"Softcore at %p is not ready for "
 			"program execution: "
-			"no input!\n"))
+			"no input!\n",
+			this))
 	}
+
+	_pc = _reader->getProgramData().main_id;
 
 	while (!_quit)
 		executeNextInstruction();
@@ -56,24 +70,24 @@ double LLCCEP_exec::softcore::get(LLCCEP_exec::arg data)
 {
 	switch (data.type) {
 	case LLCCEP_exec::ARG_T_REG:
-		if (DBL_AE(data.val, 32) ||
-		    DBL_LESS(data.val, 0)) {
+		if (static_cast<size_t>(data.val) >= 32) {
 			throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
 				"Error!\n"
-				"Overbounding while reading data from register!\n"));
+				"Overbounding while reading data from register!\n"
+				));
 		} else {
 			return _regs[static_cast<long long>(data.val)];
 		}
 		break;
 
 	case LLCCEP_exec::ARG_T_MEM:
-		if (DBL_AE(data.val, LLCCEP_exec::get_mem_size()) ||
+		if (DBL_AE(data.val, _mm->getMemSize()) ||
 		    DBL_LESS(data.val, 0)) {
 			throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
 				"Error!\n"
 				"Overbouding while reading data from RAM!\n"));
 		} else {
-			return _mm[static_cast<size_t>(data.val)];
+			return (*_mm)[static_cast<size_t>(data.val)];
 		}
 		break;
 
@@ -106,13 +120,13 @@ void LLCCEP_exec::softcore::set(LLCCEP_exec::arg data, double val)
 		break;
 
 	case LLCCEP_exec::ARG_T_MEM:
-		if (DBL_AE(data.val, LLCCEP_exec::get_mem_size()) ||
+		if (DBL_AE(data.val, _mm->getMemSize()) ||
 		    DBL_LESS(data.val, 0)) {
 			throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
 				"Error!\n"
 				"Overbounding while writing data to mem!\n"));
 		} else {
-			_mm[static_cast<size_t>(data.val)] = val;
+			(*_mm)[static_cast<size_t>(data.val)] = val;
 		}
 		break;
 
@@ -131,7 +145,49 @@ void LLCCEP_exec::softcore::set(LLCCEP_exec::arg data, double val)
 
 void LLCCEP_exec::softcore::executeNextInstruction()
 {
+	void (LLCCEP_exec::softcore::*funcs[])(LLCCEP_exec::instruction) = {
+		&LLCCEP_exec::softcore::emulated_mov,
+		&LLCCEP_exec::softcore::emulated_mva,
+		&LLCCEP_exec::softcore::emulated_push,
+		&LLCCEP_exec::softcore::emulated_pop,
+		&LLCCEP_exec::softcore::emulated_top,
+		&LLCCEP_exec::softcore::emulated_add,
+		&LLCCEP_exec::softcore::emulated_sub,
+		&LLCCEP_exec::softcore::emulated_mul,
+		&LLCCEP_exec::softcore::emulated_div,
+		&LLCCEP_exec::softcore::emulated_and,
+		&LLCCEP_exec::softcore::emulated_or,
+		&LLCCEP_exec::softcore::emulated_xor,
+		&LLCCEP_exec::softcore::emulated_off,
+		&LLCCEP_exec::softcore::emulated_nop,
+		&LLCCEP_exec::softcore::emulated_swi,
+		&LLCCEP_exec::softcore::emulated_cmp,
+		&LLCCEP_exec::softcore::emulated_inc,
+		&LLCCEP_exec::softcore::emulated_dec,
+		&LLCCEP_exec::softcore::emulated_sqrt,
+		&LLCCEP_exec::softcore::emulated_sin,
+		&LLCCEP_exec::softcore::emulated_cos,
+		&LLCCEP_exec::softcore::emulated_ptan,
+		&LLCCEP_exec::softcore::emulated_patan,
+		&LLCCEP_exec::softcore::emulated_ldc,
+		&LLCCEP_exec::softcore::emulated_call,
+		&LLCCEP_exec::softcore::emulated_jmp,
+		&LLCCEP_exec::softcore::emulated_ret
+	};
 
+	if (_pc >= _reader->getProgramData().size) {
+		_quit = true;
+		return;
+	}
+
+	LLCCEP_exec::instruction inst = _reader->getInstruction(_pc);
+	if (inst.opcode >= LLCCEP_ASM::INST_NUM) {
+		throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
+			"Opcode overbound!"))
+	}
+
+	(this->*funcs[inst.opcode])(inst);
+	_pc++;
 }
 
 void LLCCEP_exec::softcore::emulated_mov(LLCCEP_exec::instruction data)
@@ -140,17 +196,19 @@ void LLCCEP_exec::softcore::emulated_mov(LLCCEP_exec::instruction data)
 }
 
 void LLCCEP_exec::softcore::emulated_mva(LLCCEP_exec::instruction data)
-{
-	_mm[get(data.args[0])] = get(data.args[1]);
+{	
+	(*_mm)[get(data.args[0])] = get(data.args[1]);
 }
 
 void LLCCEP_exec::softcore::emulated_push(LLCCEP_exec::instruction data)
-{
+{	
 	_stk.push(get(data.args[0]));
 }
 
 void LLCCEP_exec::softcore::emulated_pop(LLCCEP_exec::instruction data)
-{
+{	
+	(void)data;
+
 	if (!_stk.size()) {
 		throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
 			"Error!\n"
@@ -162,7 +220,7 @@ void LLCCEP_exec::softcore::emulated_pop(LLCCEP_exec::instruction data)
 }
 
 void LLCCEP_exec::softcore::emulated_top(LLCCEP_exec::instruction data)
-{
+{	
 	if (!_stk.size()) {
 		throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
 			"Error!\n"
@@ -174,29 +232,29 @@ void LLCCEP_exec::softcore::emulated_top(LLCCEP_exec::instruction data)
 }
 
 void LLCCEP_exec::softcore::emulated_add(LLCCEP_exec::instruction data)
-{
+{	
 	set(data.args[0], get(data.args[1]) + get(data.args[2]));
 }
 
 void LLCCEP_exec::softcore::emulated_sub(LLCCEP_exec::instruction data)
-{
+{	
 	set(data.args[0], get(data.args[1]) + get(data.args[2]));
 }
 
 void LLCCEP_exec::softcore::emulated_mul(LLCCEP_exec::instruction data)
-{
+{	
 	set(data.args[0], get(data.args[1]) * get(data.args[2]));
 }
 
 void LLCCEP_exec::softcore::emulated_div(LLCCEP_exec::instruction data)
-{
+{	
 	set(data.args[0], get(data.args[1]) / get(data.args[2]));
 }
 
 void LLCCEP_exec::softcore::emulated_and(LLCCEP_exec::instruction data)
 {
-	set(data.args[0], 
-	    static_cast<long long>(get(data.args[1]))
+	set(data.args[0],
+	    static_cast<long long>(get(data.args[1])) &
 	    static_cast<long long>(get(data.args[2])));
 }
 
@@ -215,7 +273,7 @@ void LLCCEP_exec::softcore::emulated_xor(LLCCEP_exec::instruction data)
 }
 
 void LLCCEP_exec::softcore::emulated_off(LLCCEP_exec::instruction data)
-{
+{	
 	int direction = ((get(data.args[0]) >= 0)?(1):(-1));
 	set(data.args[0],
 	    ((direction == -1)
@@ -226,12 +284,12 @@ void LLCCEP_exec::softcore::emulated_off(LLCCEP_exec::instruction data)
 }
 
 void LLCCEP_exec::softcore::emulated_nop(LLCCEP_exec::instruction data)
-{
-	(void)0;
+{	
+	(void)data;
 }
 
-static void LLCCEP_exec::softcore::emulated_swi(LLCCEP_exec::instruction data)
-{
+void LLCCEP_exec::softcore::emulated_swi(LLCCEP_exec::instruction data)
+{	
 	switch (static_cast<size_t>(get(data.args[0]))) {
 	/***************************************************************************
 	 * Output character
@@ -246,7 +304,7 @@ static void LLCCEP_exec::softcore::emulated_swi(LLCCEP_exec::instruction data)
 	 * chr - characted being printed
 	 **************************************************************************/
 	case 0: {
-		::std::printf("%c", static_cast<unsigned char>(_regs[0]));
+		::std::cout << static_cast<unsigned char>(_regs[0]);
 		break;
 	}
 
@@ -280,7 +338,7 @@ static void LLCCEP_exec::softcore::emulated_swi(LLCCEP_exec::instruction data)
 	 * ptr - pointer to string being printed
 	 **************************************************************************/
 	case 2: {
-		::std::printf("%s", _mm.getString(static_cast<size_t>(_regs[0])).c_str());
+		::std::printf("%s", _mm->getString(static_cast<size_t>(_regs[0])).c_str());
 		break;
 	}
 
@@ -298,7 +356,7 @@ static void LLCCEP_exec::softcore::emulated_swi(LLCCEP_exec::instruction data)
 	 **************************************************************************/
 	case 3: {
 		unsigned char val = 0;
-		::std::scanf("%c", val);
+		::std::scanf("%c", &val);
 		_regs[0] = val;
 		break;
 	}
@@ -320,7 +378,7 @@ static void LLCCEP_exec::softcore::emulated_swi(LLCCEP_exec::instruction data)
 		::std::string val = "";
 		::std::cin >> val;
 
-		LLCCEP_exec::write_string(static_cast<size_t>(LLCCEP_exec::__added__::regs[0]), val);
+		_mm->writeString(static_cast<size_t>(_regs[0]), val);
 		break;
 	}
 
@@ -363,30 +421,30 @@ static void LLCCEP_exec::softcore::emulated_swi(LLCCEP_exec::instruction data)
 			"w",
 			"a"
 		};
-		long long r00 = static_cast<long long>(LLCCEP_exec::__added__::regs[0]);
+		long long r00 = static_cast<long long>(_regs[0]);
 
 		bool attrs[2] = {
-			static_cast<bool>(r00  0b0100),
-			static_cast<bool>(r00  0b1000)
+			static_cast<bool>(r00 & 0b0100),
+			static_cast<bool>(r00 & 0b1000)
 		};
 
-		if ((r00  0b11) >= 0b11)
+		if ((r00 & 0b11) >= 0b11)
 			throw RUNTIME_EXCEPTION("No file mode #3!")
 
-		::std::string mode = modes[r00  0b11];
+		::std::string mode = modes[r00 & 0b11];
 		if (attrs[0])
 			mode += "+";
 
 		if (attrs[1])
 			mode += 'b';
 
-		::std::string path = LLCCEP_exec::get_string(static_cast<size_t>(LLCCEP_exec::__added__::regs[1]));
+		::std::string path = _mm->getString(static_cast<size_t>(_regs[1]));
 
 		FILE *fd = fopen(path.c_str(),
 				 mode.c_str());
 
-		LLCCEP_exec::__added__::files.push_back(fd);
-		LLCCEP_exec::__added__::regs[1] = *(double *)((void *)&fd);
+		_files.push_back(fd);
+		_regs[1] = *(double *)((void *)&fd);
 		break;
 	}
 
@@ -403,9 +461,9 @@ static void LLCCEP_exec::softcore::emulated_swi(LLCCEP_exec::instruction data)
 	 * ptr - pointer to file being closed
 	 **************************************************************************/
 	case 8: {
-		FILE *r00 = *(FILE **)((void *)((double *)(&LLCCEP_exec::__added__::regs[0])));
+		FILE *r00 = *(FILE **)((void *)((double *)(&_regs[0])));
 		fclose(r00);
-		LLCCEP_exec::__added__::files.erase(vec_find(LLCCEP_exec::__added__::files, r00));
+		_files.erase(vec_find(_files, r00));
 		break;
 	}
 
@@ -427,24 +485,24 @@ static void LLCCEP_exec::softcore::emulated_swi(LLCCEP_exec::instruction data)
 	 * byte - byte beeing written/read
 	 **************************************************************************/
 	case 9: {
-		FILE *r00 = *(FILE **)((void *)((double *)(&LLCCEP_exec::__added__::regs[0])));
+		FILE *r00 = *(FILE **)((void *)((double *)(&_regs[0])));
 
-		if (DBL_EQ(LLCCEP_exec::__added__::regs[1], 0)) {
-			fprintf(r00, "%c", static_cast<uint8_t>(LLCCEP_exec::__added__::regs[2]));
+		if (DBL_EQ(_regs[1], 0)) {
+			fprintf(r00, "%c", static_cast<uint8_t>(_regs[2]));
 		} else {
 			uint8_t c = 0;
-			fscanf(r00, "%c", c);
-			LLCCEP_exec::__added__::regs[2] = c;
+			fscanf(r00, "%c", &c);
+			_regs[2] = c;
 		}
 
 		break;
 	}
 
 	case 10: {
-		FILE *r00 = *(FILE **)((void *)((double *)(&LLCCEP_exec::__added__::regs[0])));
+		FILE *r00 = *(FILE **)((void *)((double *)(&_regs[0])));
 
-		if (DBL_EQ(LLCCEP_exec::__added__::regs[1], 0)) {
-			fprintf(r00, "%s", LLCCEP_exec::get_string(static_cast<size_t>(LLCCEP_exec::__added__::regs[2])).c_str());
+		if (DBL_EQ(_regs[1], 0)) {
+			fprintf(r00, "%s", _mm->getString(static_cast<size_t>(_regs[2])).c_str());
 		} else {
 			std::string str = "";
 			char c = 0;
@@ -457,7 +515,7 @@ static void LLCCEP_exec::softcore::emulated_swi(LLCCEP_exec::instruction data)
 				str += c;
 			}
 
-			LLCCEP_exec::write_string(static_cast<size_t>(LLCCEP_exec::__added__::regs[2]), str);
+			_mm->writeString(static_cast<size_t>(_regs[2]), str);
 		}
 		break;
 	}
@@ -519,7 +577,7 @@ void LLCCEP_exec::softcore::emulated_patan(LLCCEP_exec::instruction data)
 	set(data.args[0], ::std::atan(get(data.args[1])));
 }
 
-static void LLCCEP_exec::softcore::emulated_ldc(LLCCEP_exec::instruction data)
+void LLCCEP_exec::softcore::emulated_ldc(LLCCEP_exec::instruction data)
 {
 	switch (static_cast<long long>(get(data.args[1]))) {
 	case 0:
@@ -555,55 +613,29 @@ static void LLCCEP_exec::softcore::emulated_ldc(LLCCEP_exec::instruction data)
 	}
 }
 
-static void LLCCEP_exec::softcore::emulated_call(LLCCEP_exec::instruction data)
+void LLCCEP_exec::softcore::emulated_call(LLCCEP_exec::instruction data)
 {
 	if (static_cast<size_t>(get(data.args[0])) & _cmp) {
 		_call.push(_pc);
-		_pc = static_cast<size_t>(get(data.args[1]));
+		_pc = get(data.args[1]) - 1;
 	}
 }
 
-static void LLCCEP_exec::softcore::emulated_jmp(LLCCEP_exec::instruction data)
+void LLCCEP_exec::softcore::emulated_jmp(LLCCEP_exec::instruction data)
 {
-	_pc = static_cast<size_t>(get(data.args[0]));
+	if (static_cast<size_t>(get(data.args[0])) & _cmp)
+		_pc = get(data.args[1]) - 1;
 }
 
-static void LLCCEP_exec::softcore::emulated_ret(LLCCEP_exec::instruction data)
-{
+void LLCCEP_exec::softcore::emulated_ret(LLCCEP_exec::instruction data)
+{	
+	(void)data;
+
 	if (!_call.size()) {
 		_quit = true;
+		return;
 	}
 
 	_pc = _call.top();
 	_call.pop();
 }
-
-static void (*funcs[])(LLCCEP_exec::instruction data) = {
-	emulated_mov,
-	emulated_mva,
-	emulated_push,
-	emulated_pop,
-	emulated_top,
-	emulated_add,
-	emulated_sub,
-	emulated_mul,
-	emulated_div,
-	emulated_and,
-	emulated_or,
-	emulated_xor,
-	emulated_off,
-	emulated_nop,
-	emulated_swi,
-	emulated_cmp,
-	emulated_inc,
-	emulated_dec,
-	emulated_sqrt,
-	emulated_sin,
-	emulated_cos,
-	emulated_ptan,
-	emulated_patan,
-	emulated_ldc,
-	emulated_call,
-	emulated_jmp,
-	emulated_ret	
-};

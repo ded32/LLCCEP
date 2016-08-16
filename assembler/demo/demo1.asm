@@ -1,6 +1,6 @@
 print:
 mov &00, "a"    ; &00 := 'a'
-swi 5           ; print &00
+swi 0           ; print &00
 ret             ; exit subroutine
 
 _main:          ; entry point

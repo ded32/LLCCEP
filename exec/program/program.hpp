@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <fstream>
+#include <cstdint>
 
 namespace LLCCEP_exec {
 	enum arg_t: uint8_t {
@@ -10,7 +11,7 @@ namespace LLCCEP_exec {
 		ARG_T_MEM  = 1,
 		ARG_T_VAL  = 2,
 		ARG_T_NO   = 4,
-		ARG_T_COND = 5,
+		ARG_T_COND = 5
 	};
 
 	struct arg {
@@ -23,14 +24,31 @@ namespace LLCCEP_exec {
 		arg args[3];
 	};
 
-	struct program_data {
+	struct codeData {
 		size_t offset;
 		size_t main_id;
 		size_t size;
 	};
 
-	program_data read_program_data(::std::ifstream &input);
-	instruction get_instruction_by_id(::std::ifstream &input, program_data data, size_t id);
+	class codeReader {
+	public:
+		codeReader();
+		explicit codeReader(::std::string in_path);
+
+		void initializeInputFile(::std::string in_path);
+		void readProgramHeader();
+		instruction getInstruction(size_t id);
+		codeData getProgramData() const;
+		void closeInput();
+
+	protected:
+		bool OK() const;
+
+	private:
+		::std::ifstream _input;
+		::std::string _path;
+		codeData _data;
+	};
 }
 
 #endif // PROGRAM_HPP

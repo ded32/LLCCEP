@@ -45,7 +45,7 @@ typename ::std::vector<TYPE>::iterator vec_find(::std::vector<TYPE> &vec, TYPE s
 }
 
 template<typename char_t>
-typename ::std::basic_ifstream<char_t>::pos_type get_length(::std::basic_ifstream<char_t> &fd)
+size_t get_length(::std::basic_ifstream<char_t> &fd)
 {
 	if (fd.fail()) {
 		throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
@@ -53,11 +53,11 @@ typename ::std::basic_ifstream<char_t>::pos_type get_length(::std::basic_ifstrea
 			"File reference with fail!\n"));
 	}
 
-	auto pos = fd.tellg();
-	fd.seekg(fd.end);
-	auto res = fd.tellg();
+	auto start = fd.tellg();
 
-	fd.seekg(pos);
+	fd.seekg(0, ::std::ios_base::end);
+	size_t res = fd.tellg();
+	fd.seekg(start);
 
 	return res;
 }

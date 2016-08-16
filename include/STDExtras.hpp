@@ -92,6 +92,22 @@ catch (::std::exception &exc) {\
  	            "exception type");\
 }
 
+#define DEFAULT_CHECK_BLOCK(cond, object_ptr, state) \
+{ \
+	if (object_ptr) { \
+	        if ((cond && !state) || \
+	            (!cond && state)) { \
+	                throw RUNTIME_EXCEPTION(CONSTRUCT_MSG( \
+	                        "Error!\n" \
+	                        "Object at 0x%p excepted to be " \
+	                        "%sOK, but is%s!", \
+	                        this, \
+	                        (cond)?(""):("not "), \
+	                        (cond)?("not "):(""))) \
+	        } \
+	} \
+}
+
 void dump_bytes(::std::ostream &out, ::std::vector<uint8_t> list);
 
 #endif // STDEXTRAS_HPP

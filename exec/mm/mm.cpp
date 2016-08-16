@@ -9,15 +9,16 @@
 #define MM_CHECK_BLOCK(cond) \
 { \
 	if ((cond && OK()) || (!cond && !OK())) { \
-		throw RUNTIME_EXCEPTION(CONSTUCT_MSG( \
+		throw RUNTIME_EXCEPTION(CONSTRUCT_MSG( \
 			"memoryManager at %p is %sOK, how %sexcepted", \
-			(cond)?("not "):(""), \
-			(cond)?(""):("not "))); \
+			this, \
+			(OK())?(""):("not "), \
+			(OK())?("not "):(""))); \
 	} \
 }
 
-#define MM_OK_BLOCK MM_CHECK_BLOCK(true)
-#define MM_NOTOK_BLOCK MM_CHECK_BLOCK(false)
+#define MM_OK_BLOCK MM_CHECK_BLOCK(false)
+#define MM_NOTOK_BLOCK MM_CHECK_BLOCK(true)
 
 LLCCEP_exec::memoryManager::memoryManager():
 	_mem(0),
@@ -33,7 +34,8 @@ void LLCCEP_exec::memoryManager::allocateElements(size_t amount)
 {
 	MM_NOTOK_BLOCK
 
-	_mem = new (::std::nothrow) double[_sz = amount];
+	_mem = new (::std::nothrow) double[amount];
+	_sz = amount;
 	MM_OK_BLOCK
 
 	::std::memset(_mem, 0, _sz * sizeof(double));
@@ -46,8 +48,6 @@ void LLCCEP_exec::memoryManager::freeElements()
 	delete _mem;
 	_mem = 0;
 	_sz = 0;
-
-	MM_NOTOK_BLOCK
 }
 
 ::std::string LLCCEP_exec::memoryManager::getString(size_t offset)
@@ -71,6 +71,48 @@ void LLCCEP_exec::memoryManager::writeString(size_t offset, ::std::string str)
 		_mem[i] = static_cast<double>(str[i - offset]);
 
 	MM_OK_BLOCK
+}
+
+size_t LLCCEP_exec::memoryManager::getMemSize() const
+{
+	MM_OK_BLOCK
+
+	return _sz;
+}
+
+double LLCCEP_exec::memoryManager::operator[](size_t id) const
+{
+	MM_OK_BLOCK
+
+	if (id >= _sz) {
+		throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
+			"Error!\n"
+			"Overbounding while access to "
+			"memoryManager's at %p data!\n",
+			this))
+	}
+
+	return _mem[id];
+}
+
+double &LLCCEP_exec::memoryManager::operator[](size_t id)
+{
+	MM_OK_BLOCK
+
+	if (id >= _sz) {
+		throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
+			"Error!\n"
+			"Overbounding while access to "
+			"memoryManager's at %p data!\n",
+			this))
+	}
+
+	return _mem[id];
+}
+
+bool LLCCEP_exec::memoryManager::OK() const
+{
+	return _sz && _mem;
 }
 
 #undef MM_CHECK_BLOCK
