@@ -36,9 +36,9 @@ namespace LLCCEP_ASM {
 		{"ptan",  {LEX_T_MEM,  LEX_T_VAL,  LEX_T_NO}},
 		{"patan", {LEX_T_MEM,  LEX_T_VAL,  LEX_T_NO}},
 	        {"ldc",   {LEX_T_MEM,  LEX_T_VAL,  LEX_T_NO}},
-	        {"call",  {LEX_T_COND, LEX_T_VAL,   LEX_T_NO}},
-		{"jmp",   {LEX_T_COND, LEX_T_VAL,   LEX_T_NO}},
-		{"ret",   {LEX_T_NO,   LEX_T_NO,    LEX_T_NO}}
+	        {"call",  {LEX_T_COND, LEX_T_VAL,  LEX_T_NO}},
+	        {"jmp",   {LEX_T_COND, LEX_T_VAL,  LEX_T_NO}},
+	        {"ret",   {LEX_T_NO,   LEX_T_NO,   LEX_T_NO}}
 	};
 
 	::std::string get_mnemonic_by_opcode(uint8_t op);

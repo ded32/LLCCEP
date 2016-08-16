@@ -1,8 +1,21 @@
 print:
-mov &00, "a"    ; &00 := 'a'
-swi 0           ; print &00
-ret             ; exit subroutine
+    mov &00, 0
+    mov &01, 1
+    swi 0
+    mov &01, &02
+    top &02
+    pop
+    top &03
+    pop
+    mov &00, 1
+    swi 0
+    ret
 
-_main:          ; entry point
-call @al, print ; call to function, prints 'a'
-ret             ; exit program
+_main:
+    push -40.54
+    push "n"
+    call @al, print
+    push 10
+    push "c"
+    call @al, print
+    ret
