@@ -10,8 +10,9 @@ namespace LLCCEP_JIT {
 		runtimeManager();
 
 		void *getSwiEmulatePtr();
-		int *getCmpPtr();
-		double *getRegPtr();
+		void *getCmpPtr();
+		void *getRegPtr(size_t id);
+		void *getMemoryBeginning();
 	};
 }
 

@@ -1,6 +1,6 @@
 #include "../runtime/runtime.hpp"
 #include "../program/program.hpp"
-#include "../../exec/program.hpp"
+#include "../../exec/program/program.hpp"
 
 #include "codegen.hpp"
 
@@ -32,12 +32,13 @@ void LLCCEP_JIT::codegenBackend::genPush(LLCCEP_exec::instruction data)
 
 void LLCCEP_JIT::codegenBackend::genPop(LLCCEP_exec::instruction data)
 {
+	(void)data;
 	emit_pop_reg(LLCCEP_JIT::RAX);
 }
 
 void LLCCEP_JIT::codegenBackend::genTop(LLCCEP_exec::instruction data)
 {
-	getAddress(LLCCEP_JIT::RAX, data.args[0]);
+	getPointer(LLCCEP_JIT::RAX, data.args[0]);
 
 	emit_pop_reg(LLCCEP_JIT::RBX);
 	emit_push_reg(LLCCEP_JIT::RBX);
@@ -136,6 +137,7 @@ void LLCCEP_JIT::codegenBackend::genOff(LLCCEP_exec::instruction data)
 
 void LLCCEP_JIT::codegenBackend::genNop(LLCCEP_exec::instruction data)
 {
+	(void)data;
 	// Do nothing, to increase speed...
 }
 
@@ -146,13 +148,14 @@ void LLCCEP_JIT::codegenBackend::genSwi(LLCCEP_exec::instruction data)
 		emit_push_imm(v_push);
 	}
 
-	emit_mov_reg_imm(LLCCEP_JIT::RAX, &(_runtimeManager->emulated_swi));
+	void *ptr = _runtimeManager->getSwiEmulatePtr();
+	emit_mov_reg_imm(LLCCEP_JIT::RAX, reinterpret_cast<uint64_t>(ptr));
 	emit_call_reg(LLCCEP_JIT::RAX);
 }
 
 void LLCCEP_JIT::codegenBackend::genCmp(LLCCEP_exec::instruction data)
 {
-
+	(void)data;
 }
 
 #define INCDEC(data, op) \
@@ -165,12 +168,12 @@ void LLCCEP_JIT::codegenBackend::genCmp(LLCCEP_exec::instruction data)
 
 void LLCCEP_JIT::codegenBackend::genInc(LLCCEP_exec::instruction data)
 {
-	INCDEC(data, inc)
+//	INCDEC(data, inc)
 }
 
 void LLCCEP_JIT::codegenBackend::genDec(LLCCEP_exec::instruction data)
 {
-	INCDEC(data, inc)
+//	INCDEC(data, inc)
 }
 
 #undef INCDEC
@@ -239,6 +242,7 @@ void LLCCEP_JIT::codegenBackend::genJmp(LLCCEP_exec::instruction data)
 
 void LLCCEP_JIT::codegenBackend::genRet(LLCCEP_exec::instruction data)
 {
+	(void)data;
 	emit_ret();
 }
 
@@ -249,40 +253,42 @@ void LLCCEP_JIT::codegenBackend::getImmediate(regID reg, LLCCEP_exec::arg data)
 	};
 
 	switch (data.type) {
-	case ARG_T_REG: {
+	case LLCCEP_exec::ARG_T_REG: {
 		if (static_cast<size_t>(data.val) > 32) {
 			throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
 				"Error!\n"
 				"Overbounding while reading from register"))
 		}
 
-		double *ptr = _runtimeManager->getRegPtr(static_cast<size_t>(data.val));
+		void *ptr = _runtimeManager->getRegPtr(static_cast<size_t>(data.val));
 		regID tmp = getTmpRegister();
 
 		emit_push_reg(tmp);
 
-		emit_mov_reg_imm(tmp, static_cast<uint64_t>(ptr));
+		emit_mov_reg_imm(tmp, reinterpret_cast<uint64_t>(ptr));
 		emit_mov_reg_reg_ptr(tmp, reg);
 
 		emit_pop_reg(tmp);
 		break;
 	}
 
-	case ARG_T_MEM: {
+	case LLCCEP_exec::ARG_T_MEM: {
 		regID tmp = getTmpRegister();
 		emit_push_reg(tmp);
 
-		void *mem = _runtimeManager->getMemoryBeginning() +
-			    static_cast<void *>(static_cast<size_t>(data.val) *
-						sizeof(double));
-		emit_mov_reg_imm(tmp, static_cast<uint64_t>(mem));
+		void *mem = reinterpret_cast<void *>(
+				    reinterpret_cast<uint64_t>(_runtimeManager->getMemoryBeginning()) +
+				    static_cast<uint64_t>(static_cast<size_t>(data.val) *
+							       sizeof(double)));
+
+		emit_mov_reg_imm(tmp, reinterpret_cast<uint64_t>(mem));
 		emit_mov_reg_reg_ptr(tmp, reg);
 
 		emit_pop_reg(tmp);
 		break;
 	}
 
-	case ARG_T_NUM: {
+	case LLCCEP_exec::ARG_T_VAL: {
 		uint64_t val = *reinterpret_cast<uint64_t *>(&data.val);
 		emit_mov_reg_imm(reg, val); // copy the bits, not the casted value
 		break;
@@ -299,24 +305,25 @@ void LLCCEP_JIT::codegenBackend::getImmediate(regID reg, LLCCEP_exec::arg data)
 void LLCCEP_JIT::codegenBackend::getPointer(regID reg, LLCCEP_exec::arg data)
 {
 	switch (data.type) {
-	case ARG_T_REG: {
+	case LLCCEP_exec::ARG_T_REG: {
 		if (static_cast<size_t>(data.val) > 32) {
 			throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
 				"Error!\n"
 				"Overbounding while reading from register"))
 		}
 
-		double *ptr = _runtimeManager->getRegPtr(static_cast<size_t>(data.val));
-		emit_mov_reg_imm(tmp, static_cast<uint64_t>ptr)
+		void *ptr = _runtimeManager->getRegPtr(static_cast<size_t>(data.val));
+		emit_mov_reg_imm(reg, reinterpret_cast<uint64_t>(ptr));
 
 		break;
 	}
 
-	case ARG_T_MEM: {
-		void *mem = _runtimeManager->getMemoryBeginning() +
-			    static_cast<void *>(static_cast<size_t>(data.val) *
-						sizeof(double));
-		emit_mov_reg_imm(tmp, static_cast<uint64_t>(mem));
+	case LLCCEP_exec::ARG_T_MEM: {
+		void *mem = reinterpret_cast<void *>(
+				    reinterpret_cast<uint64_t>(_runtimeManager->getMemoryBeginning()) +
+				    static_cast<uint64_t>(static_cast<size_t>(data.val) *
+							  sizeof(double)));
+		emit_mov_reg_imm(reg, reinterpret_cast<uint64_t>(mem));
 
 		break;
 	}

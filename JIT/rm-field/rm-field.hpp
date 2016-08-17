@@ -4,18 +4,15 @@
 #include <cstdint>
 
 namespace LLCCEP_JIT {
-	class rmField {
+	class rm_field {
 		uint8_t modrm;
 	public:
-		rmField();
-		rmField(uint8_t selector, uint8_t op0, uint8_t op1);
-		~rmField();
+		rm_field();
+		rm_field(uint8_t selector, uint8_t op0, uint8_t op1);
+		~rm_field();
 
-		void value(uint8_t selector, uint8_t op0, uint8_t op1);
-		uint8_t value() const;
+		uint8_t get_val() const;
 	};
-
-#define rmFieldRegReg rmField(0b11, 0, 0)
 }
 
 #endif // RM_FIELD_HPP

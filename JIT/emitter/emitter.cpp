@@ -52,6 +52,13 @@ namespace LLCCEP_JIT {
 		emit_byte(src);
 	}
 
+	void emitter::emit_rm_field(uint8_t prfx, regID reg, regID rm)
+	{
+		emit_byte((prfx & 0b011 << 5) |
+			  (reg  & 0b111 << 3) |
+			  (rm   & 0b111));
+	}
+
 	void emitter::dump(bool bin /*= false*/)
 	{
 		for (auto byte: program) {

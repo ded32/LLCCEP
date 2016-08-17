@@ -3,6 +3,7 @@
 #include <limits.h>
 #include <stdio.h>
 
+#include <STDExtras.hpp>
 #include <os-specific.hpp>
 
 #if UINT32_MAX == UNITPTR_MAX

@@ -48,12 +48,12 @@ namespace LLCCEP_JIT {
 
 	void program::emit_shl_cl(regID what)
 	{
-		emit({0x48, 0xD3, 0xE0 + what});
+		emit({0x48, 0xD3, static_cast<uint8_t>(0xE0 + what)});
 	}
 
 	void program::emit_shr_cl(regID what)
 	{
-		emit({0x48, 0xD3, 0xE8 + what});
+		emit({0x48, 0xD3, static_cast<uint8_t>(0xE8 + what)});
 	}
 
 	void program::emit_jmp(uint32_t offset)
@@ -151,7 +151,7 @@ namespace LLCCEP_JIT {
 	{
 		emit({0xDD, src});
 		if (src == RSP)
-			emit(0x24);
+			emit_byte(0x24);
 	}
 
 	void program::emit_fld_const(fld_const val)
@@ -211,9 +211,9 @@ namespace LLCCEP_JIT {
 
 	void program::emit_fstp_reg_ptr(regID dest)
 	{
-		emit({0xDD, 0x18 + dest});
+		emit({0xDD, static_cast<uint8_t>(0x18 + dest)});
 		if (dest == RSP)
-			emit(0x24);
+			emit_byte(0x24);
 	}
 
 	void program::emit_call_reg(regID id)

@@ -33,10 +33,13 @@ namespace LLCCEP_JIT {
 		void genPtan(LLCCEP_exec::instruction data);
 		void genPatan(LLCCEP_exec::instruction data);
 		void genLdc(LLCCEP_exec::instruction data);
+		void genCall(LLCCEP_exec::instruction data);
+		void genJmp(LLCCEP_exec::instruction data);
+		void genRet(LLCCEP_exec::instruction data);
 
 	protected:
-		void getImmediate(regID reg, arg data);
-		void getPointer(regID reg, arg data);
+		void getImmediate(regID reg, LLCCEP_exec::arg data);
+		void getPointer(regID reg, LLCCEP_exec::arg data);
 
 	private:
 		runtimeManager *_runtimeManager;
