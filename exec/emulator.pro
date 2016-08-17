@@ -1,5 +1,4 @@
-QT += widgets
-QT -= gui
+QT += widgets multimedia
 
 INCLUDEPATH += $$PWD/../include/
 CONFIG += gnu++11

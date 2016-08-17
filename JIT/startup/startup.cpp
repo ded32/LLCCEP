@@ -1,14 +1,14 @@
 #if defined(__linux__) || defined(__MACH__) || defined(__UNIX__)
-#	include <sys/mman.h>
-#	include <sys/types.h>
-#	include <unistd.h>
+#include <sys/mman.h>
+#include <sys/types.h>
+#include <unistd.h>
 #elif defined(_WIN32)
-#	include <windows.h>
+#include <windows.h>
 #else
-#	error _________________________________
-#	error | Error! Unknown OS: required 
-#	error | windows or some unix
-#	error |________________________________
+#error _________________________________
+#error | Error! Unknown OS: required
+#error | windows or some unix
+#error |________________________________
 #endif // platform-dependent code
 
 #include <vector>
@@ -48,7 +48,7 @@ namespace LLCCEP_JIT {
 #if defined(__linux__) || defined(__MACH__) || defined(__UNIX__)
 		res.sz = align(emit.size(), getpagesize());
 #elif defined(_WIN32)
-		res.sz = emit.size() + 1;
+		res.sz = align(emit.size(), 4096);
 #endif // platform-dependent code
 
 		std::copy(emit.begin(), emit.end(), static_cast<uint8_t *>(res.mem));

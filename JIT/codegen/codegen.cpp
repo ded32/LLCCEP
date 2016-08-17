@@ -1,314 +1,169 @@
-#include "codegen.hpp"
-#include "../rex/rex.hpp"
-#include "../runtime/runtime.hpp"
+//#include "../runtime/runtime_data.hpp"
+#include "../program/program.hpp"
 
-#define EMIT_CONDITION_CHECK(data, size_b) \
-({\
-	backend.emit_mov_reg_imm(LLCCEP_JIT::RAX, data.cond); /*RAX := condition*/\
-	backend.get_cmp(LLCCEP_JIT::RBX));                    /*RBX := compare flag*/\
-	backend.emit_and(LLCCEP_JIT::RAX, LLCCEP_JIT::RBX);   /*Look for matching bits*/\
-	backend.emit_mov(LLCCEP_JIT::RBX, 0);\
-	backend.emit_cmp(LLCCEP_JIT::RAX, LLCCEP_JIT::RBX);\
-	backend.emit_je(size_b);                              /*If there are no, skip function*/\
+#include "codegen.hpp"
+
+LLCCEP_JIT::codegenBackend::codegenBackend()
+{ }
+
+void LLCCEP_JIT::codegenBackend::genMov(LLCCEP_exec::instruction data)
+{
+	getImmediate(LLCCEP_JIT::RAX, data.args[1]);
+	getPointer(LLCCEP_JIT::RBX, data.args[0]);
+
+	emit_mov_reg_reg_ptr(LLCCEP_JIT::RAX, LLCCEP_JIT::RBX);
+}
+
+void LLCCEP_JIT::codegenBackend::genMva(LLCCEP_exec::instruction data)
+{
+	getImmediate(LLCCEP_JIT::RAX, data.args[1]);
+	getImmediate(LLCCEP_JIT::RBX, data.args[0]);
+
+	emit_mov_reg_reg_ptr(LLCCEP_JIT::RAX, LLCCEP_JIT::RBX);
+}
+
+void LLCCEP_JIT::codegenBackend::genPush(LLCCEP_exec::instruction data)
+{
+	getImmediate(LLCCEP_JIT::RAX, data.args[0]);
+
+	emit_push_reg(LLCCEP_JIT::RAX);
+}
+
+void LLCCEP_JIT::codegenBackend::genPop(LLCCEP_exec::instruction data)
+{
+	emit_pop_reg(LLCCEP_JIT::RAX);
+}
+
+void LLCCEP_JIT::codegenBackend::genTop(LLCCEP_exec::instruction data)
+{
+	getAddress(LLCCEP_JIT::RAX, data.args[0]);
+
+	emit_pop_reg(LLCCEP_JIT::RBX);
+	emit_push_imm(LLCCEP_JIT::RBX);
+
+	emit_mov_reg_ptr_reg(LLCCEP_JIT::RBX, LLCCEP_JIT::RAX);
+}
+
+#define FPU_BIOP_ARITHMETICS(data, function) \
+({ \
+	getImmediate(LLCCEP_JIT::RAX, data.args[1]); \
+	getImmediate(LLCCEP_JIT::RBX, data.args[2]); \
+ \
+	emit_push_reg(LLCCEP_JIT::RBX); \
+	emit_push_reg(LLCCEP_JIT::RAX); \
+ \
+	emit_fld(LLCCEP_JIT::RSP); \
+	emit_pop_reg(LLCCEP_JIT::RAX); \
+	emit_fld(LLCCEP_JIT::RSP); \
+	emit_pop_reg(LLCCEP_JIT::RBX); \
+	function; \
+ \
+	getPointer(LLCCEP_JIT::RCX, data.args[0]); \
+	emit_fstp_reg_ptr(LLCCEP_JIT::RCX); \
+	emit_pop_reg(LLCCEP_JIT::RAX); \
 });
 
-static inline void __gen_read_nums(LLCCEP_JIT:::codegen_backend &backend, instruction data, int num)
+void LLCCEP_JIT::codegenBackend::genAdd(LLCCEP_exec::instruction data)
 {
-	for (int i = 0; i < num; i++) {
-		backend.get_imm(LLCCEP_JIT::RAX, data.args[i + 1]);
-		backend.emit_push(LLCCEP_JIT::RAX);
-		backend.emit_fld(LLCCEP_JIT::RSP);
-		backend.emit_pop_reg(LLCCEP_JIT::RAX);
-	}
+	FPU_BIOP_ARITHMETICS(data, emit_fadd())
 }
 
-void gen_mov(LLCCEP_JIT::codegen_backend &backend, instruction data)
+void LLCCEP_JIT::codegenBackend::genSub(LLCCEP_exec::instruction data)
 {
-	EMIT_CONDITION_CHECK(data, 0/*TODO: insert size in bytes*/)
-
-	backend.get_ptr(LLCCEP_JIT::RAX, data.args[0]);
-	backend.get_imm(LLCCEP_JIT::RBX, data.args[1]);
-	backend.emit_mov_reg_ptr_reg(LLCCEP_JIT::RAX,
-				     LLCCEP_JIT::RBX);
-
-	/* TODO: insert here code, for the jumps by mov into r14 */
+	FPU_BIOP_ARITHMETICS(data, emit_fsub())
 }
 
-void gen_mva(LLCCEP_JIT::codegen_backend &backend, instruction data)
+void LLCCEP_JIT::codegenBackend::genMul(LLCCEP_exec::instruction data)
 {
-	EMIT_CONDITION_CHECK(data, 0/*TODO: insert size in bytes*/)
-
-	backend.get_mem_addr(LLCCEP_JIT::RAX, data.args[0]);
-	backend.get_imm(LLCCEP_JIT::RBX, data.args[1]);
-	backend.emit_mov_reg_ptr_reg(LLCCEP_JIT::RAX,
-				     LLCCEP_JIT::RBX);
+	FPU_BIOP_ARITHMETICS(data, emit_fmul())
 }
 
-void gen_push(LLCCEP_JIT::codegen_backend &backend, instruction data)
-{	
-	EMIT_CONDITION_CHECK(data, 0/*TODO: insert size in bytes*/)
-
-	backend.get_imm(LLCCEP_JIT::RAX, data.args[0]);
-	backend.emit_push_reg(LLCCEP_JIT::RAX);
-	backend.emit_fld();
-}
-
-void gen_pop(LLCCEP_JIT::codegen_backend &backend, instruction data)
+void LLCCEP_JIT::codegenBackend::genDiv(LLCCEP_exec::instruction data)
 {
-	EMIT_CONDITION_CHECK(data, 1/*TODO: insert size in bytes*/)
-
-	backend.emit_pop_reg(LLCCEP_JIT::RDX);
+	FPU_BIOP_ARITHMETICS(data, emit_fdiv())
 }
 
-void gen_top(LLCCEP_JIT::codegen_backend &backend, instruction data)
+#undef FPU_BIOP_ARITHMETICS
+
+#define FPU_UNIOP_ARITHMETICS(data, function) \
+({ \
+	getImmediate(LLCCEP_JIT::RAX, data.args[1]); \
+	emit_push_reg(LLCCEP_JIT::RAX); \
+ \
+	emit_fld(LLCCEP_JIT::RSP); \
+	emit_pop_reg(LLCCEP_JIT::RAX); \
+	function; \
+ \
+	getPointer(LLCCEP_JIT::RBX, data.args[0]); \
+	emit_fstp_reg_ptr(LLCCEP_JIT::RBX); \
+	emit_pop_reg(LLCCEP_JIT::RAX); \
+});
+
+#define LOAD_AND_CAST(target, arg) \
+({ \
+	emit_push_reg(LLCCEP_JIT::RDX);\
+ \
+	getImmediate(target, data.args[1]); \
+	emit_cvtsd2si(LLCCEP_JIT::RDX, target); \
+	emit_mov_reg_reg(target, LLCCEP_JIT::RDX); \
+ \
+	emit_pop_reg(LLCCEP_JIT::RDX); \
+});
+
+void LLCCEP_JIT::codegenBackend::genAnd(LLCCEP_exec::instruction data)
 {
-	EMIT_CONDITION_CHECK(data, 0/*TODO: insert size in bytes*/)
+	getPointer(LLCCEP_JIT::RCX, data.args[0]);
 
-	backend.emit_mov_reg_reg_ptr(LLCCEP_JIT::RAX, LLCCEP_JIT::RSP);
-	backend.get_ptr(LLCCEP_JIT::RBX, data.args[0]);
-	backend.emit_mov_reg_ptr_reg(LLCCEP_JIT::RBX, LLCCEP_JIT::RAX);
+	LOAD_AND_CAST(LLCCEP_JIT::RAX, data.args[1])
+	LOAD_AND_CAST(LLCCEP_JIT::RBX, data.args[2])
+
+	emit_and_reg_reg(LLCCEP_JIT::RAX, LLCCEP_JIT::RBX);
 }
 
-void gen_add(LLCCEP_JIT::codegen_backend &backend, instruction data)
+void LLCCEP_JIT::codegenBackend::genOr(LLCCEP_exec::instruction data)
 {
-	EMIT_CONDITION_CHECK(data, 0/*TODO: insert size in bytes*/)
+	getPointer(LLCCEP_JIT::RCX, data.args[0]);
 
-	__gen_read_nums(backend, data, 2);
-	backend.emit_fadd();
-	backend.get_ptr(LLCCEP_JIT::RAX, data.args[0]);
-	backend.emit_fstp_reg_ptr(LLCCEP_JIT::RAX);
+	LOAD_AND_CAST(LLCCEP_JIT::RAX, data.args[1])
+	LOAD_AND_CAST(LLCCEP_JIT::RBX, data.args[2])
+
+	emit_mov_reg_reg_ptr(LLCCEP_JIT::RBX, LLCCEP_JIT::RCX);
+	emit_or_reg_ptr_reg(LLCCEP_JIT::RCX, LLCCEP_JIT::RBX);
 }
 
-void gen_sub(LLCCEP_JIT::codegen_backend &backend, instruction data)
+void LLCCEP_JIT::codegenBackend::genXor(LLCCEP_exec::instruction data)
 {
-	EMIT_CONDITION_CHECK(data, 0/*TODO: insert size in bytes*/)
+	getPointer(LLCCEP_JIT::RCX, data.args[0]);
 
-	__gen_read_nums(backend, data, 2);
-	backend.emit_fsub();
-	backend.get_ptr(LLCCEP_JIT::RAX, data.args[0]);
-	backend.emit_fstp_reg_ptr(LLCCEP_JIT::RAX);
+	LOAD_AND_CAST(LLCCEP_JIT::RAX, data.args[1])
+	LOAD_AND_CAST(LLCCEP_JIT::RBX, data.args[2])
+
+	emit_mov_reg_reg_ptr(LLCCEP_JIT::RBX, LLCCEP_JIT::RCX);
+	emit_xor_reg_ptr_reg(LLCCEP_JIT::RCX, LLCCEP_JIT::RBX);
 }
 
-void gen_mul(LLCCEP_JIT::codegen_backend &backend, instruction data)
+void LLCCEP_JIT::codegenBackend::genOff(LLCCEP_exec::instruction data)
 {
-	EMIT_CONDITION_CHECK(data, 0/*TODO: insert size in bytes*/)
+	getPointer(LLCCEP_JIT::RCX, data.args[0]);
 
-	__gen_read_nums(backend, data, 2);
-	backend.emit_fmul();
-	backend.get_ptr(LLCCEP_JIT::RAX, data.args[0]);
-	backend.emit_fstp_reg_ptr(LLCCEP_JIT::RAX);
+	LOAD_AND_CAST(LLCCEP_JIT::RAX, data.args[1])
+	LOAD_AND_CAST(LLCCEP_JIT::RBX, data.args[2])
+
+	emit_mov_reg_imm(LLCCEP_JIT::RDX, 0);
+	emit_cmp_reg_ptr_reg(LLCCEP_JIT::RCX, LLCCEP_JIT::RBX);
 }
 
-void gen_div(LLCCEP_JIT::codegen_backend &backend, instruction data)
-{
-	EMIT_CONDITION_CHECK(data, 0/*TODO: insert size in bytes*/)
-
-	__gen_read_nums(backend, data, 2);
-	backend.emit_fdiv();
-	backend.get_ptr(LLCCEP_JIT::RAX, data.args[0]);
-	backend.emit_fstp_reg_ptr(LLCCEP_JIT::RAX);
-}
-
-void gen_and(LLCCEP_JIT::codegen_backend &backend, instruction data)
-{
-	EMIT_CONDITION_CHECK(data, 0/*TODO: insert size in bytes*/)
-
-	backend.get_ptr(LLCCEP_JIT::RAX, data.args[1]);
-	backend.get_ptr(LLCCEP_JIT::RBX, data.args[2]);
-
-	backend.emit_cvtsd2si(LLCCEP_JIT::RCX, LLCCEP_JIT::RAX);
-	backend.emit_cvtsd2si(LLCCEP_JIT::RDX, LLCCEP_JIT::RBX);
-
-	backend.emit_and(LLCCEP_JIT::RCX, LLCCEP_JIT::RDX);
-	backend.get_ptr(LLCCEP_JIT::RBX, data.args[0]);
-	backend.emit_mov_reg_ptr_reg(LLCCEP_JIT::RBX, LLCCEP_JIT::RCX);
-}
-
-void gen_or(LLCCEP_JIT::codegen_backend &backend, instruction data)
-{
-	EMIT_CONDITION_CHECK(data, 0/*TODO: insert size in bytes*/)
-
-	backend.get_ptr(LLCCEP_JIT::RAX, data.args[1]);
-	backend.get_ptr(LLCCEP_JIT::RBX, data.args[2]);
-
-	backend.emit_cvtsd2si(LLCCEP_JIT::RCX, LLCCEP_JIT::RAX);
-	backend.emit_cvtsd2si(LLCCEP_JIT::RDX, LLCCEP_JIT::RBX);
-
-	backend.emit_or(LLCCEP_JIT::RCX, LLCCEP_JIT::RDX);
-	backend.get_ptr(LLCCEP_JIT::RBX, data.args[0]);
-	backend.emit_mov_reg_ptr_reg(LLCCEP_JIT::RBX, LLCCEP_JIT::RCX);
-}
-
-void gen_xor(LLCCEP_JIT::codegen_backend &backend, instruction data)
-{
-	EMIT_CONDITION_CHECK(data, 0/*TODO: insert size in bytes*/)
-
-	backend.get_ptr(LLCCEP_JIT::RAX, data.args[1]);
-	backend.get_ptr(LLCCEP_JIT::RBX, data.args[2]);
-
-	backend.emit_cvtsd2si(LLCCEP_JIT::RCX, LLCCEP_JIT::RAX);
-	backend.emit_cvtsd2si(LLCCEP_JIT::RDX, LLCCEP_JIT::RBX);
-
-	backend.emit_xor(LLCCEP_JIT::RCX, LLCCEP_JIT::RDX);
-	backend.get_ptr(LLCCEP_JIT::RBX, data.args[0]);
-	backend.emit_mov_reg_ptr_reg(LLCCEP_JIT::RBX, LLCCEP_JIT::RCX);
-}
-
-void gen_off(LLCCEP_JIT::codegen_backend &backend, instruction data)
-{
-	EMIT_CONDITION_CHECK(data, 0/*TODO: insert size in bytes*/)
-	
-	backend.get_imm(LLCCEP_JIT::RAX, data.args[2]);
-	backend.emit_mov(LLCCEP_JIT::RBX, 0);
-	backend.emit_cmp(LLCCEP_JIT::RAX, LLCCEP_JIT::RBX);
-	backend.emit_jl(/*TODO: insert size of right offset function*/);
-
-	// Right offset
-	backend.emit_mov(LLCCEP_JIT::RCX, LLCCEP_JIT::RAX);
-	backend.get_imm(LLCCEP_JIT::RAX, data.args[1]);
-	backend.emit_shr_cl(LLCCEP_JIT::RAX);
-	backend.emit_jmp(/*TODO: insert size of left offset function*/);
-
-	// Left offset
-	backend.emit_mov(LLCCEP_JIT::RCX, LLCCEP_JIT::RAX);
-	backend.get_imm(LLCCEP_JIT::RAX, data.args[1]);
-	backend.emit_shr_cl(LLCCEP_JIT::RAX);
-}
-
-void gen_nop(LLCCEP_JIT::codegen_backend &backend, instruction data)
-{
-	EMIT_CONDITION_CHECK(data, 1)
-
-	backend.emit_nop();
-}
-
-void gen_swi(LLCCEP_JIT::codegen_backend &backend, instruction data)
-{
-	EMIT_CONDITION_CHECK(data, 0/*TODO: insert size in bytes*/)
-
-	// runtime
-}
-
-void gen_cmp(LLCCEP_JIT::codegen_backend &backend, instruction data)
-{
-	EMIT_CONDITION_CHECK(data, 0/*TODO: insert size in bytes*/)
-
-	// TODO: insert cmp code from first test
-}
-
-void gen_inc(LLCCEP_JIT::codegen_backend &backend, instruction data)
-{
-	EMIT_CONDITION_CHECK(data, 0/*TODO: insert size in bytes*/)
-
-	data.args[1] = { 
-		.type = ARG_T_VAL,
-		.val = 1
-	};
-
-	gen_add(backend, data);
-}
-
-void gen_dec(LLCCEP_JIT::codegen_backend &backend, instruction data)
-{
-	EMIT_CONDITION_CHECK(data, 0/*TODO: insert size in bytes*/)
-
-	data.args[1] = {
-		.type = ARG_T_VAL,
-		.val = 1
-	};
-
-	gen_sub(backend, data);
-}
-
-#define GEN_FPU_MATH(inst_name) \
-({\
-	instruction copy = data;\
-	copy.args[0] = copy.args[1];\
-	\
-	gen_push(backend, copy);\
-	backend.emit_ ##inst_name();\
-	gen_pop(backend, data);\
-})
-
-void gen_sqrt(LLCCEP_JIT::codegen_backend &backend, instruction data)
-{
-	GEN_FPU_MATH(fsqrt);
-}
-
-void gen_sin(LLCCEP_JIT::codegen_backend &backend, instruction data)
-{
-	GEN_FPU_MATH(fsin);
-}
-
-void gen_cos(LLCCEP_JIT::codegen_backend &backend, instruction data)
-{
-	GEN_FPU_MATH(fcos);
-}
-
-void gen_ptan(LLCCEP_JIT::codegen_backend &backend, instruction data)
-{
-	GEN_FPU_MATH(fptan);
-}
-
-void gen_patan(LLCCEP_JIT::codegen_backend &backend, instruction data)
-{
-	GEN_FPU_MATH(fpatan);
-}
-
-void gen_ldc(LLCCEP_JIT::codegen_backend &backend, instruction data)
-{
-	backend.get_ptr(LLCCEP_JIT::RAX, data.args[0]); // RAX is ptr to res
-	backend.get_imm(LLCCEP_JIT::RBX, data.args[1]);
-	backend.emit_fld_const_reg(LLCCEP_JIT::RBX);
-	backend.emit_fst_reg_ptr(LLCCEP_JIT::RAX);
-}
-
-#undef GEN_FPU_MATH
-
-void gen_outp(LLCCEP_JIT::codegen_backend &backend, instruction data)
-{ }
-
-void gen_inp(LLCCEP_JIT::codegen_backend &backend, instruction data)
-{ }
-
-static auto __codegen_functions[] = {
-	gen_mov,
-	gen_mva,
-	gen_push,
-	gen_pop,
-	gen_top,
-	gen_add,
-	gen_sub,
-	gen_mul,
-	gen_div,
-	gen_and,
-	gen_or,
-	gen_xor,
-	gen_off,
-	gen_nop,
-	gen_swi,
-	gen_cmp,
-	gen_inc,
-	gen_dec,
-	gen_sqrt,
-	gen_sin,
-	gen_cos,
-	gen_ptan,
-	gen_patan,
-	gen_ldc,
-	gen_outp,
-	gen_inp
-};
-
-namespace LLCCEP_JIT {
-	void codegen_backend::get_cmp(regID reg)
-	{
-		emit_mov_reg_imm(reg, &cmp);
-		emit_mov_reg_reg_ptr(reg, reg);
-	}
-
-	void codegen_backend::get_imm(regID reg, arg data)
-	{
-		
-	}
-}
+void LLCCEP_JIT::codegenBackend::genNop(LLCCEP_exec::instruction data);
+void LLCCEP_JIT::codegenBackend::genSwi(LLCCEP_exec::instruction data);
+void LLCCEP_JIT::codegenBackend::genCmp(LLCCEP_exec::instruction data);
+void LLCCEP_JIT::codegenBackend::genInc(LLCCEP_exec::instruction data);
+void LLCCEP_JIT::codegenBackend::genDec(LLCCEP_exec::instruction data);
+void LLCCEP_JIT::codegenBackend::genSqrt(LLCCEP_exec::instruction data);
+void LLCCEP_JIT::codegenBackend::genSin(LLCCEP_exec::instruction data);
+void LLCCEP_JIT::codegenBackend::genCos(LLCCEP_exec::instruction data);
+void LLCCEP_JIT::codegenBackend::genPtan(LLCCEP_exec::instruction data);
+void LLCCEP_JIT::codegenBackend::genPatan(LLCCEP_exec::instruction data);
+void LLCCEP_JIT::codegenBackend::genLdc(LLCCEP_exec::instruction data);
+void LLCCEP_JIT::codegenBackend::genCall(LLCCEP_exec::instruction data);
+void LLCCEP_JIT::codegenBackend::genJmp(LLCCEP_exec::instruction data);
+void LLCCEP_JIT::codegenBackend::genRet(LLCCEP_exec::instruction data);

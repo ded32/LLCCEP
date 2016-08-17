@@ -1,4 +1,9 @@
-#include <stack>
+#include <QColor>
+#include <QMediaPlayer>
+#include <QAudioRecorder>
+#include <QUrl>
+#include <QString>
+
 #include <cmath>
 #include <fstream>
 #include <cstddef>
@@ -673,6 +678,26 @@ void LLCCEP_exec::softcore::emulated_swi(LLCCEP_exec::instruction data)
 	 * Sound stuff
 	 *************************************************/
 	case 2: {
+		switch (static_cast<size_t>(_regs[0])) {
+		case 0: {
+			QMediaPlayer *mp = new QMediaPlayer;
+			mp->setMedia(QUrl(_mm->getString(static_cast<size_t>(_regs[1]))));
+			mp->setVolume(static_cast<int>(_regs[2]));
+			mp->play();
+
+			_regs[4] = mp->state() == PlayingState;
+
+			delete mp;
+
+			break;
+		}
+
+		case 1: {
+			QAudioRecorder *rec = new QAudioRecorder;
+
+			break;
+		}
+		}
 
 		break;
 	}
