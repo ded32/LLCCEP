@@ -1,5 +1,5 @@
-#ifndef RENDERER_HPP
-#define RENDERER_HPP
+#ifndef EXEC_RENDERER_HPP
+#define EXEC_RENDERER_HPP
 
 #include <QWidget>
 #include <QPixmap>

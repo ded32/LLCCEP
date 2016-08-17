@@ -9,6 +9,7 @@ HEADERS = rex/rex.hpp \
           rm-field/rm-field.hpp \
           startup/program.hpp \
           startup/startup.hpp \
+    runtime/runtime.hpp
 
 SOURCES = codegen/codegen.cpp \
           emitter/emitter.cpp \

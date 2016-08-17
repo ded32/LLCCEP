@@ -1,5 +1,5 @@
-#ifndef MM_HPP
-#define MM_HPP
+#ifndef EXEC_MM_HPP
+#define EXEC_MM_HPP
 
 #include <cstddef>
 
@@ -29,4 +29,4 @@ namespace LLCCEP_exec {
 	};
 }
 
-#endif // MM_HPP
+#endif // EXEC_MM_HPP

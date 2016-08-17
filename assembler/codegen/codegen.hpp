@@ -1,5 +1,5 @@
-#ifndef CODEGEN_HPP
-#define CODEGEN_HPP
+#ifndef ASSEMBLER_CODEGEN_HPP
+#define ASSEMBLER_CODEGEN_HPP
 
 #include <vector>
 #include <fstream>
@@ -21,4 +21,4 @@ namespace LLCCEP_ASM {
 	void dump_bitset(::std::ostream &out, op addr);
 }
 
-#endif // CODEGEN_HPP
+#endif // ASSEMBLER_CODEGEN_HPP

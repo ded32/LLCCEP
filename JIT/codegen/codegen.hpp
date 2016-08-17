@@ -1,6 +1,7 @@
 #ifndef CODEGEN_HPP
 #define CODEGEN_HPP
 
+#include "../runtime/runtime.hpp"
 #include "../program/program.hpp"
 
 namespace LLCCEP_JIT {
@@ -34,10 +35,11 @@ namespace LLCCEP_JIT {
 		void genLdc(LLCCEP_exec::instruction data);
 
 	protected:
-		void getCompareFlag(regID reg);
 		void getImmediate(regID reg, arg data);
 		void getPointer(regID reg, arg data);
-		void getMemoryAddress(regID reg, arg data);
+
+	private:
+		runtimeManager *_runtimeManager;
 	};
 }
 

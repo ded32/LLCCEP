@@ -1,5 +1,7 @@
-#ifndef PROGRAM_HPP
-#define PROGRAM_HPP
+#ifndef EXEC_PROGRAM_HPP
+#define EXEC_PROGRAM_HPP
+
+#include <STDExtras.hpp>
 
 #include <vector>
 #include <fstream>
@@ -17,12 +19,12 @@ namespace LLCCEP_exec {
 	struct arg {
 		arg_t type;
 		double val;
-	};
+	} __attribute__((aligned(8))) /* 16 bytes*/;
 
 	struct instruction {
 		uint8_t opcode;
 		arg args[3];
-	};
+	} __attribute__((aligned(8))) /* 56 bytes */;
 
 	struct codeData {
 		size_t offset;
@@ -51,4 +53,4 @@ namespace LLCCEP_exec {
 	};
 }
 
-#endif // PROGRAM_HPP
+#endif // EXEC_PROGRAM_HPP

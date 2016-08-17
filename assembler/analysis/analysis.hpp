@@ -1,5 +1,5 @@
-#ifndef ANALYSIS_HPP
-#define ANALYSIS_HPP
+#ifndef ASSEMBLER_ANALYSIS_HPP
+#define ASSEMBLER_ANALYSIS_HPP
 
 #include <vector>
 #include <string>
@@ -12,4 +12,4 @@ namespace LLCCEP_ASM {
 	void analyze(::std::vector<lexem> &lex);
 }
 
-#endif // ANALYSIS_HPP
+#endif // ASSEMBLER_ANALYSIS_HPP

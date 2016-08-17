@@ -1,5 +1,5 @@
-#ifndef SOFTCORE_HPP
-#define SOFTCORE_HPP
+#ifndef EXEC_SOFTCORE_HPP
+#define EXEC_SOFTCORE_HPP
 
 #include <vector>
 #include <stack>
@@ -55,6 +55,9 @@ namespace LLCCEP_exec {
 
 		bool OK() const;
 
+		int *getCmpPointer() const;
+		double *getRegisterPtr(size_t id) const;
+
 	private:
 		::std::stack<double>_stk;
 		::std::stack<size_t>_call;
@@ -71,4 +74,4 @@ namespace LLCCEP_exec {
 	};
 }
 
-#endif // SOFT_CORE_HPP
+#endif // EXEC_SOFTCORE_HPP

@@ -5,7 +5,6 @@
 #include <cstdlib>
 #include <vector>
 #include <cassert>
-#include <sstream>
 
 #include <STDExtras.hpp>
 
@@ -66,39 +65,23 @@ int main(int argn, char * const *argv)
 	::std::vector<std::string> inputs;
 	std::string output = "a.exec";
 
-	::std::stringstream out;
 	::std::ofstream out_f;
-	size_t i;
 
 	try {
 		parse_command_line_params(argn, argv, inputs, output);
-	} catch (::LLCCEP::runtime_exception &exc) {
-		usage();
-		QUITE_ERROR(yes, "%s", exc.msg())
-	} DEFAULT_HANDLING
 
-	try {
-		LLCCEP_ASM::compile(inputs, out);
-	} catch (::std::ios_base::failure &info) {
-		QUITE_ERROR(yes, "Can't open '%s' for read: "
-		                 "%s\n", inputs[i].c_str(), info.what());
-	} catch (::LLCCEP::runtime_exception &exc) {
-		QUITE_ERROR(yes, "%s", exc.msg());
-	} DEFAULT_HANDLING
-
-	try {
 		out_f.exceptions(::std::ofstream::failbit);
 		out_f.open(output);
 
-		out_f << out.str();
-
+		LLCCEP_ASM::compile(inputs, out_f);
+		
 		out_f.close();
 	} catch (::std::ios_base::failure &info) {
-		::std::fprintf(stderr, "Error!\nCan't open '%s' for write: %s",
-		               output.c_str(), info.what());
-	} catch (...) {
-		::std::fprintf(stderr, "Unknown exception");
-	}
+		QUITE_ERROR(yes, "Can't open '%s' for write: "
+		                 "%s\n", output.c_str(), info.what());
+	} catch (::LLCCEP::runtime_exception &exc) {
+		QUITE_ERROR(yes, "%s", exc.msg());
+	} DEFAULT_HANDLING
 	
 	return 0;
 }

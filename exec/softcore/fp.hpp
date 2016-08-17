@@ -1,5 +1,5 @@
-#ifndef FP_HPP
-#define FP_HPP
+#ifndef EXEC_FP_HPP
+#define EXEC_FP_HPP
 
 #include <cfloat>
 #include <algorithm>
@@ -11,4 +11,4 @@
 #define DBL_AE(a, b) (DBL_EQ(a, b) || DBL_ABOVE(a, b))
 #define DBL_LE(a, b) (DBL_EQ(a, b) || DBL_LESS(a, b))
 
-#endif // FP_HPP
+#endif // EXEC_FP_HPP

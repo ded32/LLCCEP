@@ -1,5 +1,5 @@
-#ifndef LINKER_HPP
-#define LINKER_HPP
+#ifndef ASSEMBLER_LINKER_HPP
+#define ASSEMBLER_LINKER_HPP
 
 #include <vector>
 #include <utility>
@@ -21,4 +21,4 @@ namespace LLCCEP_ASM {
 			::std::vector<lexem> &lex);
 }
 
-#endif // LINKER_HPP
+#endif // ASSEMBLER_LINKER_HPP

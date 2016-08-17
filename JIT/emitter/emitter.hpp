@@ -51,7 +51,7 @@ namespace LLCCEP_JIT {
 				emit_byte((reinterpret_cast<uint8_t *>(&val))[i]);
 		}
 
-		void emit(std::initializer_list<uint8_t> data);
+		void emit(::std::initializer_list<uint8_t> data);
 		void emit(opcode op, regID dst, regID src);
 		void emit(opcode op, regID src);
 		void dump(bool bin = false);

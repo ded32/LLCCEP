@@ -3,7 +3,6 @@
 
 #include <cassert>
 #include <string>
-#include <sstream>
 #include <fstream>
 #include <iostream>
 #include <cstring>
@@ -21,10 +20,11 @@
 #include "../codegen/codegen.hpp"
 
 namespace LLCCEP_ASM {
-	void compile(::std::vector<::std::string> in_paths, ::std::stringstream &out)
+	void compile(::std::vector<::std::string> in_paths, ::std::ostream &out)
 	{	
 		::std::vector<lexem> program;
 		::std::vector<::std::pair<lexem, size_t> > labels_table;
+		size_t i;
 		
 #define ITERATOR_T ::std::vector<::std::pair<lexem, size_t> >::iterator
 		auto find_main = [&labels_table] {
@@ -50,7 +50,7 @@ namespace LLCCEP_ASM {
 						dump_bytes(out, to_bytes((*(find_main())).second));
 					}
 
-					for (size_t i = 1; !in.eof(); i++) {
+					for (i = 1; !in.eof(); i++) {
 						::std::string code = "";
 
 						program.clear();

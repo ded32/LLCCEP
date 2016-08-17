@@ -1,5 +1,5 @@
-#ifndef LEXER_HPP
-#define LEXER_HPP
+#ifndef ASSEMBLER_LEXER_HPP
+#define ASSEMBLER_LEXER_HPP
 
 #include <string>
 #include <vector>
@@ -32,4 +32,4 @@ namespace LLCCEP_ASM {
 	::std::string get_lexem_typename(lex_t type);
 }
 
-#endif // LEXER_HPP
+#endif // ASSEMBLER_LEXER_HPP

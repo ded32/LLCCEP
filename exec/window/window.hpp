@@ -1,5 +1,5 @@
-#ifndef WINDOW_HPP
-#define WINDOW_HPP
+#ifndef EXEC_WINDOW_HPP
+#define EXEC_WINDOW_HPP
 
 #include <QWidget>
 #include <QCloseEvent>

@@ -6,7 +6,8 @@ namespace LLCCEP_JIT {
 		REX_W = 0x48,
 		REX_R = 0x44,
 		REX_X = 0x42,
-		REX_B = 0x41
+		REX_B = 0x41,
+		REX   = 0x40
 	};	
 }
 

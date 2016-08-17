@@ -24,6 +24,12 @@
 #define yes true
 #define no false
 
+#if defined(__GNUC__) || defined(__clang__)
+#define __noreturn __attribute__((noreturn))
+#elif defined(_MSC_VER)
+#define __noreturn __declspec(noreturn)
+#endif
+
 #define MAX_EXC_BUF_SIZE (512 * 1024)
 
 #define $(val) ({assert(val); val})
