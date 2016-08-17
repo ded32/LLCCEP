@@ -9,6 +9,10 @@
 
 #include <STLExtras.hpp>
 
+#ifdef emit
+#undef emit
+#endif
+
 namespace LLCCEP_JIT {
 	typedef std::initializer_list<uint8_t> opcode;
 

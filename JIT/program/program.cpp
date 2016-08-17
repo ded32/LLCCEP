@@ -98,10 +98,14 @@ namespace LLCCEP_JIT {
 	}
 #undef JCC_BLOCK
 
-	void program::emit_cvtsd2si(regID dst, regID src)
+	void program::emit_fistp(regID dst)
 	{
-		emit({0xF2, REX_W, 0x0F, 0x2D});
-		emit_rm_field(0b00, dst, src);
+		emit({0xDF, static_cast<uint8_t>(0x38 + dst)});
+	}
+
+	void program::emit_fild(regID dst)
+	{
+		emit({0xDF, static_cast<uint8_t>(0x28 + dst)});
 	}
 
 	void program::emit_push_reg(regID src)
@@ -125,8 +129,9 @@ namespace LLCCEP_JIT {
 	void program::emit_pop_reg_ptr(regID src)
 	{
 		if (src == RSP || src == RBP) {
-			std::cout << "SP & BP are denied to do reg_ptr_pop";
-			std::exit(EXIT_FAILURE);
+			throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
+				"RSP & RBP are denied to be used by\n"
+				"reg_ptr_pop"))
 		}
 
 		emit({0x8F, src});

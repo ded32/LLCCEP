@@ -41,7 +41,8 @@ namespace LLCCEP_JIT {
 		void emit_je(uint32_t offset);
 		void emit_jne(uint32_t offset);
 
-		void emit_cvtsd2si(regID dst, regID src);
+		void emit_fistp(regID dst);
+		void emit_fild(regID dst);
 
 		void emit_push_reg(regID src);
 		void emit_push_imm(uint64_t src);
@@ -86,7 +87,6 @@ namespace LLCCEP_JIT {
 		void emit_xor_reg_reg(regID op0, regID op1);
 		void emit_xor_reg_ptr_reg(regID op0, regID op1);
 		void emit_xor_reg_reg_ptr(regID op0, regID op1);
-
 	};
 }
 
