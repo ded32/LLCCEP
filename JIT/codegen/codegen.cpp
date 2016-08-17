@@ -244,10 +244,87 @@ void LLCCEP_JIT::codegenBackend::genRet(LLCCEP_exec::instruction data)
 
 void LLCCEP_JIT::codegenBackend::getImmediate(regID reg, LLCCEP_exec::arg data)
 {
-	switch (data.type)
+	auto getTmpRegister = [reg] {
+		return (reg == LLCCEP_JIT::RAX)?(LLCCEP_JIT::RBX):(LLCCEP_JIT::RAX);
+	};
+
+	switch (data.type) {
+	case ARG_T_REG: {
+		if (static_cast<size_t>(data.val) > 32) {
+			throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
+				"Error!\n"
+				"Overbounding while reading from register"))
+		}
+
+		double *ptr = _runtimeManager->getRegPtr(static_cast<size_t>(data.val));
+		regID tmp = getTmpRegister();
+
+		emit_push_reg(tmp);
+
+		emit_mov_reg_imm(tmp, static_cast<uint64_t>(ptr));
+		emit_mov_reg_reg_ptr(tmp, reg);
+
+		emit_pop_reg(tmp);
+		break;
+	}
+
+	case ARG_T_MEM: {
+		regID tmp = getTmpRegister();
+		emit_push_reg(tmp);
+
+		void *mem = _runtimeManager->getMemoryBeginning() +
+			    static_cast<void *>(static_cast<size_t>(data.val) *
+						sizeof(double));
+		emit_mov_reg_imm(tmp, static_cast<uint64_t>(mem));
+		emit_mov_reg_reg_ptr(tmp, reg);
+
+		emit_pop_reg(tmp);
+		break;
+	}
+
+	case ARG_T_NUM: {
+		uint64_t val = *reinterpret_cast<uint64_t *>(&data.val);
+		emit_mov_reg_imm(reg, val); // copy the bits, not the casted value
+		break;
+	}
+
+	default: {
+		throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
+			"Error!\n"
+			"Invalid reading of immediate data!\n"))
+	}
+	}
 }
 
 void LLCCEP_JIT::codegenBackend::getPointer(regID reg, LLCCEP_exec::arg data)
 {
+	switch (data.type) {
+	case ARG_T_REG: {
+		if (static_cast<size_t>(data.val) > 32) {
+			throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
+				"Error!\n"
+				"Overbounding while reading from register"))
+		}
 
+		double *ptr = _runtimeManager->getRegPtr(static_cast<size_t>(data.val));
+		emit_mov_reg_imm(tmp, static_cast<uint64_t>ptr)
+
+		break;
+	}
+
+	case ARG_T_MEM: {
+		void *mem = _runtimeManager->getMemoryBeginning() +
+			    static_cast<void *>(static_cast<size_t>(data.val) *
+						sizeof(double));
+		emit_mov_reg_imm(tmp, static_cast<uint64_t>(mem));
+
+		break;
+	}
+
+	default: {
+		throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
+			"Error!\n"
+			"Invalid reading of pointer data!\n"))
+	}
+	}
 }

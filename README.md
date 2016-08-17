@@ -1,14 +1,9 @@
 # LLCCEP
 
-This Low-Level Code Compilation and Execution Platform is an LLVM-like, but simpled a some.
+This Low-Level Code Compilation and Execution Platform is a JVM-like, but simpled a some.
 It now supports only assembly language compilation to binary files. The syntax is
-ARM-like, but instruction set is reduced a some. The language is more flexible than
-Intel or AT&T assembly. 
-The changes between ARM and LLCCEP assembly:
-- Register's indication begins with '&' character, not 'r'
-- There are only 7 conditions
-- There are no branches.
-- There are arithmetics, syscalls, FP-working rountines placed
+x86-like, but instruction set is reduced, and modified a some. The language is more flexible 
+than Intel or AT&T assembly.
 
 # TODO LIST
 Watch around difference between JIT execution on Linux and BSD-family OSs.
