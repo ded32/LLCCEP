@@ -1,5 +1,5 @@
-#ifndef DEF_INST_HPP
-#define DEF_INST_HPP
+#ifndef COMMON_DEF_INST_HPP
+#define COMMON_DEF_INST_HPP
 
 #include <string>
 #include "./../../assembler/lexer/lexer.hpp"
@@ -44,4 +44,4 @@ namespace LLCCEP_ASM {
 	::std::string get_mnemonic_by_opcode(uint8_t op);
 }
 
-#endif // DEF_INST_HPP
+#endif // COMMON_DEF_INST_HPP

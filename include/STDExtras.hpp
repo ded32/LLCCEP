@@ -5,8 +5,8 @@
 * It gives you error info & its cause info...
 * 
 *****************************************************************************************************************/
-#ifndef STDEXTRAS_HPP
-#define STDEXTRAS_HPP
+#ifndef INCLUDE_STDEXTRAS_HPP
+#define INCLUDE_STDEXTRAS_HPP
 
 #include <cstdio>
 #include <cstdlib>
@@ -116,4 +116,4 @@ catch (::std::exception &exc) {\
 
 void dump_bytes(::std::ostream &out, ::std::vector<uint8_t> list);
 
-#endif // STDEXTRAS_HPP
+#endif // INCLUDE_STDEXTRAS_HPP

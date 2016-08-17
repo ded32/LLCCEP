@@ -1,5 +1,5 @@
-#ifndef STLEXTRAS_HPP
-#define STLEXTRAS_HPP
+#ifndef INCLUDE_STLEXTRAS_HPP
+#define INCLUDE_STLEXTRAS_HPP
 
 #include <vector>
 #include <initializer_list>
@@ -85,4 +85,4 @@ void reopen_file(TYPE &f, std::string path)
 	}
 }
 
-#endif // STLEXTRAS_HPP
+#endif // INCLUDE_STLEXTRAS_HPP

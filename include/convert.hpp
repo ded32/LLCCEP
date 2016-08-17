@@ -1,5 +1,5 @@
-#ifndef CONVERT_HPP 
-#define CONVERT_HPP
+#ifndef INCLUDE_CONVERT_HPP
+#define INCLUDE_CONVERT_HPP
 
 #include <string>
 #include <sstream>
@@ -53,4 +53,4 @@ template<typename TYPE>
 	return ::std::vector<uint8_t>(cv.bytes, cv.bytes + sizeof(TYPE));
 }
 
-#endif // CONVERT_HPP
+#endif // INCLUDE_CONVERT_HPP

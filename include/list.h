@@ -1,5 +1,5 @@
-#ifndef LIST_H
-#define LIST_H
+#ifndef INCLUDE_LIST_H
+#define INCLUDE_LIST_H
 
 #if defined(__cplusplus)
 extern "C" {
@@ -22,4 +22,4 @@ void unidirected_list_delete(struct unidirected_list *head);
 }
 #endif
 
-#endif // LIST_H
+#endif // INCLUDE_LIST_H

@@ -1,5 +1,5 @@
-#ifndef DEF_COND_HPP
-#define DEF_COND_HPP
+#ifndef COMMON_DEF_COND_HPP
+#define COMMON_DEF_COND_HPP
 
 #include <map>
 #include <cstdint>
@@ -19,4 +19,4 @@ namespace LLCCEP_ASM {
 	::std::string get_condition_mnemonic(uint8_t bin);
 }
 
-#endif // DEF_COND_HPP
+#endif // COMMON_DEF_COND_HPP

@@ -1,5 +1,5 @@
-#ifndef OS_SPECIFIC_HPP
-#define OS_SPECIFIC_HPP
+#ifndef INCLUDE_OS_SPECIFIC_HPP
+#define INCLUDE_OS_SPECIFIC_HPP
 
 #ifdef _WIN32
 #define int8_t_pf "%I8d"
@@ -23,4 +23,4 @@
 #define size_t_pf "%zu"
 #endif // _WIN32
 
-#endif // OS_SPECIFIC_HPP
+#endif // INCLUDE_OS_SPECIFIC_HPP
