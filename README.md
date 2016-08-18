@@ -6,7 +6,7 @@ x86-like, but instruction set is reduced, and modified a some. The language is m
 than Intel or AT&T assembly.
 
 # TODO LIST
-Watch around difference between JIT execution on Linux and BSD-family OSs.
+Debug, finally, JIT...
 
 Report about bugs here:
 <a href=https://github.com/Andrew-Bezzubtsev/LLCCEP/issues/new>THE BUGTRACKER</a>
