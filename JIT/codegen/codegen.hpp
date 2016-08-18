@@ -1,6 +1,10 @@
 #ifndef CODEGEN_HPP
 #define CODEGEN_HPP
 
+#include <map>
+#include <vector>
+#include <cstddef>
+
 #include "../runtime/runtime.hpp"
 #include "../program/program.hpp"
 
@@ -8,6 +12,13 @@ namespace LLCCEP_JIT {
 	class codegenBackend: public program {
 	public:
 		codegenBackend();
+
+		void setRuntimeManager(runtimeManager *newRuntimeManager);
+		size_t getInstructionPos(size_t id);
+		void generateProgram();
+
+	protected:
+		void generateMachineCode(LLCCEP_exec::instruction data);
 
 		void genMov(LLCCEP_exec::instruction data);
 		void genMva(LLCCEP_exec::instruction data);
@@ -37,12 +48,14 @@ namespace LLCCEP_JIT {
 		void genJmp(LLCCEP_exec::instruction data);
 		void genRet(LLCCEP_exec::instruction data);
 
-	protected:
 		void getImmediate(regID reg, LLCCEP_exec::arg data);
 		void getPointer(regID reg, LLCCEP_exec::arg data);
 
+		bool OK() const;
+
 	private:
 		runtimeManager *_runtimeManager;
+		::std::map<size_t, size_t> _instructionPos;
 	};
 }
 

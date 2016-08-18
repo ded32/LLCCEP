@@ -11,6 +11,8 @@
 
 #include "codeReader.hpp"
 
+#include "../../common/def/def_inst.hpp"
+
 #define CHECK_PROGRAM_READER(cond) \
 	DEFAULT_CHECK_BLOCK(cond, this, OK());
 
@@ -60,7 +62,7 @@ void LLCCEP_exec::codeReader::readProgramHeader()
 		throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
 			"Can't execute the program:\n"
 			"The word-length on machine, compiled\n"
-			"this code is greater than on this."
+			"this code is greater than on this.\n"
 			"(" size_t_pf "-bit machine required)",
 			static_cast<size_t>(sz)));
 	}
@@ -91,15 +93,20 @@ LLCCEP_exec::instruction LLCCEP_exec::codeReader::getInstruction(size_t id)
 
 	if (id >= _data.size) {
 		return LLCCEP_exec::instruction{
-			15, // Software interrupt
-			{{LLCCEP_exec::ARG_T_VAL, 5}, // Quit
-			{LLCCEP_exec::ARG_T_NO},
-			{LLCCEP_exec::ARG_T_NO}}};
+			INT8_MAX,
+			{{LLCCEP_exec::ARG_T_NO},
+			 {LLCCEP_exec::ARG_T_NO},
+			 {LLCCEP_exec::ARG_T_NO}}};
 	}
 
 	LLCCEP_exec::instruction res{};
 	_input.seekg(_data.offset + id * 28);
 	res.opcode = _input.get();
+
+	if (res.opcode > LLCCEP_ASM::INST_NUM) {
+		throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
+			"Opcode overbound!\n"))
+	}
 
 	for (unsigned i = 0; i < 3; i++) {
 		res.args[i].type = static_cast<LLCCEP_exec::arg_t>(_input.get());

@@ -29,4 +29,5 @@ SOURCES = codegen/codegen.cpp \
           ../exec/mm/mm.cpp \
           ../exec/codeReader/codeReader.cpp \
           ../exec/window/window.cpp \
-          ../exec/window/renderer/renderer.cpp
+          ../exec/window/renderer/renderer.cpp \
+          ../lib/command-line.cpp

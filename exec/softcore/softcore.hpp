@@ -19,6 +19,7 @@ namespace LLCCEP_exec {
 		void setMm(memoryManager *mm);
 		void setCodeReader(codeReader *reader);
 		void executeProgram();
+		bool OK() const;
 
 	protected:
 		double get(arg data);
@@ -53,13 +54,6 @@ namespace LLCCEP_exec {
 		void emulated_jmp(LLCCEP_exec::instruction data);
 		void emulated_ret(LLCCEP_exec::instruction data);
 
-		bool OK() const;
-
-		int *getCmpPointer();
-		double *getRegisterPtr(size_t id);
-		memoryManager *getMemoryManager();
-
-	private:
 		::std::stack<double>_stk;
 		::std::stack<size_t>_call;
 

@@ -1,13 +1,88 @@
-#include <STDExtras.hpp>
+#include <utility>
 
-#include "../runtime/runtime.hpp"
-#include "../program/program.hpp"
-#include "../../exec/program/program.hpp"
+#include <STDExtras.hpp>
+#include <os-specific.hpp>
+
+#include "./../runtime/runtime.hpp"
+#include "./../program/program.hpp"
+#include "./../../exec/codeReader/codeReader.hpp"
 
 #include "codegen.hpp"
 
-LLCCEP_JIT::codegenBackend::codegenBackend()
+LLCCEP_JIT::codegenBackend::codegenBackend():
+	_runtimeManager(),
+	_instructionPos()
 { }
+
+void LLCCEP_JIT::codegenBackend::setRuntimeManager(LLCCEP_JIT::runtimeManager *newRuntimeManager)
+{
+	_runtimeManager = newRuntimeManager;
+}
+
+size_t LLCCEP_JIT::codegenBackend::getInstructionPos(size_t id)
+{
+	if (_instructionPos.find(id) == _instructionPos.end()) {
+		throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
+			"No instruction with " size_t_pf "id",
+			id))
+	}
+
+	return _instructionPos[id];
+}
+
+void LLCCEP_JIT::codegenBackend::generateProgram()
+{
+	LLCCEP_exec::instruction inst{};
+	bool pass = true;
+
+	do {
+		if (!pass)
+			generateMachineCode(inst);
+		else
+			pass = false;
+
+		inst = _runtimeManager->getCodeReader()->getInstruction(_instructionPos.size());
+	} while (inst.opcode != INT8_MAX);
+}
+
+void LLCCEP_JIT::codegenBackend::generateMachineCode(LLCCEP_exec::instruction data)
+{
+	void (LLCCEP_JIT::codegenBackend:: *functions[])(LLCCEP_exec::instruction(data)) = {
+		&LLCCEP_JIT::codegenBackend::genMov,
+		&LLCCEP_JIT::codegenBackend::genMva,
+		&LLCCEP_JIT::codegenBackend::genPush,
+		&LLCCEP_JIT::codegenBackend::genPop,
+		&LLCCEP_JIT::codegenBackend::genTop,
+		&LLCCEP_JIT::codegenBackend::genAdd,
+		&LLCCEP_JIT::codegenBackend::genSub,
+		&LLCCEP_JIT::codegenBackend::genMul,
+		&LLCCEP_JIT::codegenBackend::genDiv,
+		&LLCCEP_JIT::codegenBackend::genAnd,
+		&LLCCEP_JIT::codegenBackend::genOr,
+		&LLCCEP_JIT::codegenBackend::genXor,
+		&LLCCEP_JIT::codegenBackend::genOff,
+		&LLCCEP_JIT::codegenBackend::genNop,
+		&LLCCEP_JIT::codegenBackend::genSwi,
+		&LLCCEP_JIT::codegenBackend::genCmp,
+		&LLCCEP_JIT::codegenBackend::genInc,
+		&LLCCEP_JIT::codegenBackend::genDec,
+		&LLCCEP_JIT::codegenBackend::genSqrt,
+		&LLCCEP_JIT::codegenBackend::genSin,
+		&LLCCEP_JIT::codegenBackend::genCos,
+		&LLCCEP_JIT::codegenBackend::genPtan,
+		&LLCCEP_JIT::codegenBackend::genPatan,
+		&LLCCEP_JIT::codegenBackend::genLdc,
+		&LLCCEP_JIT::codegenBackend::genCall,
+		&LLCCEP_JIT::codegenBackend::genJmp,
+		&LLCCEP_JIT::codegenBackend::genRet
+	};
+
+	size_t old = size();
+	(this->*functions[data.opcode])(data);
+
+	size_t id = _instructionPos.size();
+	_instructionPos[id] = old - size();
+}
 
 void LLCCEP_JIT::codegenBackend::genMov(LLCCEP_exec::instruction data)
 {
@@ -336,4 +411,9 @@ void LLCCEP_JIT::codegenBackend::getPointer(regID reg, LLCCEP_exec::arg data)
 			"Invalid reading of pointer data!\n"))
 	}
 	}
+}
+
+bool LLCCEP_JIT::codegenBackend::OK() const
+{
+	return _runtimeManager && _runtimeManager->OK();
 }

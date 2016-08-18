@@ -66,6 +66,12 @@ void LLCCEP_exec::softcore::executeProgram()
 		executeNextInstruction();
 }
 
+bool LLCCEP_exec::softcore::OK() const
+{
+	return (_cmp & 0b1000) && _mm && _reader &&
+	       (_ready & 0b11);
+}
+
 double LLCCEP_exec::softcore::get(LLCCEP_exec::arg data)
 {
 	switch (data.type) {
@@ -815,37 +821,4 @@ void LLCCEP_exec::softcore::emulated_ret(LLCCEP_exec::instruction data)
 
 	_pc = _call.top();
 	_call.pop();
-}
-
-bool LLCCEP_exec::softcore::OK() const
-{
-	return (_cmp & 0b1000) && _mm && _reader &&
-	       (_ready & 0b11);
-}
-
-int *LLCCEP_exec::softcore::getCmpPointer()
-{
-	// Low-level function, no default protection
-	return &_cmp;
-}
-
-double *LLCCEP_exec::softcore::getRegisterPtr(size_t id)
-{
-	// Low-level function, no default protection
-	if (id > 32) {
-		throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
-			"Overbounding while getting pointer "
-			"to register!"))
-	}
-
-	return &(_regs[id]);
-}
-
-LLCCEP_exec::memoryManager *LLCCEP_exec::softcore::getMemoryManager()
-{
-	if (!_mm || !*_mm) {
-		throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
-			"memoryManager is not OK!"))
-	}
-	return _mm;
 }

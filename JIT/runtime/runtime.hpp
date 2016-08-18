@@ -1,8 +1,8 @@
 #ifndef RUNTIME_HPP
 #define RUNTIME_HPP
 
-#include "../../exec/softcore/softcore.hpp"
-#include "../../exec/program/program.hpp"
+#include "./../../exec/softcore/softcore.hpp"
+#include "./../../exec/codeReader/codeReader.hpp"
 
 namespace LLCCEP_JIT {
 	class runtimeManager: public LLCCEP_exec::softcore {
@@ -13,6 +13,7 @@ namespace LLCCEP_JIT {
 		void *getCmpPtr();
 		void *getRegPtr(size_t id);
 		void *getMemoryBeginning();
+		LLCCEP_exec::codeReader *getCodeReader();
 	};
 }
 
