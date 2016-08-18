@@ -7,15 +7,21 @@ int main(int argn, char **argv)
 {
 	QApplication app(argn, argv);
 
-	LLCCEP_exec::window wnd;
-	wnd.resize(800, 640);
-	wnd.show();
-	wnd.setWindowTitle(QApplication::translate("test", "Test QT Window"));
-	wnd.begin(800, 640);
-	wnd.setAntialiased(true);
+	LLCCEP_exec::window *wnd = new (std::nothrow) LLCCEP_exec::window;
+	if (!wnd) {
+	}
+	wnd->resize(800, 640);
+	wnd->show();
+	wnd->setWindowTitle(QApplication::translate("test", "Test QT Window"));
+	wnd->begin(800, 640);
+	wnd->setAntialiased(true);
 
 	for (double i = 0; i * i < 640; i += 0.001)
-		wnd.painter().drawPoint(i, i * i);
+		wnd->painter().drawPoint(i, i * i);
 
-	return app.exec();
+	int res = app.exec();
+
+	delete wnd;
+
+	return res;
 }

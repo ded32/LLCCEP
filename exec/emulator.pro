@@ -10,6 +10,7 @@ SOURCES = codeReader/codeReader.cpp \
           softcore/softcore.cpp \
           mm/mm.cpp \
           ../lib/STDExtras.cpp \
+          ../lib/command-line.cpp \
           main.cpp
 
 HEADERS = codeReader/codeReader.hpp \

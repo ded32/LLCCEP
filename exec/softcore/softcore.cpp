@@ -3,6 +3,7 @@
 #include <QAudioRecorder>
 #include <QUrl>
 #include <QString>
+#include <QApplication>
 
 #include <cmath>
 #include <fstream>
@@ -64,6 +65,14 @@ void LLCCEP_exec::softcore::executeProgram()
 
 	while (!_quit)
 		executeNextInstruction();
+
+	if (_windows.size())
+		QApplication::exit();
+}
+
+::std::vector<LLCCEP_exec::window *> LLCCEP_exec::softcore::getWindows() const
+{
+	return _windows;
 }
 
 bool LLCCEP_exec::softcore::OK() const
@@ -105,7 +114,7 @@ double LLCCEP_exec::softcore::get(LLCCEP_exec::arg data)
 	default:
 		throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
 			"Error!\n"
-			"Invalid or damaged binary file: invalid reading!\n"));
+			"Invalid or damaged binary file: invalid reading!PC - %lg\n", _pc));
 	}
 
 	return 0;
@@ -318,11 +327,12 @@ void LLCCEP_exec::softcore::emulated_swi(LLCCEP_exec::instruction data)
 		}
 	};
 
-	auto getWindowByID = [this](size_t id) {
-		if (id) {
+	auto getWindow = [this]() {
+		size_t id = static_cast<size_t>(_regs[1]);
+		if (id >= _windows.size()) {
 			throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
 				"Error!\n"
-				"Overbounding while access to windows:"
+				"Overbounding while access to windows: "
 				"no window with " size_t_pf " ID!\n",
 				id))
 		}
@@ -579,39 +589,39 @@ void LLCCEP_exec::softcore::emulated_swi(LLCCEP_exec::instruction data)
 					::std::strerror(errno)));
 			}
 
-			wnd->resize(static_cast<size_t>(_regs[1]),
-				    static_cast<size_t>(_regs[2]));
-			wnd->setWindowTitle(_mm->getString(static_cast<size_t>(_regs[3])).c_str());
+			int width  = static_cast<int>(_regs[1]),
+			    height = static_cast<int>(_regs[2]);
+
+			wnd->resize(width, height);
 			wnd->show();
-			wnd->setWindowFlags(Qt::WindowFlags(static_cast<int>(_regs[4])));
+			wnd->setWindowTitle(QApplication::translate(
+						    "emulator",
+						    _mm->getString(static_cast<size_t>(_regs[3])).c_str()));
+			wnd->begin(width, height);
+			wnd->setAntialiased(true);
 
-			if (static_cast<size_t>(_regs[4]) & Qt::MSWindowsFixedSizeDialogHint) {
-				wnd->setFixedSize(static_cast<size_t>(_regs[1]),
-						  static_cast<size_t>(_regs[2]));
-			}
-
-			_regs[5] = _windows.size();
+			_regs[4] = _windows.size();
 			_windows.push_back(wnd);
 
 			break;
 		}
 
 		case 1: {
-			LLCCEP_exec::window *wnd = getWindowByID(static_cast<size_t>(_regs[1]));
+			LLCCEP_exec::window *wnd = getWindow();
 			wnd->painter().drawPoint(static_cast<int>(_regs[2]), static_cast<size_t>(_regs[3]));
 
 			break;
 		}
 
 		case 2: {
-			LLCCEP_exec::window *wnd = getWindowByID(static_cast<size_t>(_regs[1]));
+			LLCCEP_exec::window *wnd = getWindow();
 			wnd->painter().setPen(QColor(static_cast<QRgb>(_regs[2])));
 
 			break;
 		}
 
 		case 3: {
-			LLCCEP_exec::window *wnd = getWindowByID(static_cast<size_t>(_regs[1]));
+			LLCCEP_exec::window *wnd = getWindow();
 			wnd->close();
 			delete wnd;
 			_windows.erase(_windows.begin() + static_cast<size_t>(_regs[1]));
@@ -620,7 +630,7 @@ void LLCCEP_exec::softcore::emulated_swi(LLCCEP_exec::instruction data)
 		}
 
 		case 4: {
-			LLCCEP_exec::window *wnd = getWindowByID(static_cast<size_t>(_regs[1]));
+			LLCCEP_exec::window *wnd = getWindow();
 			_regs[3] = wnd->getKeyboardButtonState((static_cast<size_t>(_regs[2]) > 0xFF)?
 							       (0):
 							       (static_cast<size_t>(_regs[2])));
@@ -632,7 +642,7 @@ void LLCCEP_exec::softcore::emulated_swi(LLCCEP_exec::instruction data)
 		}
 
 		case 5: {
-			LLCCEP_exec::window *wnd = getWindowByID(static_cast<size_t>(_regs[1]));
+			LLCCEP_exec::window *wnd = getWindow();
 			_regs[2] = wnd->pos().x();
 			_regs[3] = wnd->pos().y();
 			_regs[4] = wnd->size().width();
@@ -642,7 +652,7 @@ void LLCCEP_exec::softcore::emulated_swi(LLCCEP_exec::instruction data)
 		}
 
 		case 6: {
-			LLCCEP_exec::window *wnd = getWindowByID(static_cast<size_t>(_regs[1]));
+			LLCCEP_exec::window *wnd = getWindow();
 
 			wnd->resize(static_cast<int>(_regs[2]),
 				    static_cast<int>(_regs[3]));
@@ -650,7 +660,7 @@ void LLCCEP_exec::softcore::emulated_swi(LLCCEP_exec::instruction data)
 		}
 
 		case 7: {
-			LLCCEP_exec::window *wnd = getWindowByID(static_cast<size_t>(_regs[1]));
+			LLCCEP_exec::window *wnd = getWindow();
 
 			wnd->move(static_cast<int>(_regs[2]),
 				  static_cast<int>(_regs[3]));
@@ -658,14 +668,14 @@ void LLCCEP_exec::softcore::emulated_swi(LLCCEP_exec::instruction data)
 		}
 
 		case 8: {
-			LLCCEP_exec::window *wnd = getWindowByID(static_cast<size_t>(_regs[1]));
+			LLCCEP_exec::window *wnd = getWindow();
 
 			wnd->setWindowTitle(_mm->getString(static_cast<size_t>(_regs[2])).c_str());
 			break;
 		}
 
 		case 9: {
-			LLCCEP_exec::window *wnd = getWindowByID(static_cast<size_t>(_regs[1]));
+			LLCCEP_exec::window *wnd = getWindow();
 
 			wnd->setWindowFlags(Qt::WindowFlags(static_cast<int>(_regs[2])));
 			break;

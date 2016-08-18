@@ -14,7 +14,9 @@
 
 int main(int argn, char **argv)
 {
-	QCoreApplication app(argn, argv);
+	QApplication app(argn, argv);
+	::std::vector<LLCCEP_exec::window *> windows;
+	int ret = 0;
 
 	try {
 		commandLineParametersVM clp;
@@ -41,15 +43,23 @@ int main(int argn, char **argv)
 
 		// Execute program
 		sc.executeProgram();
+		windows = sc.getWindows();
 
 		// Release memoryManager data
 		mm.freeElements();
 
 		// Release codeReader data
 		cr.closeInput();
+
+		ret = app.exec();
+
+		for (const auto &i: windows)
+			delete i;
+
+		windows.clear();
 	} catch (::LLCCEP::runtime_exception &exc) {
 		QUITE_ERROR(yes, "%s", exc.msg());
 	} DEFAULT_HANDLING
 
-	return 0;
+	return ret;
 }

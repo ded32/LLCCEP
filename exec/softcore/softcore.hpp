@@ -19,6 +19,8 @@ namespace LLCCEP_exec {
 		void setMm(memoryManager *mm);
 		void setCodeReader(codeReader *reader);
 		void executeProgram();
+
+		::std::vector<window *> getWindows() const;
 		bool OK() const;
 
 	protected:
