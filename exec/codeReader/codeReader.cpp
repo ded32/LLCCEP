@@ -94,9 +94,9 @@ LLCCEP_exec::instruction LLCCEP_exec::codeReader::getInstruction(size_t id)
 	if (id >= _data.size) {
 		return LLCCEP_exec::instruction{
 			INT8_MAX,
-			{{LLCCEP_exec::ARG_T_NO},
-			 {LLCCEP_exec::ARG_T_NO},
-			 {LLCCEP_exec::ARG_T_NO}}};
+			{{LLCCEP_exec::ARG_T_NO, 0},
+			 {LLCCEP_exec::ARG_T_NO, 0},
+			 {LLCCEP_exec::ARG_T_NO, 0}}};
 	}
 
 	LLCCEP_exec::instruction res{};
@@ -110,15 +110,6 @@ LLCCEP_exec::instruction LLCCEP_exec::codeReader::getInstruction(size_t id)
 
 	for (unsigned i = 0; i < 3; i++) {
 		res.args[i].type = static_cast<LLCCEP_exec::arg_t>(_input.get());
-		if (res.args[i].type != LLCCEP_exec::ARG_T_REG &&
-		    res.args[i].type != LLCCEP_exec::ARG_T_MEM &&
-		    res.args[i].type != LLCCEP_exec::ARG_T_VAL &&
-		    res.args[i].type != LLCCEP_exec::ARG_T_COND &&
-		    res.args[i].type != LLCCEP_exec::ARG_T_NO) {
-			throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
-				"Argument type is damaged!\n"))
-		}
-
 		_input.read(reinterpret_cast<char *>(&res.args[i].val),
 			    sizeof(double));
 	}
