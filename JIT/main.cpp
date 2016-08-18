@@ -10,6 +10,7 @@
 #include "program/program.hpp"
 #include "codegen/codegen.hpp"
 #include "../exec/codeReader/codeReader.hpp"
+#include "../exec/signal/signal.hpp"
 
 #include "startup/program.hpp"
 #include "startup/startup.hpp"
@@ -17,6 +18,7 @@
 int main(int argn, char **argv)
 {
 	QCoreApplication app(argn, argv);
+	LLCCEP_exec::cAttachSignalsHandler();
 
 	try {
 		commandLineParametersVM clp;
