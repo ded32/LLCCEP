@@ -4,7 +4,7 @@ INCLUDEPATH += $$PWD/../include/
 CONFIG += gnu++11
 
 
-SOURCES = program/program.cpp \
+SOURCES = codeReader/codeReader.cpp \
           window/window.cpp \
           window/renderer/renderer.cpp \
           softcore/softcore.cpp \
@@ -12,7 +12,7 @@ SOURCES = program/program.cpp \
           ../lib/STDExtras.cpp \
           main.cpp
 
-HEADERS = program/program.hpp \
+HEADERS = codeReader/codeReader.hpp \
           window/window.hpp \
           window/renderer/renderer.hpp \
           softcore/softcore.hpp \

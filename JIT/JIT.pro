@@ -9,7 +9,12 @@ HEADERS = rex/rex.hpp \
           rm-field/rm-field.hpp \
           startup/program.hpp \
           startup/startup.hpp \
-          runtime/runtime.hpp
+          runtime/runtime.hpp \
+          ../exec/softcore/softcore.hpp \
+          ../exec/mm/mm.hpp \
+          ../exec/codeReader/codeReader.hpp \
+          ../exec/window/window.hpp \
+          ../exec/window/renderer/renderer.hpp
 
 SOURCES = codegen/codegen.cpp \
           emitter/emitter.cpp \
@@ -17,4 +22,11 @@ SOURCES = codegen/codegen.cpp \
           rm-field/rm-field.cpp \
           startup/startup.cpp \
           main.cpp \
-    stack-protector/stack-protector.cpp
+          stack-protector/stack-protector.cpp\
+          ../lib/STDExtras.cpp \
+          runtime/runtime.cpp \
+          ../exec/softcore/softcore.cpp \
+          ../exec/mm/mm.cpp \
+          ../exec/codeReader/codeReader.cpp \
+          ../exec/window/window.cpp \
+          ../exec/window/renderer/renderer.cpp

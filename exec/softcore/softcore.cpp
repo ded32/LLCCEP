@@ -18,7 +18,7 @@
 
 #include "./../mm/mm.hpp"
 #include "./../window/window.hpp"
-#include "./../program/program.hpp"
+#include "./../codeReader/codeReader.hpp"
 #include "./../../common/def/def_inst.hpp"
 
 LLCCEP_exec::softcore::softcore():
@@ -27,7 +27,6 @@ LLCCEP_exec::softcore::softcore():
 	_cmp(0b1000),
 	_regs(),
 	_pc(0),
-	_files(),
 	_windows(),
 	_mm(),
 	_reader(),
@@ -313,7 +312,7 @@ void LLCCEP_exec::softcore::emulated_swi(LLCCEP_exec::instruction data)
 		}
 	};
 
-	auto getWindowByID = [](size_t id) {
+	auto getWindowByID = [this](size_t id) {
 		if (id) {
 			throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
 				"Error!\n"
@@ -335,7 +334,7 @@ void LLCCEP_exec::softcore::emulated_swi(LLCCEP_exec::instruction data)
 		}
 	};
 
-	auto noFunction = [](size_t interrupt) {
+	auto noFunction = [this](size_t interrupt) {
 		throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
 			"Error!\n"
 			"No function " size_t_pf " of " size_t_pf " interrupt.\n",
@@ -578,7 +577,7 @@ void LLCCEP_exec::softcore::emulated_swi(LLCCEP_exec::instruction data)
 				    static_cast<size_t>(_regs[2]));
 			wnd->setWindowTitle(_mm->getString(static_cast<size_t>(_regs[3])).c_str());
 			wnd->show();
-			wnd->setWindowFlags(static_cast<size_t>(_regs[4]));
+			wnd->setWindowFlags(Qt::WindowFlags(static_cast<int>(_regs[4])));
 
 			if (static_cast<size_t>(_regs[4]) & Qt::MSWindowsFixedSizeDialogHint) {
 				wnd->setFixedSize(static_cast<size_t>(_regs[1]),
@@ -655,14 +654,14 @@ void LLCCEP_exec::softcore::emulated_swi(LLCCEP_exec::instruction data)
 		case 8: {
 			LLCCEP_exec::window *wnd = getWindowByID(static_cast<size_t>(_regs[1]));
 
-			wnd->setWindowTitle(_mm->getString(static_cast<size_t>(_regs[2])));
+			wnd->setWindowTitle(_mm->getString(static_cast<size_t>(_regs[2])).c_str());
 			break;
 		}
 
 		case 9: {
 			LLCCEP_exec::window *wnd = getWindowByID(static_cast<size_t>(_regs[1]));
 
-			wnd->setWindowFlags(static_cast<size_t>(_regs[2]));
+			wnd->setWindowFlags(Qt::WindowFlags(static_cast<int>(_regs[2])));
 			break;
 		}
 
@@ -681,11 +680,9 @@ void LLCCEP_exec::softcore::emulated_swi(LLCCEP_exec::instruction data)
 		switch (static_cast<size_t>(_regs[0])) {
 		case 0: {
 			QMediaPlayer *mp = new QMediaPlayer;
-			mp->setMedia(QUrl(_mm->getString(static_cast<size_t>(_regs[1]))));
+			mp->setMedia(QUrl(_mm->getString(static_cast<size_t>(_regs[1])).c_str()));
 			mp->setVolume(static_cast<int>(_regs[2]));
 			mp->play();
-
-			_regs[4] = mp->state() == PlayingState;
 
 			delete mp;
 
@@ -693,8 +690,6 @@ void LLCCEP_exec::softcore::emulated_swi(LLCCEP_exec::instruction data)
 		}
 
 		case 1: {
-			QAudioRecorder *rec = new QAudioRecorder;
-
 			break;
 		}
 		}
@@ -820,4 +815,37 @@ void LLCCEP_exec::softcore::emulated_ret(LLCCEP_exec::instruction data)
 
 	_pc = _call.top();
 	_call.pop();
+}
+
+bool LLCCEP_exec::softcore::OK() const
+{
+	return (_cmp & 0b1000) && _mm && _reader &&
+	       (_ready & 0b11);
+}
+
+int *LLCCEP_exec::softcore::getCmpPointer()
+{
+	// Low-level function, no default protection
+	return &_cmp;
+}
+
+double *LLCCEP_exec::softcore::getRegisterPtr(size_t id)
+{
+	// Low-level function, no default protection
+	if (id > 32) {
+		throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
+			"Overbounding while getting pointer "
+			"to register!"))
+	}
+
+	return &(_regs[id]);
+}
+
+LLCCEP_exec::memoryManager *LLCCEP_exec::softcore::getMemoryManager()
+{
+	if (!_mm || !*_mm) {
+		throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
+			"memoryManager is not OK!"))
+	}
+	return _mm;
 }

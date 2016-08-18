@@ -8,7 +8,7 @@
 
 #include "./../mm/mm.hpp"
 #include "./../window/window.hpp"
-#include "./../program/program.hpp"
+#include "./../codeReader/codeReader.hpp"
 
 namespace LLCCEP_exec {
 	class softcore {
@@ -55,8 +55,9 @@ namespace LLCCEP_exec {
 
 		bool OK() const;
 
-		int *getCmpPointer() const;
-		double *getRegisterPtr(size_t id) const;
+		int *getCmpPointer();
+		double *getRegisterPtr(size_t id);
+		memoryManager *getMemoryManager();
 
 	private:
 		::std::stack<double>_stk;

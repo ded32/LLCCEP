@@ -1,5 +1,5 @@
-#ifndef EXEC_PROGRAM_HPP
-#define EXEC_PROGRAM_HPP
+#ifndef EXEC_CODEREADER_HPP
+#define EXEC_CODEREADER_HPP
 
 #include <STDExtras.hpp>
 
@@ -53,4 +53,4 @@ namespace LLCCEP_exec {
 	};
 }
 
-#endif // EXEC_PROGRAM_HPP
+#endif // EXEC_CODEREADER_HPP

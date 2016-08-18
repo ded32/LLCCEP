@@ -9,7 +9,7 @@
 #include <convert.hpp>
 #include <os-specific.hpp>
 
-#include "program.hpp"
+#include "codeReader.hpp"
 
 #define CHECK_PROGRAM_READER(cond) \
 	DEFAULT_CHECK_BLOCK(cond, this, OK());

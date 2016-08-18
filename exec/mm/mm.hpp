@@ -2,6 +2,7 @@
 #define EXEC_MM_HPP
 
 #include <cstddef>
+#include <string>
 
 namespace LLCCEP_exec {
 	class memoryManager {
@@ -16,9 +17,12 @@ namespace LLCCEP_exec {
 		void writeString(size_t offset, ::std::string str);
 
 		size_t getMemSize() const;
+		void *getMemBeginning() const;
 
 		double operator[](size_t id) const;
 		double &operator[](size_t id);
+
+		operator bool() const;
 
 	protected:
 		bool OK() const;
