@@ -82,6 +82,8 @@ size_t LLCCEP_exec::memoryManager::getMemSize() const
 
 void *LLCCEP_exec::memoryManager::getMemBeginning() const
 {
+	MM_OK_BLOCK
+
 	return reinterpret_cast<void *>(getMemBeginning());
 }
 
@@ -113,11 +115,6 @@ double &LLCCEP_exec::memoryManager::operator[](size_t id)
 	}
 
 	return _mem[id];
-}
-
-LLCCEP_exec::memoryManager:: operator bool() const
-{
-	return OK();
 }
 
 bool LLCCEP_exec::memoryManager::OK() const

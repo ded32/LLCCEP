@@ -27,11 +27,12 @@ namespace LLCCEP_exec {
 
 		QPainter &painter() const;
 		QImage getImage() const;
+
+		bool OK() const;
 		
 	protected:
 		virtual void paintEvent(QPaintEvent *event) Q_DECL_OVERRIDE;
 		virtual void resizeEvent(QResizeEvent *event) Q_DECL_OVERRIDE;
-		bool OK() const;
 		
 	private:
 		QPainter *_painter;

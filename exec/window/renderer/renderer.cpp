@@ -108,6 +108,11 @@ QImage LLCCEP_exec::renderer::getImage() const
 	return _pix->toImage();
 }
 
+bool LLCCEP_exec::renderer::OK() const
+{
+	return _painter && _pix && _started;
+}
+
 void LLCCEP_exec::renderer::paintEvent(QPaintEvent *event)
 {
 	(void)event;
@@ -174,9 +179,4 @@ void LLCCEP_exec::renderer::resizeEvent(QResizeEvent *event)
 	}
 
 	Q_ASSERT(OK());
-}
-
-bool LLCCEP_exec::renderer::OK() const
-{
-	return _painter && _pix && _started;
 }

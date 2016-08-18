@@ -22,9 +22,6 @@ namespace LLCCEP_exec {
 		double operator[](size_t id) const;
 		double &operator[](size_t id);
 
-		operator bool() const;
-
-	protected:
 		bool OK() const;
 
 	private:

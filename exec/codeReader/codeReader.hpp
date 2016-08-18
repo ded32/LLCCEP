@@ -43,7 +43,6 @@ namespace LLCCEP_exec {
 		codeData getProgramData() const;
 		void closeInput();
 
-	protected:
 		bool OK() const;
 
 	private:

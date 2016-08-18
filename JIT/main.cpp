@@ -48,8 +48,6 @@ int main(int argn, char **argv)
 		LLCCEP_JIT::call(prog);
 		LLCCEP_JIT::delete_program(prog);
 
-		::std::cout << *reinterpret_cast<double *>(rm.getRegPtr(0));
-
 		mm.freeElements();
 		cr.closeInput();
 	} catch (LLCCEP::runtime_exception &exc) {

@@ -103,13 +103,22 @@ LLCCEP_exec::instruction LLCCEP_exec::codeReader::getInstruction(size_t id)
 	_input.seekg(_data.offset + id * 28);
 	res.opcode = _input.get();
 
-	if (res.opcode > LLCCEP_ASM::INST_NUM) {
+	if (res.opcode >= LLCCEP_ASM::INST_NUM) {
 		throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
-			"Opcode overbound!\n"))
+			"Opcode is overbounded!\n"))
 	}
 
 	for (unsigned i = 0; i < 3; i++) {
 		res.args[i].type = static_cast<LLCCEP_exec::arg_t>(_input.get());
+		if (res.args[i].type != LLCCEP_exec::ARG_T_REG &&
+		    res.args[i].type != LLCCEP_exec::ARG_T_MEM &&
+		    res.args[i].type != LLCCEP_exec::ARG_T_VAL &&
+		    res.args[i].type != LLCCEP_exec::ARG_T_COND &&
+		    res.args[i].type != LLCCEP_exec::ARG_T_NO) {
+			throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
+				"Argument type is damaged!\n"))
+		}
+
 		_input.read(reinterpret_cast<char *>(&res.args[i].val),
 			    sizeof(double));
 	}
