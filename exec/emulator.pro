@@ -23,3 +23,5 @@ HEADERS = codeReader/codeReader.hpp \
           mm/mm.hpp \
           signal/signal.hpp \
           messageBox/messageBox.hpp
+
+TARGET  = "LLCCEP Emulator"
