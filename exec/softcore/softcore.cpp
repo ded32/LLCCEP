@@ -1,4 +1,5 @@
 #include <QColor>
+#include <QEventLoop>
 #include <QMediaPlayer>
 #include <QAudioRecorder>
 #include <QUrl>
@@ -63,8 +64,12 @@ void LLCCEP_exec::softcore::executeProgram()
 
 	_pc = _reader->getProgramData().main_id;
 
-	while (!_quit)
+	while (!_quit) {
 		executeNextInstruction();
+
+		QEventLoop ev;
+		ev.processEvents(QEventLoop::AllEvents, 100);
+	}
 
 	if (_windows.size())
 		QApplication::exit();
@@ -114,7 +119,7 @@ double LLCCEP_exec::softcore::get(LLCCEP_exec::arg data)
 	default:
 		throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
 			"Error!\n"
-			"Invalid or damaged binary file: invalid reading!PC - %lg\n", _pc));
+			"Invalid or damaged binary file: invalid reading!\n"));
 	}
 
 	return 0;

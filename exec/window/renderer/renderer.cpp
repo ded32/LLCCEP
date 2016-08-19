@@ -7,6 +7,7 @@
 #include <QPainter>
 #include <QPaintEvent>
 #include <QResizeEvent>
+#include <QTimer>
 
 #include <algorithm>
 
@@ -14,6 +15,7 @@
 
 LLCCEP_exec::renderer::renderer(QWidget *parent /*= 0*/):
 	QWidget(parent),
+	_timer(0),
 	_painter(0),
 	_pix(0),
 	_antialiased(false),
@@ -40,6 +42,10 @@ void LLCCEP_exec::renderer::begin(int sX, int sY)
 	_painter->setFont(QFont("Courier")); // Cross-platform monospace font
 
 	_started = true;
+
+	_timer = new QTimer(this);
+	connect(_timer, SIGNAL(timeout()), this, SLOT(update()));
+	_timer->start(100);
 }
 
 void LLCCEP_exec::renderer::setAffineTransformData(

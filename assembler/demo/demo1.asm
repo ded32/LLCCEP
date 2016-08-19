@@ -31,7 +31,10 @@ _drawPoint:
     mov $00, &00
     mov $01, &01
     mov $02, &02
+    mov $03, &03
 
+    top &03
+    pop
     top &02
     pop
     top &01
@@ -43,6 +46,7 @@ _drawPoint:
     mov &00, $00
     mov &01, $01
     mov &02, $02
+    mov $03, &03
     ret
    
 _main:
@@ -72,10 +76,12 @@ _drawingLoop:
     mul &08, &07, &07
     cmp &08, 640
     jmp @ae, _drawingLoopLeave
-    push &07
+    mul &09, &07, 10
+    push &01
+    push &09
     push &08
     call @al, _drawPoint
-    inc &07
+    add &07, &07, 0.01
     jmp @al, _drawingLoop
 
 _drawingLoopLeave:

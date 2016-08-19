@@ -35,6 +35,7 @@ namespace LLCCEP_exec {
 		virtual void resizeEvent(QResizeEvent *event) Q_DECL_OVERRIDE;
 		
 	private:
+		QTimer *_timer;
 		QPainter *_painter;
 		QPixmap *_pix;
 		bool _antialiased;
