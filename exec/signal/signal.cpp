@@ -1,10 +1,10 @@
-#include <QMessageBox>
 #include <csignal>
 #include <map>
 
 #include <STDExtras.hpp>
 #include <convert.hpp>
 
+#include "../messageBox/messageBox.hpp"
 #include "signal.hpp"
 
 void LLCCEP_exec::cAttachSignalsHandler()
@@ -31,12 +31,12 @@ void LLCCEP_exec::cSignalsHandler(int signo)
 	::std::string msg = ::std::string("Program was interrupted by a signal(") +
 			    to_string(signo) + ::std::string("):\n") + sigmsg[signo] +
 			    ::std::string("\n");
-	QMessageBox mb;
-	mb.setText("Program was interrupted by a signal.");
-	mb.setInformativeText(msg.c_str());
-	mb.setStandardButtons(QMessageBox::Close);
-	mb.setIcon(QMessageBox::Critical);
-	mb.exec();
+
+	messageBox("Program was interrupted by a signal",
+		   msg.c_str(),
+		   QMessageBox::Close,
+		   QMessageBox::Close,
+		   QMessageBox::Critical).spawn();
 
 	QUITE_ERROR(yes, "%s", msg.c_str())
 }

@@ -3,7 +3,7 @@
 #include <QKeyEvent>
 #include <QMouseEvent>
 #include <QPoint>
-#include <QMessageBox>
+#include "../messageBox/messageBox.hpp"
 #include "renderer/renderer.hpp"
 
 #include "window.hpp"
@@ -45,17 +45,14 @@ void LLCCEP_exec::window::closeEvent(QCloseEvent *event)
 	if (_mayClose) {
 		event->accept();
 	} else {
-		QMessageBox mb;
-		mb.setWindowTitle(windowTitle());
-		mb.setText("Program is still executing!\n");
-		mb.setInformativeText("Terminating it now may cause\n"
-				      "problems with the future execution.\n"
-				      "Do you really want to quit?");
-		mb.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
-		mb.setDefaultButton(QMessageBox::Yes);
-		mb.setIcon(QMessageBox::Warning);
+		int res = LLCCEP_exec::messageBox("Program is still executing!\n",
+						  "Terminating it now may cause\n"
+						  "problems with the future execution.\n"
+						  "Do you really want to quit?",
+						  QMessageBox::No | QMessageBox::Yes,
+						  QMessageBox::No, QMessageBox::Warning).spawn();
 
-		if (mb.exec() == QMessageBox::Yes) {
+		if (res == QMessageBox::Yes) {
 			end();
 			event->accept();
 		} else {

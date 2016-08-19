@@ -8,6 +8,7 @@
 #include <STDExtras.hpp>
 #include <command-line.hpp>
 
+#include "messageBox/messageBox.hpp"
 #include "codeReader/codeReader.hpp"
 #include "softcore/softcore.hpp"
 #include "mm/mm.hpp"
@@ -63,6 +64,11 @@ int main(int argn, char **argv)
 
 		windows.clear();
 	} catch (::LLCCEP::runtime_exception &exc) {
+		LLCCEP_exec::messageBox("Program was interrupted by an exception",
+					exc.msg(),
+					QMessageBox::Close,
+					QMessageBox::Close,
+					QMessageBox::Critical).spawn();
 		QUITE_ERROR(yes, "%s", exc.msg());
 	} DEFAULT_HANDLING
 

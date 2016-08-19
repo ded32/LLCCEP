@@ -12,7 +12,8 @@ SOURCES = codeReader/codeReader.cpp \
           signal/signal.cpp \
           ../lib/STDExtras.cpp \
           ../lib/command-line.cpp \
-          main.cpp
+          main.cpp \
+    messageBox/messageBox.cpp
 
 HEADERS = codeReader/codeReader.hpp \
           window/window.hpp \
@@ -20,4 +21,5 @@ HEADERS = codeReader/codeReader.hpp \
           softcore/softcore.hpp \
           softcore/fp.hpp \
           mm/mm.hpp \
-          signal/signal.hpp
+          signal/signal.hpp \
+          messageBox/messageBox.hpp

@@ -37,7 +37,7 @@
 #define FATAL_ERROR(quit, place, fmt, ...) \
 ({ \
 	::std::fprintf(stderr, "Fatal error in " place \
-	                       ":\n%s file\n%d line\n%s function\n" fmt, \
+	                       ":\n%s file\n%d line\n%s function\n" fmt "\n", \
 	                       __FILE__, __LINE__, __PRETTY_FUNCTION__, ##__VA_ARGS__); \
 	\
 	if (quit) \
@@ -46,7 +46,7 @@
 
 #define QUITE_ERROR(quit, fmt, ...) \
 ({ \
-	::std::fprintf(stderr, fmt, ##__VA_ARGS__); \
+	::std::fprintf(stderr, fmt "\n", ##__VA_ARGS__); \
 	\
 	if (quit) \
 		::std::exit(EXIT_SUCCESS); \
