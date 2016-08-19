@@ -1,7 +1,9 @@
+#include <QMessageBox>
 #include <csignal>
 #include <map>
 
 #include <STDExtras.hpp>
+#include <convert.hpp>
 
 #include "signal.hpp"
 
@@ -26,6 +28,15 @@ void LLCCEP_exec::cSignalsHandler(int signo)
 		{SIGTERM, "Termination requested by application."}
 	};
 
-	QUITE_ERROR(yes, "Program was interrupted by a signal(%d):\n%s",
-			 signo, sigmsg[signo].c_str())
+	::std::string msg = ::std::string("Program was interrupted by a signal(") +
+			    to_string(signo) + ::std::string("):\n") + sigmsg[signo] +
+			    ::std::string("\n");
+	QMessageBox mb;
+	mb.setText("Program was interrupted by a signal.");
+	mb.setInformativeText(msg.c_str());
+	mb.setStandardButtons(QMessageBox::Close);
+	mb.setIcon(QMessageBox::Critical);
+	mb.exec();
+
+	QUITE_ERROR(yes, "%s", msg.c_str())
 }

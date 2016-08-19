@@ -53,6 +53,7 @@ void LLCCEP_exec::window::closeEvent(QCloseEvent *event)
 				      "Do you really want to quit?");
 		mb.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
 		mb.setDefaultButton(QMessageBox::Yes);
+		mb.setIcon(QMessageBox::Warning);
 
 		if (mb.exec() == QMessageBox::Yes) {
 			end();
