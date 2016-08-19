@@ -71,8 +71,12 @@ void LLCCEP_exec::softcore::executeProgram()
 		ev.processEvents(QEventLoop::AllEvents, 100);
 	}
 
-	if (_windows.size())
-		QApplication::exit();
+	if (_windows.size()) {
+		for (const auto &i: _windows)
+			i->setMayClose();
+	} else {
+		QApplication::quit();
+	}
 }
 
 ::std::vector<LLCCEP_exec::window *> LLCCEP_exec::softcore::getWindows() const

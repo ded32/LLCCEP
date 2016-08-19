@@ -9,6 +9,7 @@ SOURCES = codeReader/codeReader.cpp \
           window/renderer/renderer.cpp \
           softcore/softcore.cpp \
           mm/mm.cpp \
+          signal/signal.cpp \
           ../lib/STDExtras.cpp \
           ../lib/command-line.cpp \
           main.cpp
@@ -18,4 +19,5 @@ HEADERS = codeReader/codeReader.hpp \
           window/renderer/renderer.hpp \
           softcore/softcore.hpp \
           softcore/fp.hpp \
-          mm/mm.hpp
+          mm/mm.hpp \
+          signal/signal.hpp

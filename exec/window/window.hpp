@@ -19,6 +19,9 @@ namespace LLCCEP_exec {
 		QPoint getMousePos();
 		int getMouseButtons();
 
+		void setMayClose(bool newMayClose = true);
+		bool mayClose() const;
+
 	protected:
 		virtual void closeEvent(QCloseEvent *event) Q_DECL_OVERRIDE;
 		virtual void keyEvent(QKeyEvent *event);
@@ -27,6 +30,7 @@ namespace LLCCEP_exec {
 		bool _kb[0xFF + 1];
 		QPoint _mousePos;
 		int _mouseButtons;
+		bool _mayClose;
 	};
 }
 

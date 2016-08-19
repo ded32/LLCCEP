@@ -11,10 +11,13 @@
 #include "codeReader/codeReader.hpp"
 #include "softcore/softcore.hpp"
 #include "mm/mm.hpp"
+#include "signal/signal.hpp"
 
 int main(int argn, char **argv)
 {
 	QApplication app(argn, argv);
+	LLCCEP_exec::cAttachSignalsHandler();
+
 	::std::vector<LLCCEP_exec::window *> windows;
 	int ret = 0;
 
@@ -53,8 +56,10 @@ int main(int argn, char **argv)
 
 		ret = app.exec();
 
-		for (const auto &i: windows)
+		for (const auto &i: windows) {
+			i->close();
 			delete i;
+		}
 
 		windows.clear();
 	} catch (::LLCCEP::runtime_exception &exc) {

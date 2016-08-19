@@ -26,6 +26,6 @@ void LLCCEP_exec::cSignalsHandler(int signo)
 		{SIGTERM, "Termination requested by application."}
 	};
 
-	QUITE_ERROR(yes, "Program was interrupted by a (%d) signal: %s",
+	QUITE_ERROR(yes, "Program was interrupted by a signal(%d):\n%s",
 			 signo, sigmsg[signo].c_str())
 }
