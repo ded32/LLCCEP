@@ -12,8 +12,8 @@ namespace LLCCEP_exec {
 		ARG_T_REG  = 0,
 		ARG_T_MEM  = 1,
 		ARG_T_VAL  = 2,
-		ARG_T_NO   = 4,
-		ARG_T_COND = 5
+		ARG_T_COND = 3,
+		ARG_T_NO   = 5
 	};
 
 	struct arg {
