@@ -46,6 +46,11 @@ namespace LLCCEP_ASM {
 
 				for (int pass = 0; pass < 2; pass++) {
 					if (pass) {
+						if (find_main() == labels_table.end()) {
+							throw RUNTIME_EXCEPTION(CONSTRUCT_MSG("Error!\n"
+											      "'_main', required as entry point, was not declared in this scope\n"))
+						}
+						
 						out << static_cast<uint8_t>(sizeof(size_t));
 						dump_bytes(out, to_bytes((*(find_main())).second));
 					}
@@ -66,12 +71,6 @@ namespace LLCCEP_ASM {
 							
 							continue;
 						} else if (program.size() && !is_label(program)) {
-							if (find_main() == labels_table.end()) {
-								throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
-									"Error!\n"
-									"'_main', required as entry point, was not declared in this scope\n"))
-							}
-
 							substitute_labels_with_addresses(labels_table, program);
 
 							LLCCEP_ASM::op prep = prepare_op(program);

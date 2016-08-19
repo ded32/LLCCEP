@@ -55,7 +55,8 @@ int main(int argn, char **argv)
 		// Release codeReader data
 		cr.closeInput();
 
-		ret = app.exec();
+		if (windows.size())
+			ret = app.exec();
 
 		for (const auto &i: windows) {
 			i->close();

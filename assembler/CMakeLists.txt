@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.6)
 project(assembler)
 
-set(CMAKE_CXX_FLAGS "-O2 -std=c++11")
+set(CMAKE_CXX_FLAGS "-g -O0 -std=c++11")
 
 include_directories("${CMAKE_SOURCE_DIR}/../include/")
 
