@@ -29,6 +29,7 @@ LLCCEP_exec::renderer::renderer(QWidget *parent /*= 0*/):
 LLCCEP_exec::renderer::~renderer()
 {
 	end();
+	delete _timer;
 }
 
 void LLCCEP_exec::renderer::begin(int sX, int sY)
@@ -45,7 +46,7 @@ void LLCCEP_exec::renderer::begin(int sX, int sY)
 
 	_timer = new QTimer(this);
 	connect(_timer, SIGNAL(timeout()), this, SLOT(update()));
-	_timer->start(100);
+	_timer->start(30);
 }
 
 void LLCCEP_exec::renderer::setAffineTransformData(

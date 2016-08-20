@@ -3,6 +3,7 @@ QT += widgets multimedia
 INCLUDEPATH += $$PWD/../include/
 CONFIG += gnu++11
 
+QMAKE_LFLAGS += -v
 
 SOURCES = codeReader/codeReader.cpp \
           window/window.cpp \
@@ -13,7 +14,7 @@ SOURCES = codeReader/codeReader.cpp \
           ../lib/STDExtras.cpp \
           ../lib/command-line.cpp \
           main.cpp \
-    messageBox/messageBox.cpp
+          messageBox/messageBox.cpp
 
 HEADERS = codeReader/codeReader.hpp \
           window/window.hpp \
