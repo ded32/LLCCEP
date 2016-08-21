@@ -11,17 +11,17 @@
 #include "preprocessor.hpp"
 
 LLCCEP_ASM::preprocessor::preprocessor():
-	_in(),
+	_in(0),
 	_macros(),
 	_line(0)
 { }
 
-LLCCEP_ASM::preprocessor::preprocessor(::std::string inputPath):
-	_in(),
+LLCCEP_ASM::preprocessor::preprocessor(::std::ifstream *input):
+	_in(0),
 	_macros(),
 	_line(0)
 {
-	setPreprocessingFile(inputPath);
+	setPreprocessingFile(input);
 }
 
 LLCCEP_ASM::preprocessor::~preprocessor()
@@ -30,23 +30,24 @@ LLCCEP_ASM::preprocessor::~preprocessor()
 		_in.close();
 }
 
-void LLCCEP_ASM::preprocessor::setPreprocessingFile(::std::string inputPath)
+void LLCCEP_ASM::preprocessor::setPreprocessingFile(::std::ifstream *input)
 {
-	try {
-		_in.exceptions(::std::ifstream::failbit);
-		_in.open(inputPath);
-	} catch (::std::ios_base::failure &data) {
+	if (!input) {
 		throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
-			"Can't open file '%s' for preprocessing: %s!",
-			data.what()))
+			"An attempt of setting preprocessor's file to "
+			"null!"))
 	}
+	
+	_in = input;
 }
 
 void LLCCEP_ASM::preprocessor::buildPreprocessingTable()
 {
-	auto hasMacroBeginning = [](::std::vector<lexem> &lex) {
+	auto hasMacroBeginning = [](::std::vector<LLCCEP_ASM::lexem> &lex) {
 		for (size_t i = 0; i < lex.size(); i++) {
-			if (lex[i].type !=)
+			if (lex[i].type == LLCCEP_ASM::LEX_T_MACRO) {
+				
+			}
 		}
 		
 		return false;

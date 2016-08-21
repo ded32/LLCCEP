@@ -12,10 +12,10 @@ namespace LLCCEP_ASM {
 	class preprocessor {
 	public:
 		preprocessor();
-		explicit preprocessor(::std::string inputPath);
+		explicit preprocessor(::std::ifstream *input);
 		~preprocessor();
 		
-		void setPreprocessingFile(::std::string inputPath);
+		void setPreprocessingFile(::std::ifstream *input);
 		void buildPreprocessingTable();
 		void preprocessNextLine(::std::vector<lexem> &out);
 		
@@ -30,7 +30,7 @@ namespace LLCCEP_ASM {
 			::std::vector<lexem> _substitution;
 		};
 		
-		::std::ifstrem _in;
+		::std::ifstream *_in;
 		::std::vector<macro> _macros;
 		size_t _line;
 	};

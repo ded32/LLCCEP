@@ -4,6 +4,9 @@
 #include <string>
 #include <vector>
 #include <cstddef>
+#include <cstdint>
+
+#include <autoReleasePointer.hpp>
 
 namespace LLCCEP_ASM {
 	enum lex_t: uint8_t { 
@@ -11,29 +14,54 @@ namespace LLCCEP_ASM {
 		LEX_T_MEM      = 1,
 		LEX_T_VAL      = 2,
 		LEX_T_COND     = 3,
-		LEX_T_NAME     = 4,
-		LEX_T_NO       = 5,
-		LEX_T_COLON    = 6,
-		LEX_T_MACRO    = 7,
-		LEX_T_ENDMACRO = 8,
-		LEX_T_INVALID  = 9
+		LEX_T_MACROARG = 4,
+		LEX_T_NAME     = 5,
+		LEX_T_MACRO    = 6,
+		LEX_T_ENDMACRO = 7,
+		LEX_T_NO       = 8,
+		LEX_T_COLON    = 9,
+		LEX_T_INVALID  = 10
 	};
 
 	struct lexem {
 		lex_t type;
 		::std::string val;
+		char numberSystem;
 
 		struct lexemPosition {
 			::std::string file;
 			size_t line;
 		} pos;
 		
-		::std::unique
+		LLCCEP::autoReleasePointer<lexem> expansionData;
 	};
 
-	void to_lexems(::std::string str, ::std::vector<lexem> &lex, 
-	               ::std::string file, size_t line);
-	::std::string get_lexem_typename(lex_t type);
+	class lexer {
+	public:
+		lexer();
+		~lexer();
+		
+		void setProcessingPath(::std::string path);
+		void setProcessingFile(::std::istream *in);
+		void getNextLine(::std::vector<lexem> &lex);
+	
+		bool ok() const;
+		
+	protected:
+		void lexerIssue(const char *fmt, ...);
+		
+	private:
+		::std::string _path;
+		size_t _line;
+		::std::istream *_in;
+		bool _started;
+	};
+	
+	::std::string getLexemTypename(lex_t type);
+	
+	int64_t isInstruction(::std::string str);
+	int64_t isCondition(::std::string str);
+	bool isNumSystem(char c);
 }
 
 #endif // ASSEMBLER_LEXER_HPP

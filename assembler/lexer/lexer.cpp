@@ -1,153 +1,211 @@
 #include <string>
+#include <map>
 #include <vector>
 #include <cctype>
-#include <cstdio>
 #include <cstddef>
-#include <cassert>
-#include <new>
+#include <cstdarg>
 
 #include <convert.hpp>
 #include <STDExtras.hpp>
 #include <os-specific.hpp>
 
+#include "./../common/def/def_inst.hpp"
+#include "./../common/def/def_cond.hpp"
+
 #include "lexer.hpp"
 
-#define PARSE_ISSUE(file, line, fmt, ...) CONSTRUCT_MSG("Parsing issue:\n%s:" size_t_pf ":\n" fmt "\n", file, line, ##__VA_ARGS__)
+#define LEXER_OK DEFAULT_CHECK_BLOCK(true, this, ok())
+#define LEXER_NOT_OK DEFAULT_CHECK_BLOCK(false, this, ok())
 
-namespace LLCCEP_ASM {
-	void to_lexems(::std::string data, ::std::vector<lexem> &lex, 
-	               ::std::string file, size_t line)
-	{
-		auto isskip = [](char c) {
-			return (isspace(c) || (c == ','));
-		};
+LLCCEP_ASM::lexer::lexer():
+	_path(),
+	_line(1),
+	_in(0),
+	_started(false)
+{ }
 
-		size_t i = 0, l = data.length();
-		lexem curr = {};
+LLCCEP_ASM::lexer::~lexer()
+{ }
 
-		while (i < l) {
-			curr.pos.file = file;
-			curr.pos.line = line;
-			if (data[i] == ':') {
-				curr.type = LEX_T_COLON;
-				i++;
-			} else if (data[i] == '&') {
-				curr.type = LEX_T_REG;
-				i++;
-
-				while (isdigit(data[i])) {
-					curr.val += data[i];
-					i++;
-				}
-			} else if (data[i] == '$') {
-				curr.type = LEX_T_MEM;
-				i++;
-
-				while (isdigit(data[i])) {
-					curr.val += data[i];
-					i++;
-				}
-			} else if (data[i] == '"') {
-				curr.type = LEX_T_VAL;
-				i++;
-
-				::std::string tmp = "";
-
-				while (data[i] && data[i] != '\n' && data[i] != '"') {
-					tmp += data[i];
-					i++;
-				}
-
-				if (data[i] != '"') {
-					throw RUNTIME_EXCEPTION(PARSE_ISSUE(
-						file.c_str(),
-						line,
-						"Unclosed char declaration: %s",
-						tmp.c_str()))
-				}
-
-				if (tmp.length() != 1) {
-					throw RUNTIME_EXCEPTION(PARSE_ISSUE(
-						file.c_str(),
-						line,
-						"Invalid length of char declaration!"))
-				}
-
-				i++;
-
-				curr.val = to_string(static_cast<int>(tmp[0]));
-			} else if (data[i] == '@') {
-				i++;
-				curr.type = LEX_T_COND;
-
-				::std::string temporary = "";
-				while (data[i] && !isskip(data[i])) {
-					temporary += data[i];
-					i++;
-				}
-
-				curr.val = temporary;
-			} else if (isalpha(data[i]) || data[i] == '_') {
-				curr.type = LEX_T_NAME;
-
-				while (isalnum(data[i]) || data[i] == '_') {
-					curr.val += data[i];
-					i++;
-				}
-			} else if (isdigit(data[i]) || data[i] == '-' || data[i] == '.') {
-				curr.type = LEX_T_VAL;
-
-				while (isdigit(data[i]) || data[i] == '.' || data[i] == '-') {
-					curr.val += data[i];
-					i++;
-				}	
-			} else if (isskip(data[i])) {
-				while (data[i] && isskip(data[i]))
-					i++;
-
-				continue;
-			} else if (!data[i] || data[i] == ';' || data[i] == '#') {
-				break;
-			} else {
-				lex.clear();
-				
-				throw RUNTIME_EXCEPTION(PARSE_ISSUE(
-					file.c_str(), 
-					line, 
-					"Forbidden character '%c'!\n",
-					data[i]))
-			}
-
-			lex.push_back(curr);
-
-			curr.type = LEX_T_INVALID;
-			curr.val = "";
-			curr.pos.file = "";
-			curr.pos.line = 0;
-		}
-	}
+void LLCCEP_ASM::lexer::setProcessingPath(::std::string path)
+{
+	LEXER_NOT_OK
 	
-	::std::string get_lexem_typename(lex_t type)
-	{
-		::std::string names[] = {
-			"register",
-			"memory address",
-			"numeric value",
-			"name",
-		 	"none",
-			"condition",
-			"colon",
-			"invalid"
-		};
-
-		int id = static_cast<int>(type);
-		if (id < 0 || id > 7) {
-			throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
-						"Typename id overflow"))
-		}
-
-		return names[id];
-	}
+	_path = path;
 }
 
-#undef PARSE_ISSUE
+void LLCCEP_ASM::lexer::setProcessingFile(::std::istream *in)
+{
+	LEXER_NOT_OK
+	
+	_in = in;
+	_started = true;
+	
+	LEXER_OK
+}
+
+void LLCCEP_ASM::lexer::getNextLine(::std::vector<LLCCEP_ASM::lexem> &lex)
+{
+	LEXER_OK
+	
+	auto nameApproached = [](char c, bool first = true) {
+		return isalpha(c) || c == '_' || ((first)?(0):(isdigit(c)));
+	};
+	
+	auto toLower = [](::std::string val) {
+		::std::string res;
+		
+		for (size_t i = 0; i < val.length(); i++)
+			res += tolower(val[i]);
+		
+		return res;
+	};
+	
+	::std::string tmpString;
+	::std::getline(*_in, tmpString);
+	size_t i = 0, l = tmpString.length();
+	
+	while (i < l) {
+		LLCCEP_ASM::lexem tmp{};
+		
+		if (nameApproached(tmpString[i])) {
+			while (tmpString[i] && nameApproached(tmpString[i], false)) {
+				tmp.val += tmpString[i];
+				i++;
+			}
+			
+			if (toLower(tmp.val) == "macro") {
+				tmp.type = LEX_T_MACRO;
+			} else if (toLower(tmp.val) == "endmacro") {
+				tmp.type = LEX_T_ENDMACRO;
+			} else if (LLCCEP_ASM::isInstruction(toLower(tmp.val)) > 0) {
+				tmp.type = LEX_T_NAME;
+				tmp.val = toLower(tmp.val);
+			} else {
+				tmp.type = LEX_T_NAME;
+			}
+		} else if (isdigit(tmpString[i])) {
+			while (tmpString[i] && isxdigit(tmpString[i])) {
+				tmp.val += tmpString[i];
+				i++;
+			}
+			
+			if (LLCCEP_ASM::isNumSystem(tmpString[i]))
+				tmp.numberSystem = tolower(tmpString[i]);;
+		} else if (tmpString[i] == '&') {
+			tmp.type = LEX_T_REG;
+			i++;
+			
+			while (tmpString[i] && isdigit(tmpString[i])) {
+				tmp.val += tmpString[i];
+				i++;
+			}
+		} else if (tmpString[i] == '$') {
+			tmp.type = LEX_T_MEM;
+			i++;
+			
+			while (tmpString[i] && isxdigit(tmpString[i])) {
+				tmp.val += tmpString[i];
+				i++;
+			}
+			
+			if (isNumSystem(tmpString[i]))
+				tmp.numberSystem = tolower(tmpString[i]);;
+		} else if (tmpString[i] == '%') {
+			tmp.type = LEX_T_MACROARG;
+			i++;
+			
+			while (tmpString[i] && isdigit(tmpString[i])) {
+				tmp.val += tmpString[i];
+				i++;
+			}
+		} else if (tmpString[i] == '@') {
+			tmp.type = LEX_T_COND;
+			i++;
+			
+			while (tmpString[i] && nameApproached(tmpString[i], false)) {
+				tmp.val += tmpString[i];
+				i++;
+			}
+		} else if (tmpString[i] == '#' || tmpString[i] == ';') {
+			break;
+		} else if (tmpString[i] == ' ' || tmpString[i] == ',') {
+			while (tmpString[i] == ' ' || tmpString[i] == ',')
+				i++;
+			
+			continue;
+		} else {
+			lexerIssue("Forbidden character '%c'!", tmpString[i]);
+		}
+		
+		lex.push_back(tmp);
+	}
+	
+	_line++;
+	
+	LEXER_OK
+}
+
+bool LLCCEP_ASM::lexer::ok() const
+{
+	return _line && _in && _started;
+}
+
+void LLCCEP_ASM::lexer::lexerIssue(const char *fmt, ...)
+{
+	va_list list;
+	va_start(list, fmt);
+	
+	char issueMessage[4096];
+	vsprintf(issueMessage, fmt, list);
+	va_end(list);
+	
+	throw RUNTIME_EXCEPTION(CONSTRUCT_MSG("%s", issueMessage));
+}
+
+::std::string LLCCEP_ASM::getLexemTypename(LLCCEP_ASM::lex_t type)
+{
+	const ::std::map<LLCCEP_ASM::lex_t, ::std::string> typenames = {
+		{LEX_T_REG,      "register"},
+		{LEX_T_MEM,      "memory address"},
+		{LEX_T_VAL,      "numeric value"},
+		{LEX_T_COND,     "condition mnemonic"},
+		{LEX_T_MACROARG, "macro argument"},
+		{LEX_T_NAME,     "name"},
+		{LEX_T_NO,       "none"},
+		{LEX_T_COLON,    "colon"},
+		{LEX_T_MACRO,    "'macro' string"},
+		{LEX_T_ENDMACRO, "'endmacro' string"},
+		{LEX_T_INVALID,  "invalid"}
+	};
+	
+	if (typenames.find(type) == typenames.end()) {
+		throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
+			"Overbounding while getting lexem's typename: no lexem type %d!",
+			static_cast<int>(type)))
+	}
+	
+	return typenames.at(type);
+}
+
+int64_t LLCCEP_ASM::isInstruction(::std::string str)
+{
+	for (int64_t i = 0; i < LLCCEP_ASM::INST_NUM; i++) {
+		if (str == LLCCEP_ASM::INSTRUCTIONS[i].name)
+			return i;
+	}
+	
+	return -1;
+}
+
+int64_t LLCCEP_ASM::isCondition(::std::string str)
+{
+	return ((LLCCEP_ASM::CONDS.find(str) == LLCCEP_ASM::CONDS.end())?
+		(-1):
+		(LLCCEP_ASM::CONDS.at(str)));
+}
+
+bool LLCCEP_ASM::isNumSystem(char c)
+{
+	return (c == 'b') || (c == 'd') || (c == 'o') || (c == 'h');
+}
