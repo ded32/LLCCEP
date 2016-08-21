@@ -114,6 +114,7 @@ catch (::std::exception &exc) {\
 	} \
 }
 
+::std::string getAbsolutePath(::std::string relpath);
 void dump_bytes(::std::ostream &out, ::std::vector<uint8_t> list);
 
 #endif // INCLUDE_STDEXTRAS_HPP

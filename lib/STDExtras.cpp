@@ -1,3 +1,17 @@
+#ifdef UNICODE
+#undef UNICODE
+#endif
+
+#ifdef _UNICODE
+#undef _UNICODE
+#endif
+
+#if defined(_WIN32)
+#include <windows.h>
+#elif !defined(__linux__) && !defined(__MACH__)
+#error Undefined OS
+#endif
+
 #include <cstdio>
 #include <cstdlib>
 #include <climits>
@@ -71,6 +85,25 @@ namespace LLCCEP {
 	{
 		return runtime_error::what();	
 	}
+}
+
+::std::string getAbsolutePath(::std::string relpath)
+{
+	::std::string res;
+	
+#if defined(__linux__) || defined(__MACH__)
+	char *fullpath = realpath(relpath.c_str(), 0);
+	res = fullpath;
+	delete fullpath;
+#elif defined(_WIN32)
+	char fullpath[PATH_MAX] = "";
+	GetFullPathName(relpath.c_str(), MAX_PATH, fullpath, 0);
+	res = fullpath;
+#else
+#error Undefined OS.
+#endif
+	
+	return res;
 }
 
 void dump_bytes(::std::ostream &out, ::std::vector<uint8_t> list)

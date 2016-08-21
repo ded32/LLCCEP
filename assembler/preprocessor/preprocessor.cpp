@@ -30,34 +30,17 @@ LLCCEP_ASM::preprocessor::~preprocessor()
 		_in.close();
 }
 
-void LLCCEP_ASM::preprocessor::setPreprocessingFile(::std::ifstream *input)
+void LLCCEP_ASM::preprocessor::setPreprocessingPath(::std::string path)
 {
-	if (!input) {
-		throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
-			"An attempt of setting preprocessor's file to "
-			"null!"))
-	}
 	
-	_in = input;
 }
 
-void LLCCEP_ASM::preprocessor::buildPreprocessingTable()
+void LLCCEP_ASM::preprocessor::setPreprocessingFile(::std::ifstream *input)
 {
-	auto hasMacroBeginning = [](::std::vector<LLCCEP_ASM::lexem> &lex) {
-		for (size_t i = 0; i < lex.size(); i++) {
-			if (lex[i].type == LLCCEP_ASM::LEX_T_MACRO) {
-				
-			}
-		}
-		
-		return false;
-	};
+	PREPROCESSOR_NOT_OK
 	
-	while (!_in.eof()) {
-		::std::string tmpLine;
-		::std::vector<lexem> lex;
-		
-		::std::getline(_in, tmpLine);
-		LLCCEP_ASM::to_lexems(tmpLine, );
-	}
+	_in = input;
+	_started = true;
+	
+	PREPROCESSOR_OK
 }

@@ -3,7 +3,7 @@
 
 #include <string>
 #include <vector>
-#include <fstream>
+#include <iostream>
 #include <cstddef>
 
 #include "./../lexer/lexer.hpp"
@@ -12,12 +12,15 @@ namespace LLCCEP_ASM {
 	class preprocessor {
 	public:
 		preprocessor();
-		explicit preprocessor(::std::ifstream *input);
 		~preprocessor();
 		
-		void setPreprocessingFile(::std::ifstream *input);
-		void buildPreprocessingTable();
+		void setPreprocessingPath(::std::string path);
+		void setPreprocessingFile(::std::istream *input);
+		
+		void processIncludes();
+		void buildMacroTable();
 		void preprocessNextLine(::std::vector<lexem> &out);
+		::std::vector<::std::string> getProcessingOrder();
 		
 	protected:
 		void fillMacroTable();
@@ -32,7 +35,8 @@ namespace LLCCEP_ASM {
 		
 		::std::ifstream *_in;
 		::std::vector<macro> _macros;
-		size_t _line;
+		::std::vector<::std::string> _processingOrder;
+		bool _started;
 	};
 }
 
