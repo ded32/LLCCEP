@@ -1,7 +1,7 @@
 QT += widgets multimedia
 
 INCLUDEPATH += $$PWD/../include/
-CONFIG += gnu++11
+CONFIG += gnu++14
 
 QMAKE_LFLAGS += -v
 
