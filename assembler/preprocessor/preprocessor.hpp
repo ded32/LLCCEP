@@ -3,6 +3,7 @@
 
 #include <string>
 #include <vector>
+#include <stack>
 #include <iostream>
 #include <cstddef>
 
@@ -17,26 +18,29 @@ namespace LLCCEP_ASM {
 		void setPreprocessingPath(::std::string path);
 		void setPreprocessingFile(::std::istream *input);
 		
-		void processIncludes();
+		//void processIncludes();
 		void buildMacroTable();
-		void preprocessNextLine(::std::vector<lexem> &out);
-		::std::vector<::std::string> getProcessingOrder();
+		void preprocessCode(::std::vector<lexem> in, ::std::vector<lexem> &out);
+		//::std::vector<::std::string> getProcessingOrder();
 		
+		bool ok() const;
+
 	protected:
-		void fillMacroTable();
-		void addMacro(::std::vector<lexem> lexemData);
-		
+		void preprocessingIssue(size_t line, const char *fmt, ...);
+
 	private:
 		struct macro {
-			::std::string _macroName;
+			lexem _macroData;
 			size_t _amountOfArguments;
 			::std::vector<lexem> _substitution;
 		};
 		
-		::std::ifstream *_in;
-		::std::vector<macro> _macros;
-		::std::vector<::std::string> _processingOrder;
+		::std::istream *_in;
+		::std::string _path;
 		bool _started;
+		
+		::std::vector<macro> _macros;
+		::std::vector<::std::string> _processingOrder; // reversed
 	};
 }
 

@@ -75,16 +75,18 @@ void LLCCEP_ASM::lexer::getNextLine(::std::vector<LLCCEP_ASM::lexem> &lex)
 			}
 			
 			if (toLower(tmp.val) == "macro") {
-				tmp.type = LEX_T_MACRO;
+				tmp.type = LLCCEP_ASM::LEX_T_MACRO;
 			} else if (toLower(tmp.val) == "endmacro") {
-				tmp.type = LEX_T_ENDMACRO;
+				tmp.type = LLCCEP_ASM::LEX_T_ENDMACRO;
 			} else if (LLCCEP_ASM::isInstruction(toLower(tmp.val)) > 0) {
-				tmp.type = LEX_T_NAME;
+				tmp.type = LLCCEP_ASM::LEX_T_NAME;
 				tmp.val = toLower(tmp.val);
 			} else {
-				tmp.type = LEX_T_NAME;
+				tmp.type = LLCCEP_ASM::LEX_T_NAME;
 			}
 		} else if (isdigit(tmpString[i])) {
+			tmp.type = LLCCEP_ASM::LEX_T_VAL;
+
 			while (tmpString[i] && isxdigit(tmpString[i])) {
 				tmp.val += tmpString[i];
 				i++;
@@ -93,7 +95,7 @@ void LLCCEP_ASM::lexer::getNextLine(::std::vector<LLCCEP_ASM::lexem> &lex)
 			if (LLCCEP_ASM::isNumSystem(tmpString[i]))
 				tmp.numberSystem = tolower(tmpString[i]);;
 		} else if (tmpString[i] == '&') {
-			tmp.type = LEX_T_REG;
+			tmp.type = LLCCEP_ASM::LEX_T_REG;
 			i++;
 			
 			while (tmpString[i] && isdigit(tmpString[i])) {
@@ -101,7 +103,7 @@ void LLCCEP_ASM::lexer::getNextLine(::std::vector<LLCCEP_ASM::lexem> &lex)
 				i++;
 			}
 		} else if (tmpString[i] == '$') {
-			tmp.type = LEX_T_MEM;
+			tmp.type = LLCCEP_ASM::LEX_T_MEM;
 			i++;
 			
 			while (tmpString[i] && isxdigit(tmpString[i])) {
@@ -112,7 +114,7 @@ void LLCCEP_ASM::lexer::getNextLine(::std::vector<LLCCEP_ASM::lexem> &lex)
 			if (isNumSystem(tmpString[i]))
 				tmp.numberSystem = tolower(tmpString[i]);;
 		} else if (tmpString[i] == '%') {
-			tmp.type = LEX_T_MACROARG;
+			tmp.type = LLCCEP_ASM::LEX_T_MACROARG;
 			i++;
 			
 			while (tmpString[i] && isdigit(tmpString[i])) {
@@ -120,13 +122,16 @@ void LLCCEP_ASM::lexer::getNextLine(::std::vector<LLCCEP_ASM::lexem> &lex)
 				i++;
 			}
 		} else if (tmpString[i] == '@') {
-			tmp.type = LEX_T_COND;
+			tmp.type = LLCCEP_ASM::LEX_T_COND;
 			i++;
 			
 			while (tmpString[i] && nameApproached(tmpString[i], false)) {
 				tmp.val += tmpString[i];
 				i++;
 			}
+		} else if (tmpString[i] == ':') {
+			tmp.type = LLCCEP_ASM::LEX_T_COLON;
+			i++;
 		} else if (tmpString[i] == '#' || tmpString[i] == ';') {
 			break;
 		} else if (tmpString[i] == ' ' || tmpString[i] == ',') {
