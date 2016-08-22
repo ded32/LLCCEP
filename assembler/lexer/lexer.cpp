@@ -67,7 +67,9 @@ void LLCCEP_ASM::lexer::getNextLine(::std::vector<LLCCEP_ASM::lexem> &lex)
 	
 	while (i < l) {
 		LLCCEP_ASM::lexem tmp{};
-		
+		tmp.pos.file = _path;
+		tmp.pos.line = _line;
+
 		if (nameApproached(tmpString[i])) {
 			while (tmpString[i] && nameApproached(tmpString[i], false)) {
 				tmp.val += tmpString[i];

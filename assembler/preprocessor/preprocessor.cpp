@@ -98,8 +98,9 @@ void LLCCEP_ASM::preprocessor::buildMacroTable()
 			if (lexems[0].type == LLCCEP_ASM::LEX_T_ENDMACRO && lexems.size() > 1) {
 				preprocessingIssue(lexems[0].pos.line, "Junk data after 'endmacro'!");
 			} else if (_in->eof()) {
-				preprocessingIssue(0, "No 'endmacro' to match macro '%s' definition at line " size_t_pf,
-						   newMacro._macroData.val.c_str(), newMacro._macroData.pos.line);
+				preprocessingIssue(newMacro._macroData.pos.line, 
+						   "No 'endmacro' to match macro '%s' definition",
+						   newMacro._macroData.val.c_str());
 			}
 		}
 	};
@@ -107,7 +108,7 @@ void LLCCEP_ASM::preprocessor::buildMacroTable()
 	lex.setProcessingPath(_path);
 	lex.setProcessingFile(_in);
 
-	_in->seekg(0, _in->beg);
+	_in->seekg(0);
 	
 	while (!_in->eof()) {
 		lexems.clear();
@@ -116,7 +117,7 @@ void LLCCEP_ASM::preprocessor::buildMacroTable()
 		addMacro();
 	}
 	
-	_in->seekg(0, _in->beg);
+	_in->seekg(0);
 	
 	PREPROCESSOR_OK
 }

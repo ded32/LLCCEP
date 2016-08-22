@@ -1,5 +1,6 @@
 #include <iostream>
 #include <fstream>
+#include <cerrno>
 
 #include "./../lexer/lexer.hpp"
 #include "preprocessor.hpp"
@@ -23,7 +24,7 @@ void dump(::std::vector<LLCCEP_ASM::lexem> lexems)
 int main(int argn, char **argv)
 {
 	if (argn != 2) {
-		::std::cerr << "invalid usage!";
+		::std::cerr << "Invalid usage!\n";
 		return EINVAL;
 	}
 
@@ -41,16 +42,16 @@ int main(int argn, char **argv)
 		prep.setPreprocessingFile(&in);
 		prep.buildMacroTable();
 
-		in.seekg(0, in.beg);
 		while (!in.eof()) {
 			::std::vector<LLCCEP_ASM::lexem> _in;
-			::std::vector<LLCCEP_ASM::lexem> _out;
+			//::std::vector<LLCCEP_ASM::lexem> _out;
 
 			lex.getNextLine(_in);
-			prep.preprocessCode(_in, _out);
+			
+			//prep.preprocessCode(_in, _out);
 
 			dump(_in);
-			dump(_out);
+			//dump(_out);
 		}
 	} catch (::std::ios_base::failure &data) {
 		QUITE_ERROR(yes, "Can't open '%s': %s",
