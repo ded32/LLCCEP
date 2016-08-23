@@ -165,7 +165,7 @@ void LLCCEP_ASM::lexer::lexerIssue(const char *fmt, ...)
 	vsprintf(issueMessage, fmt, list);
 	va_end(list);
 	
-	throw RUNTIME_EXCEPTION(CONSTRUCT_MSG("%s", issueMessage));
+	throw RUNTIME_EXCEPTION(CONSTRUCT_MSG("%s:" size_t_pf "%s", _path.c_str(), _line, issueMessage));
 }
 
 ::std::string LLCCEP_ASM::getLexemTypename(LLCCEP_ASM::lex_t type)
