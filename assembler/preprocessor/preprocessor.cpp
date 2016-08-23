@@ -120,7 +120,26 @@ void LLCCEP_ASM::preprocessor::preprocessCode(::std::vector<LLCCEP_ASM::lexem> i
 			auto macroData = findMacro(i->val);
 			if (macroData._amountOfArguments > in.end() - i) {
 				preprocessingIssue(*i, "Not enough arguments"
-						       "for '%s' macro")
+						       "for '%s' macro");
+			}
+
+			::std::vector<LLCCEP_ASM::lexem> args;
+			args.insert(args.begin(), i + 1, i + 1 + macroData._amountOfArguments);
+			for (const auto &i: macroData._substitution) {
+				if (i.type == LLCCEP_ASM::LEX_T_MACROARG) {
+					size_t argN = from_string<size_t>(i.val);
+					if (argN >= macroData._amountOfArguments) {
+						preprocessingIssue(i, 
+								   "Macro's argument id overbound: at least " size_t_pf "allowed!",
+								   macroData._amountOfArguments);
+					}
+
+					out.push_back(args[argN]);
+			}
+
+			i += 1 + macroData._amountOfArguments;
+		} else {
+			out.push_back(*i);
 		}
 	}
 }
