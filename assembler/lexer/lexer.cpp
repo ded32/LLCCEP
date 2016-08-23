@@ -93,9 +93,6 @@ void LLCCEP_ASM::lexer::getNextLine(::std::vector<LLCCEP_ASM::lexem> &lex)
 				tmp.val += tmpString[i];
 				i++;
 			}
-			
-			if (LLCCEP_ASM::isNumSystem(tmpString[i]))
-				tmp.numberSystem = tolower(tmpString[i]);;
 		} else if (tmpString[i] == '&') {
 			tmp.type = LLCCEP_ASM::LEX_T_REG;
 			i++;
@@ -112,9 +109,6 @@ void LLCCEP_ASM::lexer::getNextLine(::std::vector<LLCCEP_ASM::lexem> &lex)
 				tmp.val += tmpString[i];
 				i++;
 			}
-			
-			if (isNumSystem(tmpString[i]))
-				tmp.numberSystem = tolower(tmpString[i]);;
 		} else if (tmpString[i] == '%') {
 			tmp.type = LLCCEP_ASM::LEX_T_MACROARG;
 			i++;

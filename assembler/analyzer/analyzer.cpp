@@ -1,5 +1,15 @@
 #include <vector>
+#include <map>
+#include <string>
+
 #include <STDExtras.hpp>
+#include <convert.hpp>
+#include <STLExtras.hpp>
+
+#include <stdio.h>
+#include <cstdarg>
+
+#include "./../../common/def/def_inst.hpp"
 
 #include "./../lexer/lexer.hpp"
 #include "analyzer.hpp"
@@ -12,7 +22,7 @@ LLCCEP_ASM::analyzer::~analyzer()
 
 void LLCCEP_ASM::analyzer::analyze(::std::vector<LLCCEP_ASM::lexem> lex)
 {
-	auto argumentsMismatch = [this](LLCCEP_ASM::lexem lex, LLCCEP_ASM::lex_t t1) {
+	auto argumentsMismatch = [this](LLCCEP_ASM::lexem lexemData, LLCCEP_ASM::lex_t t1) {
 		::std::map<LLCCEP_ASM::lex_t, ::std::vector<LLCCEP_ASM::lex_t> > supportedMap = {
 			{LLCCEP_ASM::LEX_T_REG,  {LLCCEP_ASM::LEX_T_REG}},
 			{LLCCEP_ASM::LEX_T_MEM,  {LLCCEP_ASM::LEX_T_REG, LLCCEP_ASM::LEX_T_MEM}},
@@ -20,18 +30,15 @@ void LLCCEP_ASM::analyzer::analyze(::std::vector<LLCCEP_ASM::lexem> lex)
 			{LLCCEP_ASM::LEX_T_COND, {LLCCEP_ASM::LEX_T_COND}}
 		};
 
-		auto found = supportedMap.find(lex.type);
+		auto found = supportedMap.find(t1);
 		if (found == supportedMap.end()) {
-			analyzerIssue("Lexem of type '%s' shouldn't appear on analyzis step!\n",
-			              LLCCEP_ASM::getLexemTypename(lex.type));
+			analyzerIssue("undefined", 0,
+				      "Lexem of type '%s' shouldn't appear on analyzis step!",
+			              LLCCEP_ASM::getLexemTypename(lexemData.type).c_str());
 		}
 
-		for (const auto &i: supportedMap[lex.type]) {
-			if (lex.type == i)
-				return false;
-		}
-
-		return true;
+		auto data = supportedMap[t1];
+		return (vec_find(data, lexemData.type) == data.end());
 	};
 
 	if (!lex.size())
@@ -51,15 +58,28 @@ void LLCCEP_ASM::analyzer::analyze(::std::vector<LLCCEP_ASM::lexem> lex)
 	}
 
 	for (unsigned i = 1; i < lex.size(); i++) {
-		if (argumentsMismatch(lex[i], INSTRUCTIONS[pos_inst].types[i - 1])) {
+		if (argumentsMismatch(lex[i], LLCCEP_ASM::INSTRUCTIONS[instructionFound].types[i - 1])) {
 			analyzerIssue(lex[i].pos.file, lex[i].pos.line,
 			              "Conflicting type of %u argument of "
 				      "'%s' instruction.\n"
 				      "'%s' is required, instead of '%s'.\n",
 				      i, lex[0].val.c_str(),
 				      LLCCEP_ASM::getLexemTypename(
-					      INSTRUCTIONS[pos_inst].types[i - 1]),
-				      LLCCEP_ASM::getLexemTypename(lex[i].type));
+					      LLCCEP_ASM::INSTRUCTIONS[instructionFound].types[i - 1]).c_str(),
+				      LLCCEP_ASM::getLexemTypename(lex[i].type).c_str());
 		}
 	}
+}
+
+void LLCCEP_ASM::analyzer::analyzerIssue(::std::string file, size_t line, const char *fmt, ...)
+{
+	va_list list;
+	va_start(list, fmt);
+
+	char res[4096];
+	vsprintf(res, (file + ::std::string(":") + to_string<size_t>(line) + ::std::string(":\n") + ::std::string(fmt)).c_str(), list);
+
+	va_end(list);
+
+	throw RUNTIME_EXCEPTION(CONSTRUCT_MSG("%s", res));
 }
