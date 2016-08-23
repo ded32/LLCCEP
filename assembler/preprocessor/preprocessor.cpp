@@ -21,7 +21,7 @@ LLCCEP_ASM::preprocessor::preprocessor():
 LLCCEP_ASM::preprocessor::~preprocessor()
 { }
 
-bool LLCCEP_ASM::preprocessor::buildMacroTable(::std::vector<lexem> lexems)
+bool LLCCEP_ASM::preprocessor::buildMacroTable(::std::vector<LLCCEP_ASM::lexem> lexems)
 {
 	::std::vector<lexem> in;
 	preprocessCode(lexems, in);
@@ -79,17 +79,53 @@ void LLCCEP_ASM::preprocessor::processMacroTable()
 	}
 }
 
-void LLCCEP_ASM::preprocessor::preprocessCode(::std::vector<lexem> in, ::std::vector<lexem> &out)
+void LLCCEP_ASM::preprocessor::preprocessCode(::std::vector<LLCCEP_ASM::lexem> in, ::std::vector<LLCCEP_ASM::lexem> &out)
 {
 	preprocessCode(in, out, ::std::vector<::std::string>{});
 }
 
-void LLCCEP_ASM::preprocessor::preprocessCode(::std::vector<lexem> in, ::std::vector<lexem> &out, ::std::vector<::std::string> forbidden)
+void LLCCEP_ASM::preprocessor::preprocessCode(::std::vector<LLCCEP_ASM::lexem> in, ::std::vector<LLCCEP_ASM::lexem> &out, ::std::vector<::std::string> forbidden)
 {
+	auto findMacro = [this](::std::string name) {
+		for (auto i = _macros.begin();
+		     i < _macros.end();
+		     i++) {
+			if (name == i->_macroData.val)
+				return i;
+		}
 
+		return _macros.end();
+	};
+
+	auto shouldBeReplaced = [this, findMacro](LLCCEP_ASM::lexem data) {
+		return data.type == LLCCEP_ASM::LEX_T_NAME && 
+		       findMacro(data.val) != _macros.end(); 
+	};
+
+	auto isForbidden = [forbidden](LLCCEP_ASM::lexem data) {
+		for (const auto &i: forbidden)
+			if (data.val == i.val)
+				return true;
+
+		return false;
+	};
+
+	for (auto i = in.begin(); i < in.end(); i++) {
+		if (shouldBeReplaced(*i)) {
+			if (isForbidden(*i)) {
+				preprocessingIssue(*i, "Looped macro '%s'",
+						   i->val.c_str());
+			}
+
+			auto macroData = findMacro(i->val);
+			if (macroData._amountOfArguments > in.end() - i) {
+				preprocessingIssue(*i, "Not enough arguments"
+						       "for '%s' macro")
+		}
+	}
 }
 
-void LLCCEP_ASM::preprocessor::preprocessingIssue(lexem issuedLexem, const char *fmt, ...)
+void LLCCEP_ASM::preprocessor::preprocessingIssue(LLCCEP_ASM::lexem issuedLexem, const char *fmt, ...)
 {
 	va_list list;
 	va_start(list, fmt);
