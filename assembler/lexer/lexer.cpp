@@ -80,6 +80,10 @@ void LLCCEP_ASM::lexer::getNextLine(::std::vector<LLCCEP_ASM::lexem> &lex)
 				tmp.type = LLCCEP_ASM::LEX_T_MACRO;
 			} else if (toLower(tmp.val) == "endmacro") {
 				tmp.type = LLCCEP_ASM::LEX_T_ENDMACRO;
+			} else if (toLower(tmp.val) == "var") {
+				tmp.type = LLCCEP_ASM::LEX_T_VAR;
+			} else if (toLower(tmp.val) == "release") {
+				tmp.type = LLCCEP_ASM::LEX_T_RELEASE;
 			} else if (LLCCEP_ASM::isInstruction(toLower(tmp.val)) > 0) {
 				tmp.type = LLCCEP_ASM::LEX_T_NAME;
 				tmp.val = toLower(tmp.val);
@@ -177,6 +181,8 @@ void LLCCEP_ASM::lexer::lexerIssue(const char *fmt, ...)
 		{LEX_T_COLON,    "colon"},
 		{LEX_T_MACRO,    "'macro' string"},
 		{LEX_T_ENDMACRO, "'endmacro' string"},
+		{LEX_T_VAR,      "'var' string"},
+		{LEX_T_RELEASE,  "'release' string"},
 		{LEX_T_INVALID,  "invalid"}
 	};
 	
