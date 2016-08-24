@@ -145,7 +145,7 @@ void LLCCEP_ASM::lexer::getNextLine(::std::vector<LLCCEP_ASM::lexem> &lex)
 		
 		lex.push_back(tmp);
 	}
-	
+
 	_line++;
 	
 	LEXER_OK
@@ -183,6 +183,7 @@ void LLCCEP_ASM::lexer::lexerIssue(const char *fmt, ...)
 		{LEX_T_ENDMACRO, "'endmacro' string"},
 		{LEX_T_VAR,      "'var' string"},
 		{LEX_T_RELEASE,  "'release' string"},
+		{LEX_T_NEWLINE,  "new line"},
 		{LEX_T_INVALID,  "invalid"}
 	};
 	

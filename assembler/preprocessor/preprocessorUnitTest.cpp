@@ -9,6 +9,9 @@ void dumpLexem(LLCCEP_ASM::lexem lexemData)
 {
 	::std::cout << "-> Lexem data: " << lexemData.val 
 	            << "(" << LLCCEP_ASM::getLexemTypename(lexemData.type) << ")\n";
+
+	if (lexemData.expansionData)
+		::std::cout << "Exanded from macro '" << static_cast<LLCCEP_ASM::lexem *>(lexemData.expansionData)->val << "\n";
 }
 
 void dump(::std::vector<LLCCEP_ASM::lexem> lexems)
@@ -33,7 +36,7 @@ int main(int argn, char **argv)
 			lex.getNextLine(_in);
 			
 			if (!prep.buildMacroTable(_in)) {
-				prep.dump();
+				prep.processMacroTable();
 				prep.preprocessCode(_in, _out);
 
 				dump(_in);

@@ -24,10 +24,13 @@ namespace LLCCEP_ASM {
 
 		void preprocessCode(::std::vector<lexem> in, ::std::vector<lexem> &out);
 
-		void dump() const;
-
 	protected:
-		void preprocessCode(::std::vector<lexem> in, ::std::vector<lexem> &out, ::std::vector<::std::string> forbidden);
+		::std::vector<macro>::iterator findMacro(::std::string name);
+		bool shouldBeReplaced(LLCCEP_ASM::lexem data);
+
+		void preprocessCode(::std::vector<lexem> in, 
+				    ::std::vector<lexem> &out, 
+				    ::std::vector<::std::string> forbidden);
 		void preprocessingIssue(lexem issuedLexem, const char *fmt, ...);
 
 	private:	

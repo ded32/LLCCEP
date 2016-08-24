@@ -6,7 +6,19 @@
 #include <iostream>
 
 namespace LLCCEP_ASM {
-	void compile(::std::vector<::std::string> in_paths, ::std::ostream &out);
+	class compiler {
+	public:
+		compiler();
+		~compiler();
+
+		void setProcessingFiles(::std::vector<::std::istream *> in,
+				        ::std::ostream *out);
+		void compile();
+
+	private:
+		::std::vector<::std::istream *> _in;
+		::std::ostream *_out;
+	};
 }
 
 #endif // ASSEMBLER_COMPILER_HPP
