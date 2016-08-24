@@ -20,8 +20,6 @@ namespace LLCCEP_ASM {
 		~preprocessor();
 				
 		bool buildMacroTable(::std::vector<lexem> in);
-		void processMacroTable();
-
 		void preprocessCode(::std::vector<lexem> in, ::std::vector<lexem> &out);
 
 	protected:

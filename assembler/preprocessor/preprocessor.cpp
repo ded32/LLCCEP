@@ -81,23 +81,8 @@ bool LLCCEP_ASM::preprocessor::buildMacroTable(::std::vector<LLCCEP_ASM::lexem> 
 	return false;
 }
 
-void LLCCEP_ASM::preprocessor::processMacroTable()
-{
-	for (auto &i: _macros) {
-		::std::vector<LLCCEP_ASM::lexem> newSubstitution;
-		preprocessCode(i._substitution, newSubstitution, 
-			       ::std::vector<::std::string>{i._macroData.val});
-			
-		i._substitution.clear();
-		i._substitution.insert(i._substitution.begin(),
-		                       newSubstitution.begin(),
-				       newSubstitution.end());
-	}
-}
-
 void LLCCEP_ASM::preprocessor::preprocessCode(::std::vector<LLCCEP_ASM::lexem> in, ::std::vector<LLCCEP_ASM::lexem> &out)
 {
-	processMacroTable();
 	preprocessCode(in, out, ::std::vector<::std::string>{});
 }
 
@@ -166,7 +151,7 @@ void LLCCEP_ASM::preprocessor::preprocessCode(::std::vector<LLCCEP_ASM::lexem> i
 			}
 
 			::std::vector<LLCCEP_ASM::lexem> args;
-			args.insert(args.begin(), i + 1, i + 1 + macroData->_amountOfArguments);
+			args.insert(args.begin(), i + 1, i + macroData->_amountOfArguments);
 			for (auto &i: macroData->_substitution) {
 				if (i.type == LLCCEP_ASM::LEX_T_MACROARG) {
 					size_t argN = from_string<size_t>(i.val);
@@ -182,7 +167,7 @@ void LLCCEP_ASM::preprocessor::preprocessCode(::std::vector<LLCCEP_ASM::lexem> i
 				}
 			}
 
-			i += macroData->_amountOfArguments + 1;
+			i += macroData->_amountOfArguments;
 		} else {
 			out.push_back(*i);
 		}

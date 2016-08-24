@@ -2,23 +2,34 @@
 #define ASSEMBLER_CODEGEN_HPP
 
 #include <vector>
-#include <fstream>
+#include <iostream>
 
 #include "../lexer/lexer.hpp"
 
 namespace LLCCEP_ASM {
-	struct arg {
-		lex_t type;
-		double value;
-	};
+	class codeGenerator {
+		struct arg {
+			lex_t type;
+			double value;
+		};
 
-	struct op {
-		uint8_t instruction;
-		arg args[3];
-	};
+		struct op {
+			uint8_t instruction;
+			arg args[3];
+		};
 
-	op prepare_op(::std::vector<lexem> &lex);
-	void dump_bitset(::std::ostream &out, op addr);
+	public:
+		codeGenerator();
+		~codeGenerator();
+
+		void setOutput(::std::ostream *out);
+
+		op prepareOperation(::std::vector<lexem> &lex);
+		void dumpOperationBitset(op data);
+
+	private:
+		::std::ostream *_out;
+	};
 }
 
 #endif // ASSEMBLER_CODEGEN_HPP
