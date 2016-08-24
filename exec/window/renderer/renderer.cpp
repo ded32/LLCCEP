@@ -126,8 +126,7 @@ void LLCCEP_exec::renderer::paintEvent(QPaintEvent *event)
 
 	QPainter painter(this);
 
-	if (_antialiased)
-		painter.setRenderHint(QPainter::Antialiasing);
+	painter.setRenderHint(QPainter::Antialiasing, _antialiased);
 
 	if (!_locked && OK()) // only if initialization has been proceeded
 		painter.drawPixmap(0, 0, *_pix);
