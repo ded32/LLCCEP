@@ -8,6 +8,7 @@
 
 namespace LLCCEP_ASM {
 	class codeGenerator {
+	public:
 		struct arg {
 			lex_t type;
 			double value;
@@ -18,7 +19,6 @@ namespace LLCCEP_ASM {
 			arg args[3];
 		};
 
-	public:
 		codeGenerator();
 		~codeGenerator();
 

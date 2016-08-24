@@ -1,6 +1,10 @@
 #include <vector>
 #include <iostream>
 
+#include <STDExtras.hpp>
+#include <convert.hpp>
+
+#include "../analyzer/analyzer.hpp"
 #include "../lexer/lexer.hpp"
 
 #include "codegen.hpp"
@@ -33,17 +37,17 @@ LLCCEP_ASM::codeGenerator::op LLCCEP_ASM::codeGenerator::prepareOperation(
 	res.instruction = LLCCEP_ASM::isInstruction(lex[0].val);
 	for (unsigned i = 0; i < 3; i++) {
 		if (i >= lex.size() - 1) {
-			res.args[i].type = LLCCEP_ASM::LEX_T_NONE;
+			res.args[i].type = LLCCEP_ASM::LEX_T_NO;
 		} else {
 			res.args[i].type = lex[i + 1].type;
-			res.args[i].type = from_string<double>(lex[i + 1].val);
+			res.args[i].value = from_string<double>(lex[i + 1].val);
 		}
 	}
 
 	return res;
 }
 
-void dumpOperationBitset(LLCCEP_ASM::codeGenerator::op data)
+void LLCCEP_ASM::codeGenerator::dumpOperationBitset(LLCCEP_ASM::codeGenerator::op data)
 {
 	auto dumpDouble = [this](double val) {
 		for (size_t i = 0; i < sizeof(double); i++)
@@ -54,6 +58,6 @@ void dumpOperationBitset(LLCCEP_ASM::codeGenerator::op data)
 
 	for (unsigned i = 0; i < 3; i++) {
 		*_out << static_cast<uint8_t>(data.args[i].type);
-		dumpDouble(data.args[i].val);
+		dumpDouble(data.args[i].value);
 	}
 }
