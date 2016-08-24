@@ -3,6 +3,7 @@
 #include <fstream>
 #include <cstddef>
 #include <cstdarg>
+#include <iostream>
 #include <ios>
 
 #include <STDExtras.hpp>
@@ -46,16 +47,20 @@ bool LLCCEP_ASM::preprocessor::buildMacroTable(::std::vector<LLCCEP_ASM::lexem> 
 			}
 
 			_processingMacro = false;
-		} else {
+		} else if (in[0].type == LEX_T_MACRO) {
+			preprocessingIssue(in[0], "Not allowed to declare macro inside macro");
+		} else {		
 			if (!_macros.size()) {
 				preprocessingIssue(in[0],
 						   "Macro's lexem with no "
 						   "macro");
 			}
 
-			auto insertTo = (_macros.end() - 1)->_substitution;
+			auto &insertTo = (_macros.end() - 1)->_substitution;
 			insertTo.insert(insertTo.end(), in.begin(), in.end());
 		}
+
+		return true;
 	} else if (correctMacroDirective()) {
 		if (in.size() > 4) {
 			preprocessingIssue(in[0], 
@@ -63,25 +68,44 @@ bool LLCCEP_ASM::preprocessor::buildMacroTable(::std::vector<LLCCEP_ASM::lexem> 
 					   "directive.");
 		}
 
-		macro newMacro{in[1], from_string<size_t>(in[3])};
+		macro newMacro{in[1], from_string<size_t>(in[3].val)};
 		_macros.push_back(newMacro);
 		_processingMacro = true;
+	
+		return true;
+	} else if (in[0].type == LLCCEP_ASM::LEX_T_ENDMACRO) {
+		preprocessingIssue(in[0], "No 'macro' directive to match this 'endmacro'.");
 	}
+
+	return false;
 }
 
 void LLCCEP_ASM::preprocessor::processMacroTable()
 {
-	for (const auto &i: _macros) {
+	for (auto &i: _macros) {
 		::std::vector<LLCCEP_ASM::lexem> newSubstitution;
 		preprocessCode(i._substitution, newSubstitution, ::std::vector<::std::string>{i._macroData.val});
 		i._substitution.clear();
-		i._substitution.insert(i._substitution.begin, newSubstitution.begin(), newSubstitution.end());
+		i._substitution.insert(i._substitution.begin(), newSubstitution.begin(), newSubstitution.end());
 	}
 }
 
 void LLCCEP_ASM::preprocessor::preprocessCode(::std::vector<LLCCEP_ASM::lexem> in, ::std::vector<LLCCEP_ASM::lexem> &out)
 {
 	preprocessCode(in, out, ::std::vector<::std::string>{});
+}
+
+void LLCCEP_ASM::preprocessor::dump() const
+{
+	for (const auto &i: _macros) {
+		::std::cout << "'" << i._macroData.val << "' macro: " << i._amountOfArguments 
+		            << " arguments.\nSubstitution:\n\t";
+
+		for (const auto &j: i._substitution)
+			::std::cout << j.val;
+
+		::std::cout << "\n";
+	}
 }
 
 void LLCCEP_ASM::preprocessor::preprocessCode(::std::vector<LLCCEP_ASM::lexem> in, ::std::vector<LLCCEP_ASM::lexem> &out, ::std::vector<::std::string> forbidden)
@@ -104,7 +128,7 @@ void LLCCEP_ASM::preprocessor::preprocessCode(::std::vector<LLCCEP_ASM::lexem> i
 
 	auto isForbidden = [forbidden](LLCCEP_ASM::lexem data) {
 		for (const auto &i: forbidden)
-			if (data.val == i.val)
+			if (data.val == i)
 				return true;
 
 		return false;
@@ -118,26 +142,30 @@ void LLCCEP_ASM::preprocessor::preprocessCode(::std::vector<LLCCEP_ASM::lexem> i
 			}
 
 			auto macroData = findMacro(i->val);
-			if (macroData._amountOfArguments > in.end() - i) {
-				preprocessingIssue(*i, "Not enough arguments"
-						       "for '%s' macro");
+			if (macroData->_amountOfArguments > in.end() - i) {
+				preprocessingIssue(*i, "Not enough arguments "
+						       "for '%s' macro",
+						       macroData->_macroData.val.c_str());
 			}
 
 			::std::vector<LLCCEP_ASM::lexem> args;
-			args.insert(args.begin(), i + 1, i + 1 + macroData._amountOfArguments);
-			for (const auto &i: macroData._substitution) {
+			args.insert(args.begin(), i + 1, i + 1 + macroData->_amountOfArguments);
+			for (const auto &i: macroData->_substitution) {
 				if (i.type == LLCCEP_ASM::LEX_T_MACROARG) {
 					size_t argN = from_string<size_t>(i.val);
-					if (argN >= macroData._amountOfArguments) {
+					if (argN >= macroData->_amountOfArguments) {
 						preprocessingIssue(i, 
 								   "Macro's argument id overbound: at least " size_t_pf "allowed!",
-								   macroData._amountOfArguments);
+								   macroData->_amountOfArguments);
 					}
 
 					out.push_back(args[argN]);
+				} else {
+					out.push_back(i);
+				}
 			}
 
-			i += 1 + macroData._amountOfArguments;
+			i += macroData->_amountOfArguments + 1;
 		} else {
 			out.push_back(*i);
 		}
