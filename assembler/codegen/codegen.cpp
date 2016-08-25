@@ -1,5 +1,5 @@
 #include <vector>
-#include <iostream>
+#include <fstream>
 
 #include <STDExtras.hpp>
 #include <convert.hpp>
@@ -9,23 +9,11 @@
 
 #include "codegen.hpp"
 
-LLCCEP_ASM::codeGenerator::codeGenerator():
-	_out(0)
+LLCCEP_ASM::codeGenerator::codeGenerator()
 { }
 
 LLCCEP_ASM::codeGenerator::~codeGenerator()
 { }
-
-void LLCCEP_ASM::codeGenerator::setOutput(::std::ostream *out)
-{
-	if (!out) {
-		throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
-			"Error!\n"
-			"Given output to codeGenetor is null!\n"));
-	}
-
-	_out = out;
-}
 
 LLCCEP_ASM::codeGenerator::op LLCCEP_ASM::codeGenerator::prepareOperation(
 		::std::vector<lexem> &lex)
@@ -47,17 +35,17 @@ LLCCEP_ASM::codeGenerator::op LLCCEP_ASM::codeGenerator::prepareOperation(
 	return res;
 }
 
-void LLCCEP_ASM::codeGenerator::dumpOperationBitset(LLCCEP_ASM::codeGenerator::op data)
+void LLCCEP_ASM::codeGenerator::dumpOperationBitset(::std::ofstream &out, LLCCEP_ASM::codeGenerator::op data)
 {
-	auto dumpDouble = [this](double val) {
+	auto dumpDouble = [&out](double val) {
 		for (size_t i = 0; i < sizeof(double); i++)
-			*_out << (reinterpret_cast<uint8_t *>(&val))[i];
+			out << reinterpret_cast<uint8_t *>(&val)[i];
 	};
 
-	*_out << static_cast<uint8_t>(data.instruction);
+	out << static_cast<uint8_t>(data.instruction);
 
 	for (unsigned i = 0; i < 3; i++) {
-		*_out << static_cast<uint8_t>(data.args[i].type);
+		out << static_cast<uint8_t>(data.args[i].type);
 		dumpDouble(data.args[i].value);
 	}
 }

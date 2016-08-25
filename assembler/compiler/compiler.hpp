@@ -3,7 +3,7 @@
 
 #include <vector>
 #include <string>
-#include <iostream>
+#include <fstream>
 
 namespace LLCCEP_ASM {
 	class compiler {
@@ -11,13 +11,8 @@ namespace LLCCEP_ASM {
 		compiler();
 		~compiler();
 
-		void setProcessingFiles(::std::vector<::std::istream *> in,
-				        ::std::ostream *out);
-		void compile();
-
-	private:
-		::std::vector<::std::istream *> _in;
-		::std::ostream *_out;
+		void compile(::std::vector<::std::string> in,
+			     ::std::string out);
 	};
 }
 

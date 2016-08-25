@@ -1,9 +1,17 @@
-#ifndef COMPILER_HPP
-#define COMPILER_HPP
-
 #include <vector>
 #include <string>
+#include <fstream>
 #include <iostream>
+
+#include <STDExtras.hpp>
+#include <STLExtras.hpp>
+#include <convert.hpp>
+
+#include "./../lexer/lexer.hpp"
+#include "./../linker/linker.hpp"
+#include "./../codegen/codegen.hpp"
+
+#include "compiler.hpp"
 
 LLCCEP_ASM::compiler::compiler()
 { }
@@ -11,43 +19,66 @@ LLCCEP_ASM::compiler::compiler()
 LLCCEP_ASM::compiler::~compiler()
 { }
 
-void LLCCEP_ASM::compiler::setProcessingFiles(::std::vector<::std::istream *> in,
-                                              ::std::ostream *out)
+void LLCCEP_ASM::compiler::compile(::std::vector<::std::string> in, ::std::string out)
 {
-	for (const auto &i: in) {
-		if (!i) {
-			throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
-				"Met null input file for setProcessingFiles"))
-		}
+	//LLCCEP_ASM::preprocessor prep;
+	LLCCEP_ASM::linker link;
+	LLCCEP_ASM::codeGenerator codegen;
+	size_t pc = 0;
 
-		_in.push_back(i);
-	}
-
-	_out = out;
-
-	if (!_in.size())
-		throw RUNTIME_EXCEPTION(CONSTRUCT_MSG("No input"))
-
-	if (!_out)
-		throw RUNTIME_EXCEPTION(CONSTRUCT_MSG("No output"))
-}
-
-void LLCCEP_ASM::compiler::compile()
-{
-	if (!_in.size() || !_out) {
+	::std::vector<::std::ifstream> inputs;
+	::std::ofstream output(out);
+	if (output.fail()) {
 		throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
-			"No input or output"))
+			"Can't open '%s' as output: %s",
+			out.c_str(), ::std::strerror(errno)));
 	}
 
-	LLCCEP_ASM::lexer lex;
-	LLCCEP_ASM::
+	for (const auto &i: in) {
+		inputs.push_back(::std::ifstream{i});
 
-	for (const auto &i: _in) {
-		if (!i) {
+		if (inputs[inputs.size() - 1].fail()) {
 			throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
-				"Null input at compiling"))
+				"Can't open '%s' as input: %s",
+				i.c_str(), ::std::strerror(errno)));
+		}
+	}
+
+	for (unsigned pass = 0; pass < 2; pass++) { // bi-passage.
+		if (pass) {
+			output << static_cast<uint8_t>(sizeof(size_t));
+			dump_bytes(output, to_bytes(link.getMainAddress()));
 		}
 
+		for (size_t i = 0; i < inputs.size(); i++) {
+			LLCCEP_ASM::lexer lex;
+			lex.setProcessingPath(in[i]);
+			lex.setProcessingFile(&inputs[i]);
 
+			while (!inputs[i].eof()) { // process entire file
+				::std::vector<LLCCEP_ASM::lexem> lexems; // current line's lexems
+				lex.getNextLine(lexems); // get'em
+
+				bool hasDeclaration = link.hasDeclaration(lexems); // has line declaration, or not
+				if (pass) {
+					link.modifyVariablesTable(lexems);	
+					if (!hasDeclaration && lexems.size()) {
+						link.substituteWithAddresses(lexems);	
+		
+						LLCCEP_ASM::codeGenerator::op opData = codegen.prepareOperation(lexems);
+						codegen.dumpOperationBitset(output, opData);
+					}
+				} else {
+					link.buildLabelsAssociativeTable(lexems, pc);
+
+					if (!hasDeclaration && lexems.size())
+						pc++;
+				}
+			}
+
+			reopen_file(inputs[i], in[i]);
+		}
 	}
+
+	output.close();
 }

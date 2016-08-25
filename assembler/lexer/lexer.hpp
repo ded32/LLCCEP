@@ -5,6 +5,7 @@
 #include <vector>
 #include <cstddef>
 #include <cstdint>
+#include <fstream>
 
 #include <autoReleasePointer.hpp>
 
@@ -29,7 +30,6 @@ namespace LLCCEP_ASM {
 	struct lexem {
 		lex_t type;
 		::std::string val;
-		char numberSystem;
 
 		struct lexemPosition {
 			::std::string file;
@@ -45,7 +45,7 @@ namespace LLCCEP_ASM {
 		~lexer();
 		
 		void setProcessingPath(::std::string path);
-		void setProcessingFile(::std::istream *in);
+		void setProcessingFile(::std::ifstream *in);
 		void getNextLine(::std::vector<lexem> &lex);
 	
 		bool ok() const;
@@ -56,7 +56,7 @@ namespace LLCCEP_ASM {
 	private:
 		::std::string _path;
 		size_t _line;
-		::std::istream *_in;
+		::std::ifstream *_in;
 		bool _started;
 	};
 	

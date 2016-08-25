@@ -29,4 +29,22 @@ private:
 	bool _help;
 };
 
+class commandLineParametersAssembler {
+public:
+	commandLineParametersAssembler();
+	~commandLineParametersAssembler();
+
+	void parse(int argn, char **argv);
+	void usage() const;
+
+	::std::vector<::std::string> getInput() const;
+	::std::string getOutput() const;
+	bool getHelpNeeded() const;
+
+private:
+	::std::vector<::std::string> _input;
+	::std::string _output;
+	bool _help;
+};
+
 #endif // INCLUDE_COMMAND_LINE_HPP

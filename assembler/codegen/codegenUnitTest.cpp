@@ -4,6 +4,14 @@
 #include "./../lexer/lexer.hpp"
 #include "codegen.hpp"
 
+void dump(LLCCEP_ASM::codeGenerator::op opData)
+{
+	::std::cout << static_cast<int>(opData.instruction) << "\n";
+
+	for (unsigned i = 0; i < 3; i++)
+		::std::cout << static_cast<int>(opData.args[i].value);
+}
+
 int main()
 {
 	try {
@@ -19,9 +27,10 @@ int main()
 		while ((lexems.size())?(lexems[0].val != "exit"):(1)) {
 			lexems.clear();
 			lex.getNextLine(lexems);
-			LLCCEP_ASM::codeGenerator::op tmp{};
-			tmp = codegen.prepareOperation(lexems);
-			codegen.dumpOperationBitset(tmp);
+
+			LLCCEP_ASM::codeGenerator::op tmp = codegen.prepareOperation(lexems);
+			dump(tmp);
+			//			codegen.dumpOperationBitset(tmp);
 		}
 	} DEFAULT_HANDLING
 

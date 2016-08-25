@@ -4,6 +4,7 @@
 #include <cctype>
 #include <cstddef>
 #include <cstdarg>
+#include <fstream>
 
 #include <convert.hpp>
 #include <STDExtras.hpp>
@@ -34,7 +35,7 @@ void LLCCEP_ASM::lexer::setProcessingPath(::std::string path)
 	_path = path;
 }
 
-void LLCCEP_ASM::lexer::setProcessingFile(::std::istream *in)
+void LLCCEP_ASM::lexer::setProcessingFile(::std::ifstream *in)
 {
 	LEXER_NOT_OK
 	
@@ -90,13 +91,33 @@ void LLCCEP_ASM::lexer::getNextLine(::std::vector<LLCCEP_ASM::lexem> &lex)
 			} else {
 				tmp.type = LLCCEP_ASM::LEX_T_NAME;
 			}
-		} else if (isdigit(tmpString[i])) {
+		} else if (isdigit(tmpString[i]) || tmpString[i] == '.' || tmpString[i] == '-') {
 			tmp.type = LLCCEP_ASM::LEX_T_VAL;
 
-			while (tmpString[i] && isxdigit(tmpString[i])) {
+			while (tmpString[i] && (tmpString[i] == '-' ||
+					        tmpString[i] == '.' ||	
+						isdigit(tmpString[i]))) {
 				tmp.val += tmpString[i];
 				i++;
 			}
+		} else if (tmpString[i] == '"') {
+			i++;
+
+			tmp.type = LLCCEP_ASM::LEX_T_VAL;
+			while (tmpString[i] && tmpString[i] != '"') {
+				tmp.val += tmpString[i];
+				i++;
+			}
+
+			if (tmpString[i] != '"')
+				lexerIssue("Unclosed characted-instead-number");
+
+			if (tmp.val.length() != 1)
+				lexerIssue("Character-instead-number's length is not one character(inside quotes)");
+
+			char c = tmp.val[0];
+			tmp.val = to_string<int>(static_cast<int>(c));
+			i++;
 		} else if (tmpString[i] == '&') {
 			tmp.type = LLCCEP_ASM::LEX_T_REG;
 			i++;
@@ -165,7 +186,7 @@ void LLCCEP_ASM::lexer::lexerIssue(const char *fmt, ...)
 	vsprintf(issueMessage, fmt, list);
 	va_end(list);
 	
-	throw RUNTIME_EXCEPTION(CONSTRUCT_MSG("%s:" size_t_pf "%s", _path.c_str(), _line, issueMessage));
+	throw RUNTIME_EXCEPTION(CONSTRUCT_MSG("%s:" size_t_pf ":\n%s", _path.c_str(), _line, issueMessage));
 }
 
 ::std::string LLCCEP_ASM::getLexemTypename(LLCCEP_ASM::lex_t type)

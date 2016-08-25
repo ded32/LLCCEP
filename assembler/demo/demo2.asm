@@ -1,2 +1,6 @@
+var x
+
 _main:
-call al, main
+mov x, 500
+push x
+top x

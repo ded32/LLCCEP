@@ -34,12 +34,13 @@ int main(void)
 		do {
 			lexems.clear();
 			lex.getNextLine(lexems);
-			
-			bool res = linker.modifyVariablesTable(lexems);
-			res |= linker.buildLabelsAssociativeTable(lexems,
-			                                          iteration);
 
-			if (!res && lexems.size()) {
+			bool hasDeclaration = linker.hasDeclaration(lexems);
+
+			linker.modifyVariablesTable(lexems);
+			linker.buildLabelsAssociativeTable(lexems, iteration);
+
+			if (!hasDeclaration && lexems.size()) {
 				linker.substituteWithAddresses(lexems);
 				iteration++;
 			}

@@ -14,13 +14,20 @@ namespace LLCCEP_ASM {
 		linker();
 		~linker();
 
-		bool modifyVariablesTable(::std::vector<lexem> lex);
-		bool buildLabelsAssociativeTable(::std::vector<lexem> lex,
+		bool hasDeclaration(::std::vector<lexem> lex) const;
+
+		void modifyVariablesTable(::std::vector<lexem> lex);
+		void buildLabelsAssociativeTable(::std::vector<lexem> lex,
 				                 size_t iteration);
 		void substituteWithAddresses(::std::vector<lexem> &lexems);
-	
+
+		size_t getMainAddress() const;
+
 	protected:
-		void linkerIssue(lexem issuedLexem, const char *fmt, ...);
+		void linkerIssue(lexem issuedLexem, const char *fmt, ...) const;
+
+		bool hasLabelDeclaration(::std::vector<lexem> lex) const;
+		bool hasVariableModification(::std::vector<lexem> lex) const;
 
 	private:
 		struct saveData {

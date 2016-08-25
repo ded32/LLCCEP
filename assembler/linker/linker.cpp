@@ -19,18 +19,22 @@ LLCCEP_ASM::linker::linker():
 LLCCEP_ASM::linker::~linker()
 { }
 
-bool LLCCEP_ASM::linker::modifyVariablesTable(::std::vector<lexem> lex)
+bool LLCCEP_ASM::linker::hasDeclaration(::std::vector<lexem> lex) const
 {
+	return hasVariableModification(lex) || hasLabelDeclaration(lex);
+}
+
+void LLCCEP_ASM::linker::modifyVariablesTable(::std::vector<lexem> lex)
+{
+	if (!hasVariableModification(lex))
+		return;
+
 	auto isVariableDeclaration = [lex] {
-		return (lex.size() >= 2 &&
-		        lex[0].type == LEX_T_VAR && 
-			lex[1].type == LEX_T_NAME);
+		return lex[0].type == LLCCEP_ASM::LEX_T_VAR;
 	};
 
 	auto isVariableDeletion = [lex] {
-		return (lex.size() >= 2 &&
-			lex[0].type == LEX_T_RELEASE &&
-			lex[1].type == LEX_T_NAME);
+		return lex[0].type == LLCCEP_ASM::LEX_T_RELEASE;
 	};
 
 	auto lastVariable = [this] {
@@ -49,8 +53,7 @@ bool LLCCEP_ASM::linker::modifyVariablesTable(::std::vector<lexem> lex)
 			if (i.lexemData.val == lex[1].val) {
 				linkerIssue(lex[1],
 					    "'%s' was already "
-					    "declared in '%s' file on line "
-					    size_t_pf,
+					    "declared in '%s' file on line " size_t_pf,
 					    lex[1].val.c_str(), 
 					    i.lexemData.pos.file.c_str(),
 					    i.lexemData.pos.line);
@@ -91,54 +94,23 @@ bool LLCCEP_ASM::linker::modifyVariablesTable(::std::vector<lexem> lex)
 		}
 	};
 
-	if (isVariableDeclaration()) {
-		if (lex.size() > 2) {
-			linkerIssue(lex[1], 
-				    "Junk expressions after '%s' declaration",
-				    lex[1].val.c_str());
-		}
-
+	if (isVariableDeclaration())
 		createVariable();
-		return true;
-	} else if (isVariableDeletion()) {
-		if (lex.size() < 2) {
-		       linkerIssue(lex[1],
-				   "Junk expressions after '%s' deletion",
-				   lex[1].val.c_str());
-		}
-
+	else if (isVariableDeletion())
 		deleteVariable();
-		return true;
-	}
-
-	return false;
 }
 
-bool LLCCEP_ASM::linker::buildLabelsAssociativeTable(::std::vector<lexem> lex,
+void LLCCEP_ASM::linker::buildLabelsAssociativeTable(::std::vector<lexem> lex,
                                                      size_t iteration)
 {
-	auto isLabel = [lex] {
-		return ((lex.size() >= 2)?
-			(lex[0].type == LEX_T_NAME && lex[1].type == LEX_T_COLON):
-			(false));
-	};
+	if (!hasLabelDeclaration(lex))
+		return;
 
-	auto buildLabelData = [this, isLabel, lex, iteration] {
-		if (!isLabel())
-			return saveData{};
-
-		if (lex.size() > 2) {
-			linkerIssue(lex[0], 0, 
-				    "Junk expressions after '%s' declaration",
-				    lex[0].val.c_str());
-		}
-
+	auto buildLabelData = [lex, iteration] {
 		return saveData{lex[0], iteration, true};
 	};
 
 	saveData newLabel = buildLabelData();
-	if (!newLabel.lexemData.val.length())
-		return false;
 
 	for (const auto &i: _variablesLabels) {
 		if (i.lexemData.val == newLabel.lexemData.val) {
@@ -151,7 +123,6 @@ bool LLCCEP_ASM::linker::buildLabelsAssociativeTable(::std::vector<lexem> lex,
 	}
 
 	_variablesLabels.push_back(newLabel);
-	return true;
 }
 
 void LLCCEP_ASM::linker::substituteWithAddresses(::std::vector<lexem> &lexems)
@@ -186,7 +157,21 @@ void LLCCEP_ASM::linker::substituteWithAddresses(::std::vector<lexem> &lexems)
 	}
 }
 
-void LLCCEP_ASM::linker::linkerIssue(LLCCEP_ASM::lexem issuedLabel, const char *fmt, ...)
+size_t LLCCEP_ASM::linker::getMainAddress() const
+{
+	for (const auto &i: _variablesLabels) {
+		if (i.lexemData.val == "_main") {
+			if (!i.label)
+				linkerIssue(i.lexemData, "_main is not label!");
+			
+			return i.pos;
+		}
+	}
+
+	linkerIssue(LLCCEP_ASM::lexem{}, "_main was not declared in this scope");
+}
+
+void LLCCEP_ASM::linker::linkerIssue(LLCCEP_ASM::lexem issuedLabel, const char *fmt, ...) const
 {
 	va_list list;
 	va_start(list, fmt);
@@ -200,3 +185,45 @@ void LLCCEP_ASM::linker::linkerIssue(LLCCEP_ASM::lexem issuedLabel, const char *
 
 	throw RUNTIME_EXCEPTION(CONSTRUCT_MSG("%s", res))
 }
+
+bool LLCCEP_ASM::linker::hasLabelDeclaration(::std::vector<LLCCEP_ASM::lexem> lex) const
+{
+	if (lex.size() >= 2 && lex[0].type == LLCCEP_ASM::LEX_T_NAME &&
+	    lex[1].type == LLCCEP_ASM::LEX_T_COLON) {
+		if (lex.size() > 2) {
+			linkerIssue(lex[0],
+				    "Junk lexems after '%s' label declaration",
+				    lex[0].val.c_str());
+		}
+
+		return true;
+	}
+
+	return false;
+}
+
+bool LLCCEP_ASM::linker::hasVariableModification(::std::vector<LLCCEP_ASM::lexem> lex) const
+{
+	if (lex.size() && (lex[0].type == LLCCEP_ASM::LEX_T_VAR ||
+	                   lex[0].type == LLCCEP_ASM::LEX_T_RELEASE)) {
+		if (lex.size() < 2 || lex[1].type != LLCCEP_ASM::LEX_T_NAME) {
+			linkerIssue(lex[0], 
+				    "Excepted variable name after '%s'",
+				    (lex[0].type == LLCCEP_ASM::LEX_T_VAR)?
+				    ("var"):
+				    ("release"));
+		} else if (lex.size() > 2) {
+			linkerIssue(lex[0],
+				    "Junk lexems after '%s' variable %s",
+				    lex[1].val.c_str(),
+				    (lex[0].type == LLCCEP_ASM::LEX_T_VAR)?
+				    ("declaration"):
+				    ("deletion"));
+		}
+
+		return true;
+	}
+
+	return false;
+}
+
