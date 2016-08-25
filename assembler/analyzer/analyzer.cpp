@@ -27,7 +27,8 @@ void LLCCEP_ASM::analyzer::analyze(::std::vector<LLCCEP_ASM::lexem> lex)
 			{LLCCEP_ASM::LEX_T_REG,  {LLCCEP_ASM::LEX_T_REG}},
 			{LLCCEP_ASM::LEX_T_MEM,  {LLCCEP_ASM::LEX_T_REG, LLCCEP_ASM::LEX_T_MEM}},
 			{LLCCEP_ASM::LEX_T_VAL,  {LLCCEP_ASM::LEX_T_REG, LLCCEP_ASM::LEX_T_MEM, LLCCEP_ASM::LEX_T_VAL}},
-			{LLCCEP_ASM::LEX_T_COND, {LLCCEP_ASM::LEX_T_COND}}
+			{LLCCEP_ASM::LEX_T_COND, {LLCCEP_ASM::LEX_T_COND}},
+			{LLCCEP_ASM::LEX_T_NO,   {LLCCEP_ASM::LEX_T_NO}}
 		};
 
 		auto found = supportedMap.find(t1);
