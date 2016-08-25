@@ -22,157 +22,137 @@ LLCCEP_ASM::preprocessor::preprocessor():
 LLCCEP_ASM::preprocessor::~preprocessor()
 { }
 
-bool LLCCEP_ASM::preprocessor::buildMacroTable(::std::vector<LLCCEP_ASM::lexem> lexems)
+bool LLCCEP_ASM::preprocessor::describeMacro(::std::vector<LLCCEP_ASM::lexem> in)
 {
-	::std::vector<lexem> in;
-	preprocessCode(lexems, in);
-
-	auto correctMacroDirective = [in] {
-		return in.size() >= 4 &&
-		       in[0].type == LLCCEP_ASM::LEX_T_MACRO &&
-		       in[1].type == LLCCEP_ASM::LEX_T_NAME &&
-		       in[2].type == LLCCEP_ASM::LEX_T_COLON &&
-		       in[3].type == LLCCEP_ASM::LEX_T_VAL;
-	};
-
-	if (!in.size())
-		return _processingMacro;
-
 	if (_processingMacro) {
-		if (in[0].type == LEX_T_ENDMACRO) {
+		if (in.size() && in[0].type == LLCCEP_ASM::LEX_T_ENDMACRO) {
 			if (in.size() > 1) {
 				preprocessingIssue(in[0],
-						   "Junk expressions after "
-						   "'endmacro' directive.");
+						   "Junk lexems after 'endmacro' directive");
 			}
 
 			_processingMacro = false;
-		} else if (in[0].type == LEX_T_MACRO) {
-			preprocessingIssue(in[0], "Not allowed to declare macro inside macro");
-		} else {		
+		} else if (in.size()) {
 			if (!_macros.size()) {
-				preprocessingIssue(in[0],
-						   "Macro's lexem with no "
-						   "macro");
+				throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
+					"Macro table's empty, how not excepted."))
 			}
 
-			in.push_back(LLCCEP_ASM::lexem{LLCCEP_ASM::LEX_T_NEWLINE});
-			auto &insertTo = (_macros.end() - 1)->_substitution;
-			insertTo.insert(insertTo.end(), in.begin(), in.end());
+			auto i = _macros.end() - 1;
+			i->_substitution.insert(i->_substitution.end(),
+					        in.begin(), in.end());
+			i->_substitution.push_back(LLCCEP_ASM::lexem{LLCCEP_ASM::LEX_T_NEWLINE});
 		}
 
 		return true;
-	} else if (correctMacroDirective()) {
-		if (in.size() > 4) {
-			preprocessingIssue(in[0], 
-				 	   "Junk expressions after 'macro' "
-					   "directive.");
+	} else if (in.size() && in[0].type == LLCCEP_ASM::LEX_T_MACRO) {
+		if (in.size() != 4 || in[1].type != LLCCEP_ASM::LEX_T_NAME ||
+		    in[2].type != LLCCEP_ASM::LEX_T_COLON || in[3].type != LLCCEP_ASM::LEX_T_VAL) {
+			preprocessingIssue(in[0], "'macro' directive should be followed by:\n"
+					          "1) macro's name\n"
+						  "2) colon\n"
+						  "3) amount of arguments\n");
 		}
 
-		macro newMacro{in[1], from_string<size_t>(in[3].val)};
-		_macros.push_back(newMacro);
+		LLCCEP_ASM::preprocessor::macro macroData{};
+		macroData._macroData = in[1];
+		macroData._amountOfArguments = from_string<size_t>(in[3].val);
+
+		_macros.push_back(macroData);
 		_processingMacro = true;
-	
 		return true;
-	} else if (in[0].type == LLCCEP_ASM::LEX_T_ENDMACRO) {
-		preprocessingIssue(in[0], "No 'macro' directive to match this 'endmacro'.");
 	}
 
 	return false;
 }
 
-void LLCCEP_ASM::preprocessor::preprocessCode(::std::vector<LLCCEP_ASM::lexem> in, ::std::vector<LLCCEP_ASM::lexem> &out)
+void LLCCEP_ASM::preprocessor::preprocessCode(::std::vector<LLCCEP_ASM::lexem> oldLexems, ::std::vector<LLCCEP_ASM::lexem> &newLexems)
 {
-	preprocessCode(in, out, ::std::vector<::std::string>{});
+	preprocessCode(oldLexems, newLexems, ::std::vector<::std::string>{});
 }
 
-::std::vector<LLCCEP_ASM::preprocessor::macro>::iterator LLCCEP_ASM::preprocessor::findMacro(
-		::std::string name)
+::std::vector<LLCCEP_ASM::preprocessor::macro>::iterator LLCCEP_ASM::preprocessor::findMacro(::std::string possibleName)
 {
 	for (auto i = _macros.begin(); i < _macros.end(); i++)
-		if (name == i->_macroData.val)
+		if (i->_macroData.val == possibleName)
 			return i;
 
 	return _macros.end();
 }
 
-bool LLCCEP_ASM::preprocessor::shouldBeReplaced(LLCCEP_ASM::lexem data)
+bool LLCCEP_ASM::preprocessor::isMacroName(::std::string possibleName)
 {
-	return data.type == LEX_T_NAME && 
-	       findMacro(data.val) != _macros.end();
+	return findMacro(possibleName) != _macros.end();
 }
 
-void LLCCEP_ASM::preprocessor::preprocessCode(::std::vector<LLCCEP_ASM::lexem> in, 
-                                              ::std::vector<LLCCEP_ASM::lexem> &out, 
-					      ::std::vector<::std::string> forbidden)
+bool LLCCEP_ASM::preprocessor::shouldBePreprocessed(::std::vector<LLCCEP_ASM::lexem> in)
 {
-	auto notPreprocessedSubstitution = [this](::std::vector<LLCCEP_ASM::lexem> sub) {
-		for (const auto &i: sub)
-			if (shouldBeReplaced(i))
+	for (const auto &i: in)
+		if (isMacroName(i.val))
+			return true;
+
+	return false;
+}
+
+void LLCCEP_ASM::preprocessor::preprocessCode(::std::vector<LLCCEP_ASM::lexem> oldLexems, ::std::vector<LLCCEP_ASM::lexem> &newLexems,
+                                              ::std::vector<::std::string> forbiddenMacros)
+{
+	auto isForbidden = [forbiddenMacros](::std::string name) {
+		for (const auto &i: forbiddenMacros)
+			if (i == name)
 				return true;
 
 		return false;
 	};
 
-	auto isForbidden = [forbidden](LLCCEP_ASM::lexem data) {
-		for (const auto &i: forbidden)
-			if (data.val == i)
-				return true;
+	for (auto i = oldLexems.begin(); i < oldLexems.end(); i++) {
+		if (isMacroName(i->val)) {
+			if (isForbidden(i->val)) {
+				preprocessingIssue(*i, "Looped macro '%s'",
+						   i->val.c_str());
+			}
 
-		return false;
-	};
-
-	for (auto i = in.begin(); i < in.end(); i++) {
-		if (isForbidden(*i)) {
-			preprocessingIssue(*i, "Looped macro '%s'",
-					   i->val.c_str());
-		}
-
-		if (shouldBeReplaced(*i)) {
 			auto macroData = findMacro(i->val);
-			if (macroData->_amountOfArguments > in.end() - i) {
-				preprocessingIssue(*i, "Not enough arguments "
-						       "for '%s' macro",
-						       macroData->_macroData.val.c_str());
+
+			if (oldLexems.end() - i < macroData->_amountOfArguments) {
+				preprocessingIssue(*i, "Not enough arguments for '%s' macro: " 
+						       size_t_pf " requested",
+						       macroData->_amountOfArguments);
 			}
 
-			if (notPreprocessedSubstitution(macroData->_substitution)) {
+			if (shouldBePreprocessed(macroData->_substitution)) {
 				::std::vector<LLCCEP_ASM::lexem> newSubstitution;
-				::std::vector<::std::string> denied(forbidden);
-				denied.push_back(macroData->_macroData.val);
-
-				preprocessCode(macroData->_substitution, 
-					       newSubstitution, denied);
-
+				::std::vector<::std::string> newForbidden{forbiddenMacros};
+				
+				newForbidden.push_back(macroData->_macroData.val);
+				preprocessCode(macroData->_substitution, newSubstitution, newForbidden);
 				macroData->_substitution.clear();
-				macroData->_substitution.insert(macroData->_substitution.begin(), 
-						                newSubstitution.begin(), 
-								newSubstitution.end());
+				macroData->_substitution = newSubstitution;
 			}
 
-			::std::vector<LLCCEP_ASM::lexem> args;
-			args.insert(args.begin(), i + 1, i + macroData->_amountOfArguments);
-			for (auto &i: macroData->_substitution) {
-				if (i.type == LLCCEP_ASM::LEX_T_MACROARG) {
-					size_t argN = from_string<size_t>(i.val);
-					if (argN >= macroData->_amountOfArguments) {
-						preprocessingIssue(i, 
-								   "Macro's argument id overbound: at least " size_t_pf "allowed!",
-								   macroData->_amountOfArguments);
+			::std::vector<LLCCEP_ASM::lexem> macroArguments{i + 1, i + macroData->_amountOfArguments + 1};
+			for (const auto &j: macroData->_substitution) {
+				if (j.type == LLCCEP_ASM::LEX_T_MACROARG) {
+					size_t id = from_string<size_t>(j.val);
+					if (id >= macroArguments.size()) {
+						preprocessingIssue(j, "Macro '%s' doesn't have " size_t_pf " argument, it takes " size_t_pf " arguments",
+								      i->val.c_str(), id,
+								      macroData->_amountOfArguments);
 					}
 
-					out.push_back(args[argN]);
+					newLexems.push_back(macroArguments[id]);
 				} else {
-					out.push_back(i);
+					newLexems.push_back(j);
 				}
 			}
 
-			i += macroData->_amountOfArguments;
+			i += macroData->_amountOfArguments + 1;
 		} else {
-			out.push_back(*i);
+			newLexems.push_back(*i);
 		}
 	}
 }
+
 
 void LLCCEP_ASM::preprocessor::preprocessingIssue(LLCCEP_ASM::lexem issuedLexem, const char *fmt, ...)
 {

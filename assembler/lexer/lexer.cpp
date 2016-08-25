@@ -4,7 +4,7 @@
 #include <cctype>
 #include <cstddef>
 #include <cstdarg>
-#include <fstream>
+#include <iostream>
 
 #include <convert.hpp>
 #include <STDExtras.hpp>
@@ -35,7 +35,7 @@ void LLCCEP_ASM::lexer::setProcessingPath(::std::string path)
 	_path = path;
 }
 
-void LLCCEP_ASM::lexer::setProcessingFile(::std::ifstream *in)
+void LLCCEP_ASM::lexer::setProcessingFile(::std::istream *in)
 {
 	LEXER_NOT_OK
 	

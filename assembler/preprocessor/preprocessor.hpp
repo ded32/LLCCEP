@@ -18,17 +18,18 @@ namespace LLCCEP_ASM {
 	public:
 		preprocessor();
 		~preprocessor();
-				
-		bool buildMacroTable(::std::vector<lexem> in);
+
+		bool describeMacro(::std::vector<lexem> in);
 		void preprocessCode(::std::vector<lexem> in, ::std::vector<lexem> &out);
 
 	protected:
-		::std::vector<macro>::iterator findMacro(::std::string name);
-		bool shouldBeReplaced(LLCCEP_ASM::lexem data);
+		::std::vector<macro>::iterator findMacro(::std::string possibleName);
+		bool isMacroName(::std::string possibleName);
+		bool shouldBePreprocessed(::std::vector<lexem> in);
 
 		void preprocessCode(::std::vector<lexem> in, 
 				    ::std::vector<lexem> &out, 
-				    ::std::vector<::std::string> forbidden);
+				    ::std::vector<::std::string> forbiddenMacros);
 		void preprocessingIssue(lexem issuedLexem, const char *fmt, ...);
 
 	private:	

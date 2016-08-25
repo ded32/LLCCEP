@@ -1,5 +1,5 @@
 #include <vector>
-#include <fstream>
+#include <iostream>
 
 #include <STDExtras.hpp>
 #include <convert.hpp>
@@ -35,7 +35,7 @@ LLCCEP_ASM::codeGenerator::op LLCCEP_ASM::codeGenerator::prepareOperation(
 	return res;
 }
 
-void LLCCEP_ASM::codeGenerator::dumpOperationBitset(::std::ofstream &out, LLCCEP_ASM::codeGenerator::op data)
+void LLCCEP_ASM::codeGenerator::dumpOperationBitset(::std::ostream &out, LLCCEP_ASM::codeGenerator::op data)
 {
 	auto dumpDouble = [&out](double val) {
 		for (size_t i = 0; i < sizeof(double); i++)

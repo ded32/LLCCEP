@@ -35,7 +35,7 @@ int main(int argn, char **argv)
 
 			lex.getNextLine(_in);
 			
-			if (!prep.buildMacroTable(_in)) {
+			if (!prep.describeMacro(_in)) {
 				prep.preprocessCode(_in, _out);
 
 				dump(_in);

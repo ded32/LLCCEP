@@ -2,7 +2,7 @@
 #define ASSEMBLER_CODEGEN_HPP
 
 #include <vector>
-#include <fstream>
+#include <iostream>
 
 #include "../lexer/lexer.hpp"
 
@@ -23,7 +23,7 @@ namespace LLCCEP_ASM {
 		~codeGenerator();
 
 		op prepareOperation(::std::vector<lexem> &lex);
-		void dumpOperationBitset(::std::ofstream &out, op data);
+		void dumpOperationBitset(::std::ostream &out, op data);
 	};
 }
 
