@@ -7,17 +7,11 @@
 #include <fstream>
 #include <cstdint>
 
-namespace LLCCEP_exec {
-	enum arg_t: uint8_t {
-		ARG_T_REG  = 0,
-		ARG_T_MEM  = 1,
-		ARG_T_VAL  = 2,
-		ARG_T_COND = 3,
-		ARG_T_NO   = 5
-	};
+#include "./../../assembler/lexer/lexer.hpp"
 
+namespace LLCCEP_exec {
 	struct arg {
-		arg_t type;
+		LLCCEP_ASM::lex_t type;
 		double val;
 	} __attribute__((aligned(8))) /* 16 bytes*/;
 

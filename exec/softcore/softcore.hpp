@@ -16,8 +16,8 @@ namespace LLCCEP_exec {
 		softcore();
 		~softcore();
 
-		void setMm(memoryManager *mm);
-		void setCodeReader(codeReader *reader);
+		void setMm(memoryManager *newMm);
+		void setCodeReader(codeReader *newReader);
 		void executeProgram();
 
 		::std::vector<window *> getWindows() const;
@@ -55,19 +55,22 @@ namespace LLCCEP_exec {
 		void emulated_call(LLCCEP_exec::instruction data);
 		void emulated_jmp(LLCCEP_exec::instruction data);
 		void emulated_ret(LLCCEP_exec::instruction data);
+		void emulated_stregs(LLCCEP_exec::instruction data);
+		void emulated_ldregs(LLCCEP_exec::instruction data);
 
-		::std::stack<double>_stk;
-		::std::stack<size_t>_call;
+		::std::stack<double> stk;
+		::std::stack<size_t> call;
+		::std::vector<double *> registersStore;
 
-		int _cmp;
-		double _regs[32];
-		double _pc;
+		int cmp;
+		double regs[32];
+		double pc;
 
-		::std::vector<window *> _windows;
-		memoryManager *_mm;
-		codeReader *_reader;
-		int _ready;
-		bool _quit;
+		::std::vector<window *> windows;
+		memoryManager *mm;
+		codeReader *reader;
+		int ready;
+		bool quit;
 	};
 }
 

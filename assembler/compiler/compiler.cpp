@@ -89,6 +89,7 @@ void LLCCEP_ASM::compiler::compile(::std::vector<::std::string> in, ::std::strin
 							}
 						}
 
+						link.substituteWithAddresses(lexems);
 						generateCode();	
 					}
 				} else {

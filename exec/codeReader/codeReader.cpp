@@ -11,7 +11,8 @@
 
 #include "codeReader.hpp"
 
-#include "../../common/def/def_inst.hpp"
+#include "./../../assembler/lexer/lexer.hpp"
+#include "./../../common/def/def_inst.hpp"
 
 #define CHECK_PROGRAM_READER(cond) \
 	DEFAULT_CHECK_BLOCK(cond, this, OK());
@@ -94,9 +95,9 @@ LLCCEP_exec::instruction LLCCEP_exec::codeReader::getInstruction(size_t id)
 	if (id >= _data.size) {
 		return LLCCEP_exec::instruction{
 			INT8_MAX,
-			{{LLCCEP_exec::ARG_T_NO, 0},
-			 {LLCCEP_exec::ARG_T_NO, 0},
-			 {LLCCEP_exec::ARG_T_NO, 0}}};
+			{{LLCCEP_ASM::LEX_T_NO, 0},
+			 {LLCCEP_ASM::LEX_T_NO, 0},
+			 {LLCCEP_ASM::LEX_T_NO, 0}}};
 	}
 
 	LLCCEP_exec::instruction res{};
@@ -109,7 +110,7 @@ LLCCEP_exec::instruction LLCCEP_exec::codeReader::getInstruction(size_t id)
 	}
 
 	for (unsigned i = 0; i < 3; i++) {
-		res.args[i].type = static_cast<LLCCEP_exec::arg_t>(_input.get());
+		res.args[i].type = static_cast<LLCCEP_ASM::lex_t>(_input.get());
 		_input.read(reinterpret_cast<char *>(&res.args[i].val),
 			    sizeof(double));
 	}

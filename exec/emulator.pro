@@ -1,9 +1,13 @@
 QT += widgets multimedia
 
 INCLUDEPATH += $$PWD/../include/
-CONFIG += gnu++14
+CONFIG += gnu++14 release
 
-QMAKE_LFLAGS += -v
+QMAKE_CXXFLAGS_DEBUG += -g -O0
+QMAKE_CXXFLAGS_RELEASE += -flto -Ofast \
+                          -march=native \
+                          -funroll-loops \
+                          -fstack-protector-all
 
 SOURCES = codeReader/codeReader.cpp \
           window/window.cpp \
