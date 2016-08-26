@@ -81,6 +81,8 @@ void LLCCEP_ASM::lexer::getNextLine(::std::vector<LLCCEP_ASM::lexem> &lex)
 				tmp.type = LLCCEP_ASM::LEX_T_MACRO;
 			} else if (toLower(tmp.val) == "endmacro") {
 				tmp.type = LLCCEP_ASM::LEX_T_ENDMACRO;
+			} else if (toLower(tmp.val) == "delmacro") {
+				tmp.type = LLCCEP_ASM::LEX_T_DELMACRO;
 			} else if (toLower(tmp.val) == "var") {
 				tmp.type = LLCCEP_ASM::LEX_T_VAR;
 			} else if (toLower(tmp.val) == "release") {

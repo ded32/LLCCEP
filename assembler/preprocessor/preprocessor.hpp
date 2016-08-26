@@ -10,31 +10,39 @@
 namespace LLCCEP_ASM {
 	class preprocessor {
 		struct macro {
-			lexem _macroData;
-			size_t _amountOfArguments;
-			::std::vector<lexem> _substitution;
+			lexem macroData;
+			size_t amountOfArguments;
+			::std::vector<lexem> substitution;
 		};
 
 	public:
 		preprocessor();
 		~preprocessor();
 
-		bool describeMacro(::std::vector<lexem> in);
+		bool preprocessorStuff(::std::vector<lexem> in);
+		bool preprocessorCode(::std::vector<lexem> in);
 		void preprocessCode(::std::vector<lexem> in, ::std::vector<lexem> &out);
 
 	protected:
+		bool describeMacro(::std::vector<lexem> in);
+	        bool deleteMacro(::std::vector<lexem> in);
+
 		::std::vector<macro>::iterator findMacro(::std::string possibleName);
-		bool isMacroName(::std::string possibleName);
-		bool shouldBePreprocessed(::std::vector<lexem> in);
+		::std::vector<macro>::const_iterator findMacro(::std::string possibleName) const;
+		bool isMacroName(::std::string possibleName) const;
+
+		bool shouldBePreprocessed(::std::vector<lexem> in) const;
 
 		void preprocessCode(::std::vector<lexem> in, 
 				    ::std::vector<lexem> &out, 
 				    ::std::vector<::std::string> forbiddenMacros);
-		void preprocessingIssue(lexem issuedLexem, const char *fmt, ...);
 
+		void preprocessingIssue(lexem issuedLexem, const char *fmt, ...);
+		void preprocessingWarning(lexem issuedLexem, const char *fmt, ...);
 	private:	
-		::std::vector<macro> _macros;
-		bool _processingMacro;
+		::std::vector<macro> macros;
+		bool processingMacro;
+		bool preprocessorsCode;
 	};
 }
 

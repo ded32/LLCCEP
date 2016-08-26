@@ -30,16 +30,16 @@ int main(int argn, char **argv)
 		lex.setProcessingFile(&::std::cin);
 
 		do {
-			::std::vector<LLCCEP_ASM::lexem> _in;
-			::std::vector<LLCCEP_ASM::lexem> _out;
+			::std::vector<LLCCEP_ASM::lexem> in;
+			::std::vector<LLCCEP_ASM::lexem> out;
 
-			lex.getNextLine(_in);
+			lex.getNextLine(in);
 			
-			if (!prep.describeMacro(_in)) {
-				prep.preprocessCode(_in, _out);
+			if (!prep.preprocessorStuff(in)) {
+				prep.preprocessCode(in, out);
 
-				dump(_in);
-				dump(_out);
+				dump(in);
+				dump(out);
 			}
 		} while (1);
 	} catch (::std::ios_base::failure &data) {

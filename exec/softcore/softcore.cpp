@@ -442,14 +442,13 @@ void LLCCEP_exec::softcore::emulated_swi(LLCCEP_exec::instruction data)
 			}
 
 			case 's': {
-				::std::fprintf(out, "%s", reinterpret_cast<char *>(static_cast<size_t>(_regs[3])));
+				::std::fprintf(out, "%s", _mm->getString(static_cast<size_t>(_regs[3])));
 				break;
 			}
 
 			case 'x':
 			case 'b':
 			case 'o': {
-
 				::std::fprintf(out, getFmtString(static_cast<char>(_regs[2])).c_str(),
 					       *reinterpret_cast<size_t *>(&_regs[3]));
 				break;

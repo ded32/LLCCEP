@@ -19,12 +19,13 @@ namespace LLCCEP_ASM {
 		LEX_T_NAME     = 5,
 		LEX_T_MACRO    = 6,
 		LEX_T_ENDMACRO = 7,
-		LEX_T_VAR      = 8,
-		LEX_T_RELEASE  = 9,
-		LEX_T_NO       = 10,
-		LEX_T_COLON    = 11,
-		LEX_T_NEWLINE  = 12,
-		LEX_T_INVALID  = 13
+		LEX_T_DELMACRO = 8,
+		LEX_T_VAR      = 9,
+		LEX_T_RELEASE  = 10,
+		LEX_T_NO       = 11,
+		LEX_T_COLON    = 12,
+		LEX_T_NEWLINE  = 13,
+		LEX_T_INVALID  = 14
 	};
 
 	struct lexem {
