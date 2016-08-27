@@ -1,7 +1,16 @@
 cmake_minimum_required(VERSION 2.6)
-project(assembler)
+project(LLCCEP_assembler)
 
-set(CMAKE_CXX_FLAGS "-g -O0 -std=c++11")
+set(BUILD_MODE "Debug" CACHE STRING "Do you want to build assembler for debug")
+set(CMAKE_CXX_FLAGS "-std=gnu++11")
+	
+if(BUILD_MODE STREQUAL "Debug")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -O0")
+elseif(BUILD_MODE STREQUAL "Release")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Ofast -flto -funroll-loops -march=native")
+else()	
+	message(SEND_ERROR "BUILD_MODE is not 'Debug' or 'Release'.")
+endif()
 
 include_directories("${CMAKE_SOURCE_DIR}/../include/")
 
@@ -21,6 +30,6 @@ target_link_libraries(codegen STDExtras linker lexer analyzer)
 target_link_libraries(compiler lexer analyzer codegen linker preprocessor)
 target_link_libraries(commandLine STDExtras)
 
-add_executable(assembler "${CMAKE_SOURCE_DIR}/main.cpp")
-target_link_libraries(assembler lexer analyzer linker codegen 
+add_executable(LLCCEP_assembler "${CMAKE_SOURCE_DIR}/main.cpp")
+target_link_libraries(LLCCEP_assembler lexer analyzer linker codegen 
 	              commandLine compiler STDExtras)

@@ -3,17 +3,22 @@ digit [0-9]
 
 %{
 #include <stdio.h>
+#include <string>
 
-#include "SiHi_parser.hpp"
+#include <STDExtras.hpp>
+#include <os-specific.hpp>
+
+#include "SiHiParser.hpp"
 
 #ifndef YY_PARSER_EXISTS
 size_t yycharno = 0;
 #define RET(val) ({update(); yylval.string = yytext; return val;})
 #else
-#define RET(val) ({update(); return val;})
+#define RET(val) ({update(); printf("%s", #val);})
 #endif // YY_PARSER_EXISTS
 
 static inline void update(void);
+static inline void lexerIssue(const char *fmt, ...);
 
 %}
 
@@ -90,7 +95,7 @@ vararg           {RET(VARARG);}
 {digit}+("."{digit}*)?              {RET(NUMBER);}
 \"(\\.|[^\\"])*\"                   {RET(LITERAL);}
 
-. {RET(UNKNOWN);}
+. {lexerIssue("Forbidden input characters: %s", yytext);}
 %%
 
 static inline void update(void)
@@ -110,4 +115,19 @@ static inline void update(void)
 			yycharno++;
 		}
 	}
+}
+
+static inline void lexerIssue(const char *fmt, ...)
+{
+	va_list list;
+	va_start(list, fmt);
+
+	char text[4096] = "";
+	vsprintf(text, fmt, list);
+
+	va_end(fmt);
+
+	throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
+		"%s:" size_t_pf ":\n%s", "", yylineno,
+		text));
 }

@@ -169,6 +169,7 @@ size_t LLCCEP_ASM::linker::getMainAddress() const
 	}
 
 	linkerIssue(LLCCEP_ASM::lexem{}, "_main was not declared in this scope");
+	return 0;
 }
 
 void LLCCEP_ASM::linker::linkerIssue(LLCCEP_ASM::lexem issuedLabel, const char *fmt, ...) const
