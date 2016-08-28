@@ -111,6 +111,19 @@ depend:
 .PHONY : depend
 
 #=============================================================================
+# Target rules for targets named STDExtras
+
+# Build rule for target.
+STDExtras: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 STDExtras
+.PHONY : STDExtras
+
+# fast build rule for target.
+STDExtras/fast:
+	$(MAKE) -f CMakeFiles/STDExtras.dir/build.make CMakeFiles/STDExtras.dir/build
+.PHONY : STDExtras/fast
+
+#=============================================================================
 # Target rules for targets named SiHiCompiler
 
 # Build rule for target.
@@ -137,17 +150,17 @@ SiHiParserLib/fast:
 .PHONY : SiHiParserLib/fast
 
 #=============================================================================
-# Target rules for targets named STDExtras
+# Target rules for targets named DotViz
 
 # Build rule for target.
-STDExtras: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 STDExtras
-.PHONY : STDExtras
+DotViz: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 DotViz
+.PHONY : DotViz
 
 # fast build rule for target.
-STDExtras/fast:
-	$(MAKE) -f CMakeFiles/STDExtras.dir/build.make CMakeFiles/STDExtras.dir/build
-.PHONY : STDExtras/fast
+DotViz/fast:
+	$(MAKE) -f CMakeFiles/DotViz.dir/build.make CMakeFiles/DotViz.dir/build
+.PHONY : DotViz/fast
 
 SiHiLexer.o: SiHiLexer.cpp.o
 
@@ -230,6 +243,33 @@ Users/andrew/Documents/projects/personal/LLCCEP/lib/STDExtras.cpp.s:
 	$(MAKE) -f CMakeFiles/STDExtras.dir/build.make CMakeFiles/STDExtras.dir/Users/andrew/Documents/projects/personal/LLCCEP/lib/STDExtras.cpp.s
 .PHONY : Users/andrew/Documents/projects/personal/LLCCEP/lib/STDExtras.cpp.s
 
+Users/andrew/Documents/projects/personal/LLCCEP/third-party/DotViz/DotViz++.o: Users/andrew/Documents/projects/personal/LLCCEP/third-party/DotViz/DotViz++.cpp.o
+
+.PHONY : Users/andrew/Documents/projects/personal/LLCCEP/third-party/DotViz/DotViz++.o
+
+# target to build an object file
+Users/andrew/Documents/projects/personal/LLCCEP/third-party/DotViz/DotViz++.cpp.o:
+	$(MAKE) -f CMakeFiles/DotViz.dir/build.make CMakeFiles/DotViz.dir/Users/andrew/Documents/projects/personal/LLCCEP/third-party/DotViz/DotViz++.cpp.o
+.PHONY : Users/andrew/Documents/projects/personal/LLCCEP/third-party/DotViz/DotViz++.cpp.o
+
+Users/andrew/Documents/projects/personal/LLCCEP/third-party/DotViz/DotViz++.i: Users/andrew/Documents/projects/personal/LLCCEP/third-party/DotViz/DotViz++.cpp.i
+
+.PHONY : Users/andrew/Documents/projects/personal/LLCCEP/third-party/DotViz/DotViz++.i
+
+# target to preprocess a source file
+Users/andrew/Documents/projects/personal/LLCCEP/third-party/DotViz/DotViz++.cpp.i:
+	$(MAKE) -f CMakeFiles/DotViz.dir/build.make CMakeFiles/DotViz.dir/Users/andrew/Documents/projects/personal/LLCCEP/third-party/DotViz/DotViz++.cpp.i
+.PHONY : Users/andrew/Documents/projects/personal/LLCCEP/third-party/DotViz/DotViz++.cpp.i
+
+Users/andrew/Documents/projects/personal/LLCCEP/third-party/DotViz/DotViz++.s: Users/andrew/Documents/projects/personal/LLCCEP/third-party/DotViz/DotViz++.cpp.s
+
+.PHONY : Users/andrew/Documents/projects/personal/LLCCEP/third-party/DotViz/DotViz++.s
+
+# target to generate assembly for a file
+Users/andrew/Documents/projects/personal/LLCCEP/third-party/DotViz/DotViz++.cpp.s:
+	$(MAKE) -f CMakeFiles/DotViz.dir/build.make CMakeFiles/DotViz.dir/Users/andrew/Documents/projects/personal/LLCCEP/third-party/DotViz/DotViz++.cpp.s
+.PHONY : Users/andrew/Documents/projects/personal/LLCCEP/third-party/DotViz/DotViz++.cpp.s
+
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -237,10 +277,11 @@ help:
 	@echo "... clean"
 	@echo "... depend"
 	@echo "... edit_cache"
+	@echo "... STDExtras"
 	@echo "... rebuild_cache"
 	@echo "... SiHiCompiler"
 	@echo "... SiHiParserLib"
-	@echo "... STDExtras"
+	@echo "... DotViz"
 	@echo "... SiHiLexer.o"
 	@echo "... SiHiLexer.i"
 	@echo "... SiHiLexer.s"
@@ -250,6 +291,9 @@ help:
 	@echo "... Users/andrew/Documents/projects/personal/LLCCEP/lib/STDExtras.o"
 	@echo "... Users/andrew/Documents/projects/personal/LLCCEP/lib/STDExtras.i"
 	@echo "... Users/andrew/Documents/projects/personal/LLCCEP/lib/STDExtras.s"
+	@echo "... Users/andrew/Documents/projects/personal/LLCCEP/third-party/DotViz/DotViz++.o"
+	@echo "... Users/andrew/Documents/projects/personal/LLCCEP/third-party/DotViz/DotViz++.i"
+	@echo "... Users/andrew/Documents/projects/personal/LLCCEP/third-party/DotViz/DotViz++.s"
 .PHONY : help
 
 

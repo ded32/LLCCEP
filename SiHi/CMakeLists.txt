@@ -5,6 +5,7 @@ set(CMAKE_CXX_FLAGS "-std=gnu++11")
 set(BUILD_MODE "Debug" CACHE STRING "Do you want to build project for debug?")
 include_directories("${CMAKE_SOURCE_DIR}/../include/")
 include_directories("${CMAKE_SOURCE_DIR}/../common/")
+include_directories("${CMAKE_SOURCE_DIR}/../third-party/")
 
 if(BUILD_MODE STREQUAL "Debug")
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -O0")
@@ -15,6 +16,7 @@ else()
 endif()
 
 add_library(STDExtras "${CMAKE_SOURCE_DIR}/../lib/STDExtras.cpp")
+add_library(DotViz "${CMAKE_SOURCE_DIR}/../third-party/DotViz/DotViz++.cpp")
 
 find_package(bison)
 find_package(flex)
@@ -24,7 +26,7 @@ flex_target(SiHiLexer "${CMAKE_SOURCE_DIR}/SiHi.l" "${CMAKE_SOURCE_DIR}/SiHiLexe
 add_flex_bison_dependency(SiHiLexer SiHiParser)
 
 add_library(SiHiParserLib "${BISON_SiHiParser_OUTPUT_SOURCE}")
-target_link_libraries(SiHiParserLib STDExtras)
+target_link_libraries(SiHiParserLib STDExtras DotViz)
 
 add_executable(SiHiCompiler "${FLEX_SiHiLexer_OUTPUTS}")
 target_link_libraries(SiHiCompiler SiHiParserLib STDExtras)

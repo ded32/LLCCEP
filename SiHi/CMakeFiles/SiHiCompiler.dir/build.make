@@ -104,6 +104,7 @@ SiHiCompiler: CMakeFiles/SiHiCompiler.dir/SiHiLexer.cpp.o
 SiHiCompiler: CMakeFiles/SiHiCompiler.dir/build.make
 SiHiCompiler: libSiHiParserLib.a
 SiHiCompiler: libSTDExtras.a
+SiHiCompiler: libDotViz.a
 SiHiCompiler: CMakeFiles/SiHiCompiler.dir/link.txt
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/Users/andrew/Documents/projects/personal/LLCCEP/SiHi/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Linking CXX executable SiHiCompiler"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/SiHiCompiler.dir/link.txt --verbose=$(VERBOSE)

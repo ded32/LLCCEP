@@ -6,5 +6,5 @@ CXX_FLAGS = -std=gnu++11 -g -O0
 
 CXX_DEFINES = 
 
-CXX_INCLUDES = -I/Users/andrew/Documents/projects/personal/LLCCEP/SiHi/../include -I/Users/andrew/Documents/projects/personal/LLCCEP/SiHi/../common 
+CXX_INCLUDES = -I/Users/andrew/Documents/projects/personal/LLCCEP/SiHi/../include -I/Users/andrew/Documents/projects/personal/LLCCEP/SiHi/../common -I/Users/andrew/Documents/projects/personal/LLCCEP/SiHi/../third-party 
 

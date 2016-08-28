@@ -185,6 +185,9 @@ CMAKE_STRIP:FILEPATH=/Applications/Xcode.app/Contents/Developer/Toolchains/Xcode
 // Studio IDE projects all commands are done without /nologo.
 CMAKE_VERBOSE_MAKEFILE:BOOL=FALSE
 
+//Dependencies for target
+DotViz_LIB_DEPENDS:STATIC=
+
 //path to the flex executable
 FLEX_EXECUTABLE:FILEPATH=/usr/bin/flex
 
@@ -204,7 +207,7 @@ SiHiCompiler_BINARY_DIR:STATIC=/Users/andrew/Documents/projects/personal/LLCCEP/
 SiHiCompiler_SOURCE_DIR:STATIC=/Users/andrew/Documents/projects/personal/LLCCEP/SiHi
 
 //Dependencies for the target
-SiHiParserLib_LIB_DEPENDS:STATIC=general;STDExtras;
+SiHiParserLib_LIB_DEPENDS:STATIC=general;STDExtras;general;DotViz;
 
 
 ########################

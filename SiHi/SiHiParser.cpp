@@ -1704,7 +1704,7 @@ yyreduce:
 #line 87 "/Users/andrew/Documents/projects/personal/LLCCEP/SiHi/SiHi.y"
     {
                                 (yyval.ast) = LLCCEP_SiHi::ast({(yyvsp[(1) - (3)].ast), (yyvsp[(3) - (3)].ast)},
-                                                          (yyvsp[(1) - (3)].ast).value() + " " + (yyvsp[(1) - (3)].ast).value(),
+                                                          (yyvsp[(1) - (3)].ast).value().toString() + " " + (yyvsp[(1) - (3)].ast).value().toString(),
                                                           "Argument expression list");
                         ;}
     break;
