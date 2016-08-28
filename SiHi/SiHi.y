@@ -13,8 +13,8 @@
 %token <string> EQUALS NOT_EQUALS MUL_ASSIGN DIV_ASSIGN MOD_ASSIGN
 %token <string> ADD_ASSIGN SUB_ASSIGN SHL_ASSIGN SHR_ASSIGN AND_ASSIGN
 %token <string> XOR_ASSIGN OR_ASSIGN EMPTY REAL STRING OTHER PASS
-%token <string> IF ELSE CASE LOOP JUMP NEXT STOP RETURN FUNCTION
-%token <string> DONE UNLESS VARARG
+%token <string> IF ELSE CASE WHILE DO FOR JUMP NEXT STOP RETURN
+%token <string> DONE UNLESS VARARG FUNCTION
 
 %type <ast> primary_expression postfix_expression argument_expression_list
 %type <ast> unary_expression unary_operator cast_expression multiplicative_expression
@@ -567,18 +567,18 @@ branched_statement: IF expression statement {
                                                      CASE);
                    };
 
-looped_statement: LOOP expression statement {
+looped_statement: WHILE expression statement {
                         $$ = new LLCCEP_SiHi::ast({$<ast>2, $<ast>3},
                                                   "loop",
-                                                  LOOP);
-                } | LOOP expression ';' expression statement {
+                                                  WHILE);
+                } | DO expression statement WHILE statement {
                         $$ = new LLCCEP_SiHi::ast({$<ast>2, $<ast>4, $<ast>5},
                                                   "loop",
-                                                  LOOP);
-	        } | LOOP expression_statement ';' expression_statement ';' expression statement {
+                                                  DO);
+	        } | FOR expression_statement ';' expression_statement ';' expression statement {
                         $$ = new LLCCEP_SiHi::ast({$<ast>2, $<ast>4, $<ast>6, $<ast>7},
                                                   "loop",
-                                                  LOOP);
+                                                  FOR);
                 };
 
 jump_statement: JUMP ID {

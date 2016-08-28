@@ -36,7 +36,9 @@ pass             {RET(PASS);}
 if               {RET(IF);}
 else             {RET(ELSE);}
 case             {RET(CASE);}
-loop             {RET(LOOP);}
+while            {RET(WHILE);}
+do               {RET(DO);}
+for              {RET(FOR);}
 jump             {RET(JUMP);}
 next             {RET(NEXT);}
 stop             {RET(STOP);}

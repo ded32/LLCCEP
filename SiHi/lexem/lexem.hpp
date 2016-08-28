@@ -1,12 +1,74 @@
 #ifndef SIHI_LEXEM_TYPE_HPP
 #define SIHI_LEXEM_TYPE_HPP
 
+#include <string>
+
 namespace LLCCEP_SiHi {
 	enum lex_t: int {
-		LEX_T_
+		PRIMARY_EXPRESSION         = 1024,
+		POSTFIX_EXPRESSION         = 1025,
+		ARGUMENT_EXPRESSION_LIST   = 1026,
+		UNARY_EXPRESSION           = 1027,
+		UNARY_OPERATOR             = 1028,
+		CAST_EXPRESSION            = 1029,
+		MULTIPLICATIVE_EXPRESSION  = 1030,
+		MULTIPLICATIVE_OPERATOR    = 1031,
+		ADDITIVE_EXPRESSION        = 1032,
+		ADDITIVE_OPERATOR          = 1033,
+		SHIFT_EXPRESSION           = 1034,
+		SHIFT_OPERATOR             = 1035,
+		RELATIONAL_EXPRESSION      = 1036,
+		RELATIONAL_OPERATOR        = 1037,
+		EQUALITY_EXPRESSION        = 1038,
+		EQUALITY_OPERATOR          = 1039,
+		AND_EXPRESSION             = 1040,
+		EXCLUSIVE_OR_EXPRESSION    = 1041,
+		INCLUSIVE_OR_EXPRESSION    = 1042,
+		CONDITIONAL_EXPRESSION     = 1043,
+		ASSIGNMENT_EXPRESSION      = 1044,
+		ASSIGNMENT_OPERATOR        = 1045,
+		EXPRESSION                 = 1046,
+		CONSTANT_EXPRESSION        = 1047,
+		DECLARATION                = 1048,
+		DECLARATION_SPECIFIERS     = 1049,
+		INIT_DECLARATOR_LIST       = 1050,
+		INIT_DECLARATOR            = 1051,
+		TYPE_SPECIFIER             = 1052,
+		DECLARATOR                 = 1053,
+		DIRECT_DECLARATOR          = 1054,
+		POINTER                    = 1055,
+		PARAMETER_TYPE_LIST        = 1056,
+		PARAMETER_LIST             = 1057,
+		PARAMETER_DECLARATION      = 1058,
+		IDENTIFIER_LIST            = 1059,
+		TYPE_NAME                  = 1060,
+		ABSTRACT_DECLARATOR        = 1061,
+		DIRECT_ABSTRACT_DECLARATOR = 1062,
+		INITIALIZER                = 1063,
+		INITIALIZER_LIST           = 1064,
+		STATEMENT                  = 1065,
+		LABELED_STATEMENT          = 1066,
+		COMPOUND_STATEMENT         = 1067,
+		DECLARATION_STATEMENT      = 1068,
+		DECLARATION_STATEMENT_LIST = 1069,
+		EXPRESSION_STATEMENT       = 1070,
+		BRANCHED_STATEMENT         = 1071,
+		LOOPED_STATEMENT           = 1072,
+		JUMP_STATEMENT             = 1073,
+		TRANSLATION_UNIT           = 1074,
+		EXTERNAL_DECLARATION       = 1075,
+		FUNCTION_DEFINITION        = 1076,
+		FUNCTION_SIGNATURE         = 1077,
+		FUNCTION_NAME              = 1078,
+		FUNCTION_ARGS              = 1079,
+		FUNCTION_TYPE              = 1080,
+		LABELED_STATEMENT_LIST     = 1081
 	};
 
-	typedef LLCCEP::lexem<lex_t> lexem;
+	struct lexem {
+		::std::string value;
+		lex_t type;
+	};
 }
 
 #endif // SIHI_LEXEM_HPP
