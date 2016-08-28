@@ -1,0 +1,9 @@
+# By DotViz++
+digraph astDump {
+	Node_140734679693424[shape="box", color="#FFDEAD", style="rounded, solid, filled", fillcolor="#FFDEAD", fontcolor="#FF0000", weight="1", label="\"testRoot\":0"];
+	Node_140587177095824[shape="box", color="#FFDEAD", style="rounded, solid, filled", fillcolor="#FFDEAD", fontcolor="#FF0000", weight="1", label="\"testLeftNode\":1"];
+	Node_140734679693424-> Node_140587177095824[style="solid", color="#9ACD32"];
+	Node_140587177095904[shape="box", color="#FFDEAD", style="rounded, solid, filled", fillcolor="#FFDEAD", fontcolor="#FF0000", weight="1", label="\"testRightNode\":1"];
+	Node_140734679693424-> Node_140587177095904[style="solid", color="#9ACD32"];
+}
+# By DotViz++

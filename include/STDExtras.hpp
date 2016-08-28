@@ -117,4 +117,41 @@ catch (::std::exception &exc) {\
 ::std::string getAbsolutePath(::std::string relpath);
 void dump_bytes(::std::ostream &out, ::std::vector<uint8_t> list);
 
+template<typename charT, typename traits, size_t length>
+::std::basic_istream<charT, traits> &operator>>(::std::basic_istream<charT, traits> &in, const charT(&sliteral)[length])
+{
+	charT buf[length - 1] = {};
+
+        in >> buf[0];
+        if (length > 2)
+		in.read(buf + 1, length - 2);
+
+        if (memcmp(buf, sliteral, sizeof(buf))) {
+		throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
+			"Invalid input formatting!"))
+	}
+
+	return in;
+}
+
+template<typename charT, typename traits>
+::std::basic_istream<charT, traits> &operator>>(::std::basic_istream<charT, traits> &in, const charT &cliteral)
+{
+	charT buf = 0;
+	in >> buf;
+
+	if (in != buf) {
+		throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
+			"Invalid input formatting!"))
+	}
+
+	return in;
+}
+
+template<typename charT, typename traits, size_t length>
+::std::basic_istream<charT, traits> &operator>>(::std::basic_istream<charT, traits> &in, charT(&carray)[length])
+{
+	return operator>>(in, carray);
+}
+
 #endif // INCLUDE_STDEXTRAS_HPP
