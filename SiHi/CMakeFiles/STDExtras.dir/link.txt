@@ -1,0 +1,2 @@
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ar qc libSTDExtras.a  CMakeFiles/STDExtras.dir/Users/andrew/Documents/projects/personal/LLCCEP/lib/STDExtras.cpp.o
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ranlib libSTDExtras.a

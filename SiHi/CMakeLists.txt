@@ -4,6 +4,7 @@ project(SiHiCompiler)
 set(CMAKE_CXX_FLAGS "-std=gnu++11")
 set(BUILD_MODE "Debug" CACHE STRING "Do you want to build project for debug?")
 include_directories("${CMAKE_SOURCE_DIR}/../include/")
+include_directories("${CMAKE_SOURCE_DIR}/../common/")
 
 if(BUILD_MODE STREQUAL "Debug")
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -O0")
