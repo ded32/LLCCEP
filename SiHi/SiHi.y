@@ -1,10 +1,20 @@
 %{
 #include <string>
 #include "ast/ast.hpp"
+
+void yyerror(LLCCEP_SiHi::ast *, const char *msg);
+
+extern ::std::string yyfilename;
+extern int yylex(void);
+extern int yylineno;
 %}
 
+%error-verbose
+
+%parse-param {LLCCEP_SiHi::ast *ast}
+
 %union {
-	LLCCEP_SiHi::ast *ast;
+	::LLCCEP_SiHi::ast *ast;
 	const char *string;
 }
 
@@ -33,161 +43,135 @@
 %type <ast> function_definition function_signature function_name function_args function_type
 %type <ast> labeled_statement_list
 
+%start translation_unit
+
 %%
 primary_expression: ID {
-                            $$ = new LLCCEP_SiHi::ast({}, 
-                                                      "Identifier: " + $<string>1,
-                                                      ID);
+                            $$ = createAst{PRIMARY_EXPRESSION_LEXEM, {createAst{createLexem{$<string>1, ID}}}};
                     } | NUMBER {
-                            $$ = new LLCCEP_SiHi::ast({},
-                                                      "Number: " + $<string>1,
-                                                      NUMBER);
+                            $$ = createAst{PRIMARY_EXPRESSION_LEXEM, {createAst{createLexem{$<string>1, NUMBER}}}};
                     } | LITERAL {
-                            $$ = new LLCCEP_SiHi::ast({},
-                                                      "Literal: " + $<string>1,
-                                                      LITERAL);
+                            $$ = createAst{PRIMARY_EXPRESSION_LEXEM, {createAst{createLexem{$<string>1, LITERAL}}}};
                     } | '(' expression ')' {
-                            $$ = $<ast>2;
+                            $$ = createAst{PRIMARY_EXPRESSION_LEXEM, {$<ast>2}};
                     };
 
 postfix_expression: primary_expression {
-                            $$ = $<ast>1;
+                            $$ = createAst{POSTFIX_EXPRESSION_LEXEM, {$<ast>1}};
 	            } | postfix_expression '[' expression ']' {
-                            $$ = new LLCCEP_SiHi::ast({$<ast>1, $<ast>3},
-                                                      "[]",
-                                                      ACCESS_ARRAY_MEMBER);
+                            $$ = createAst{POSTFIX_EXPRESSION_LEXEM, {$<ast>1, $<ast>3}};
                     } | postfix_expression '(' ')' {
-                            $$ = new LLCCEP_SiHi::ast({$<ast>1},
-                                                      "()",
-                                                      INVOKE);
+                            $$ = createAst{POSTFIX_EXPRESSION_LEXEM, {$<ast>1}};
 		    } | postfix_expression '(' argument_expression_list ')' {
-                            $$ = new LLCCEP_SiHi::ast({$<ast>1, $<ast>3},
-                                                      "()",
-                                                      INVOKE);
+                            $$ = createAst{POSTFIX_EXPRESSION_LEXEM, {$<ast>1, $<ast>3}};
                     } | postfix_expression '.' ID {
-                            $$ = new LLCCEP_SiHi::ast({$<ast>1, new LLCCEP_SiHi::ast({}, "Identifier: " + $<string>3, ID)},
-                                                      "."
-                                                      ACCESS_MEMBER);
+                            $$ = createAst{POSTFIX_EXPRESSION_LEXEM, {$<ast>1, createAst{createLexem{$<string>3, ID}}}};
                     } | postfix_expression ARROW ID {
-                            $$ = new LLCCEP_SiHi::ast({$<ast>1, new LLCCEP_SiHi::ast({}, "Identifier: " + $<string>3, ID)},
-                                                      "->",
-                                                      ACCESS_MEMBER_BY_PTR);
+                            $$ = createAst{POSTFIX_EXPRESSION_LEXEM, {$<ast>1, createAst{createLexem{$<string>3, ID}}}};
                     } | postfix_expression INCREMENT {
-                            $$ = new LLCCEP_SiHi::ast({$<ast>1},
-                                                      "++",
-                                                      INCREMENT);
+                            $$ = createAst{POSTFIX_EXPRESSION_LEXEM, {$<ast>1, createAst{createLexem{$<string>2, INCREMENT}}}};
                     } | postfix_expression DECREMENT {
-                            $$ = new LLCCEP_SiHi::ast({$<ast>1},
-                                                      "--",
-                                                      DECREMENT);
+                            $$ = createAst{POSTFIX_EXPRESSION_LEXEM, {$<ast>1, createAst{createLexem{$<string>2, DECREMENT}}}};
                     };
 
 argument_expression_list: assignment_expression {
-                                $$ = $<ast>1; 
+                                $$ = createAst{ARGUMENT_EXPRESSION_LIST_LEXEM, {$<ast>1}};
                         } | argument_expression_list ',' assignment_expression {
-                                $$ = new LLCCEP_SiHi::ast({$<ast>1, $<ast>3},
-                                                          $<ast>1.value().toString() + " " + $<ast>1.value().toString(),
-                                                          "Argument expression list");
+                                $$ = $<ast>1;
+                                $$->addChild($<ast>3);
                         };
 
 unary_expression: postfix_expression {
-                        $$ = $<ast>1;
-                } | INCREMENT unary_expression {
-                        $$ = new LLCCEP_SiHi::ast({$<ast>2}, 
-                                                  "++",
-                                                  INCREMENT);
-                } | DECREMENT unary_expression {
-                        $$ = new LLCCEP_SiHi::ast({$<ast>2},
-                                                  "--",
-                                                  DECREMENT);
-	        } | unary_operator cast_expression {
-		        $$ = $1;
-                        $$->insert_child($<ast>2);
+                        $$ = createAst{UNARY_EXPRESSION_LEXEM, {$<ast>1}};
+                } | unary_operator cast_expression {
+                        $$ = createAst{UNARY_EXPRESSION_LEXEM, {$<ast>1, $<ast>2}};
 		};
 
-unary_operator: '&' {
-                      $$ = new LLCCEP_SiHi::ast({}, "&", '&');
+unary_operator: INCREMENT {
+	              $$ = createAst{UNARY_OPERATOR_LEXEM, {createAst{createLexem{$<string>1, INCREMENT}}}};
+              } | DECREMENT {
+                      $$ = createAst{UNARY_OPERATOR_LEXEM, {createAst{createLexem{$<string>1, DECREMENT}}}};
+	      } | '&' {
+                      $$ = createAst{UNARY_OPERATOR_LEXEM, {createAst{createLexem{$<string>1, '&'}}}};
 	      } | '@' {
-                      $$ = new LLCCEP_SiHi::ast({}, "@", '@');
+                      $$ = createAst{UNARY_OPERATOR_LEXEM, {createAst{createLexem{$<string>1, '@'}}}};
               } | '+' {
-                      $$ = new LLCCEP_SiHi::ast({}, "+", '+');
+                      $$ = createAst{UNARY_OPERATOR_LEXEM, {createAst{createLexem{$<string>1, '+'}}}};
               } | '-' {
-                      $$ = new LLCCEP_SiHi::ast({}, "-", '-');
+                      $$ = createAst{UNARY_OPERATOR_LEXEM, {createAst{createLexem{$<string>1, '-'}}}};
               } | '~' {
-                      $$ = new LLCCEP_SiHi::ast({}, "~", '~');
-	      } | '!' {
-                      $$ = new LLCCEP_SiHi::ast({}, "!", '!');
-              };
+                      $$ = createAst{UNARY_OPERATOR_LEXEM, {createAst{createLexem{$<string>1, '~'}}}};
+	      };
 
 cast_expression: unary_expression {
-                       $$ = $<ast>1;
+                       $$ = createAst{CAST_EXPRESSION_LEXEM, {$<ast>1}};
 	       } | REINTERPRET_CAST '<' type_name '>' '(' cast_expression ')' {
-                       $$ = new LLCCEP_SiHi::ast({$<ast>3, $<ast>6}, "reinterpret_cast", REINTERPRET_CAST);
+                       $$ = createAst{CAST_EXPRESSION_LEXEM, {$<ast>3, $<ast>6}};
                };
 
 multiplicative_expression: cast_expression {
                                   $$ = $<ast>1;
                          } | multiplicative_expression multiplicative_operator cast_expression {
                                   $$ = $<ast>2; 
-                                  $$->insert_child($<ast>1); 
-                                  $$->insert_child($<ast>3);
+                                  $$->addChild($<ast>1); 
+                                  $$->addChild($<ast>3);
                          };
 
 multiplicative_operator: '*' {
-                               $$ = new LLCCEP_SiHi::ast({}, "*", '*');
+                               $$ = createAst{MULTIPLICATIVE_OPERATOR_LEXEM, {createAst{createLexem{$<string>1, '*'}}}};
                        } | '/' {
-                               $$ = new LLCCEP_SiHi::ast({}, "/", '/');
+                               $$ = createAst{MULTIPLICATIVE_OPERATOR_LEXEM, {createAst{createLexem{$<string>1, '/'}}}};
                        } | '%' {
-                               $$ = new LLCCEP_SiHi::ast({}, "%", '%');
+                               $$ = createAst{MULTIPLICATIVE_OPERATOR_LEXEM, {createAst{createLexem{$<string>1, '%'}}}};
                        };
 
 additive_expression: multiplicative_expression {
                            $$ = $<ast>1;
                    } | additive_expression additive_operator multiplicative_expression {
                            $$ = $<ast>2;
-                           $$->insert_child($<ast>1);
-                           $$->insert_child($<ast>3);
+                           $$->addChild($<ast>1);
+                           $$->addChild($<ast>3);
                    };
 
 additive_operator: '+' {
-                         $$ = new LLCCEP_SiHi::ast({}, "+", '+');
+                         $$ = createAst{ADDITIVE_OPERATOR_LEXEM, {createAst{createLexem{$<string>1, '+'}}}};
                  } | '-' {
-                         $$ = new LLCCEP_SiHi::ast({}, "-", '-');
+                         $$ = createAst{ADDITIVE_OPERATOR_LEXEM, {createAst{createLexem{$<string>1, '-'}}}};
                  };
 
 shift_expression: additive_expression {
                          $$ = $<ast>1;
 	        } | shift_expression shift_operator additive_expression {
                          $$ = $<ast>2;
-                         $$->insert_child($<ast>1);
-                         $$->insert_child($<ast>3);
+                         $$->addChild($<ast>1);
+                         $$->addChild($<ast>3);
                 };
 
 shift_operator: SHL {
-                      $$ = new LLCCEP_SiHi::ast({}, "<<", SHL);
+                      $$ = createAst{SHIFT_OPERATOR_LEXEM, {createAst{createLexem{$<string>1, SHL}}}};
               } | SHR {
-                      $$ = new LLCCEP_SiHi::ast({}, ">>", SHR);
+                      $$ = createAst{SHIFT_OPERATOR_LEXEM, {createAst{createLexem{$<string>1, SHR}}}};
               };
 
 relational_expression: shift_expression {
                              $$ = $<ast>1;
 	             } | relational_expression relational_operator shift_expression {
                              $$ = $<ast>2;
-                             $$->insert_child($<ast>1);
-                             $$->insert_child($<ast>3);
+                             $$->addChild($<ast>1);
+                             $$->addChild($<ast>3);
                      };
 
 relational_operator: '<' {
-                           $$ = new LLCCEP_SiHi::ast({}, "<", '<');
+                           $$ = createAst{RELATIONAL_OPERATOR_LEXEM, {createAst{createLexem{$<string>1, '<'}}}};
                    } | '>' {
-                           $$ = new LLCCEP_SiHi::ast({}, ">", '>');
+                           $$ = createAst{RELATIONAL_OPERATOR_LEXEM, {createAst{createLexem{$<string>1, '>'}}}}; 
                    } | LESS_EQUAL {
-                           $$ = new LLCCEP_SiHi::ast({}, "<=", LESS_EQUAL);
+                           $$ = createAst{RELATIONAL_OPERATOR_LEXEM, {createAst{createLexem{$<string>1, LESS_EQUAL}}}};
                    } | ABOVE_EQUAL {
-                           $$ = new LLCCEP_SiHi::ast({}, ">=", ABOVE_EQUAL);
-                   };
+                           $$ = createAst{RELATIONAL_OPERATOR_LEXEM, {createAst{createLexem{$<string>1, ABOVE_EQUAL}}}};
+	           };
 
-equality_expression: relational_expressiqon {
+equality_expression: relational_expression {
 		           $$ = $<ast>1;
 	           } | equality_expression equality_operator relational_expression {
                            $$ = $<ast>2;
@@ -209,7 +193,7 @@ and_expression: equality_expression {
 
 exclusive_or_expression: and_expression {
 		               $$ = createAst{EXCLUSIVE_OR_EXPRESSION_LEXEM, {$<ast>1}};
-  	               } | exclusive_or_expressqion '^' and_expression {
+  	               } | exclusive_or_expression '^' and_expression {
                                $$ = createAst{EXCLUSIVE_OR_EXPRESSION_LEXEM, {$<ast>1, $<ast>3}};
                        };
 
@@ -228,31 +212,31 @@ conditional_expression: inclusive_or_expression {
 assignment_expression: conditional_expression {
 		             $$ = createAst{ASSIGNMENT_EXPRESSION_LEXEM, {$<ast>1}};
 	             } | unary_expression assignment_operator assignment_expression {
-                             $$ = createAst{ASSIGNMENT_EXPRESSION_LEXEM, {$<ast>1, $<ast>2, $<ast>3}}.
+                             $$ = createAst{ASSIGNMENT_EXPRESSION_LEXEM, {$<ast>1, $<ast>2, $<ast>3}};
                      };
 
 assignment_operator: '=' {
-		           $$ = createAst{ASSIGN_LEXEM};
+		           $$ = createAst{createLexem{"=", '='}};
 	           } | MUL_ASSIGN {
-                           $$ = createAst{MUL_ASSIGN_LEXEM};
+                           $$ = createAst{createLexem{"*=", MUL_ASSIGN}};
 	           } | DIV_ASSIGN {
-                           $$ = createAst{DIV_ASSIGN_LEXEM};
+                           $$ = createAst{createLexem{"/=", DIV_ASSIGN}};
 	           } | MOD_ASSIGN {
-                           $$ = createAst{MOD_ASSIGN_LEXEM};
+                           $$ = createAst{createLexem{"%=", MOD_ASSIGN}};
 	           } | ADD_ASSIGN {
-                           $$ = createAst{ADD_ASSIGN_LEXEM};
+                           $$ = createAst{createLexem{"+=", ADD_ASSIGN}};
 	           } | SUB_ASSIGN {
-                           $$ = createAst{SUB_ASSIGN_LEXEM};
+                           $$ = createAst{createLexem{"-=", SUB_ASSIGN}};
 	           } | SHL_ASSIGN {
-                           $$ = createAst{SHL_ASSIGN_LEXEM};
+                           $$ = createAst{createLexem{"<<=", SHL_ASSIGN}};
 	           } | SHR_ASSIGN {
-                           $$ = createAst{SHR_ASSIGN_LEXEM};
+                           $$ = createAst{createLexem{">>=", SHR_ASSIGN}};
 	           } | AND_ASSIGN {
-                           $$ = createAst{AND_ASSIGN_LEXEM};
+                           $$ = createAst{createLexem{"&=", AND_ASSIGN}};
 	           } | XOR_ASSIGN {
-                           $$ = createAst{XOR_ASSIGN_LEXEM};
+                           $$ = createAst{createLexem{"^=", XOR_ASSIGN}};
 	           } | OR_ASSIGN {
-                           $$ = createAst{OR_ASSIGN_LEXEM};
+                           $$ = createAst{createLexem{"|=", OR_ASSIGN}};
                    };
 
 expression: assignment_expression {
@@ -263,11 +247,11 @@ expression: assignment_expression {
           };
 
 constant_expression: conditional_expression {
-		           $$ = createAst{{CONSTANT_EXPRESSION_LEXEM, {$<ast>1}};
+		           $$ = createAst{CONSTANT_EXPRESSION_LEXEM, {$<ast>1}};
 		   };
 
 declaration: declaration_specifiers {
-	           $$ = createAst{DECLARATION_LEXEM, {$<ast>1, $<ast>2}};
+	           $$ = createAst{DECLARATION_LEXEM, {$<ast>1}};
    	   } | declaration_specifiers init_declarator_list {
                    $$ = createAst{DECLARATION_LEXEM, {$<ast>1, $<ast>2}}; 
            };
@@ -310,7 +294,7 @@ direct_declarator: ID {
  	         } | '(' declarator ')' {
                          $$ = createAst{DIRECT_DECLARATOR_LEXEM, {$<ast>2}};
                  } | direct_declarator '[' constant_expression ']' {
-                         $$ = createAst{DIRECT_DECLARATOR_LEXEM, {$<ast>1, ${ast}3}};
+                         $$ = createAst{DIRECT_DECLARATOR_LEXEM, {$<ast>1, $<ast>3}};
                  } | direct_declarator '[' ']' {
                          $$ = createAst{DIRECT_DECLARATOR_LEXEM, {$<ast>1}};
 	         } | direct_declarator '(' parameter_type_list ')' {
@@ -351,10 +335,10 @@ parameter_declaration: declaration_specifiers declarator {
                      };
 
 identifier_list: ID {
-	               $$ = createAst{IDENTIFIER_LIST_LEXEM, {createAst{$<string>1, ID}}};
+	               $$ = createAst{IDENTIFIER_LIST_LEXEM, {createAst{createLexem{$<string>1, ID}}}};
 	       } | identifier_list ',' ID {
                        $$ = $<ast>1;
-                       $$->addChild(createAst{$<string>3, ID});
+                       $$->addChild(createAst{createLexem{$<string>3, ID}});
                };
 
 type_name: abstract_declarator {
@@ -485,7 +469,7 @@ jump_statement: JUMP ID {
               };
 
 translation_unit: external_declaration {
-                        builtSyntaxTree = $$ = createAst{EXTERNAL_DECLARATION_LIST_LEXEM, {$<ast>1}};
+                        ast = $$ = createAst{EXTERNAL_DECLARATION_LIST_LEXEM, {$<ast>1}};
                 } | translation_unit external_declaration {
                         $$ = $<ast>1;
                         $$->addChild($<ast>2);
@@ -526,12 +510,9 @@ function_type: {
              };
 %%
 
-int main()
+void yyerror(LLCCEP_SiHi::ast *, const char *msg)
 {
-	yyin = stdin;
-	yyparse();
-
-	builtSyntaxTree->dumpImage("out.gv");
-
-	return 0;
+	::std::cerr << "[" << yyfilename << ":" << yylineno << "]:\n"
+                    << msg << "\n";
 }
+

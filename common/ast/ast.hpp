@@ -23,7 +23,7 @@ namespace LLCCEP {
 				              ::std::vector<ast<lexemType> *>{});
 		~ast();
 		
-		void addChild(const ast<lexemType> &child);
+		void addChild(ast<lexemType> *child);
 		::std::vector<ast<lexemType> *> getChildren() const;
 
 		void value(lexemType newLexemData);
@@ -65,7 +65,7 @@ LLCCEP::ast<lexemType>::ast(const LLCCEP::ast<lexemType> &from):
 {
 	for (const auto &i: from.getChildren()) {
 		if (i) {
-			LLCCEP::ast<lexemType> newChild(i->value(), i->getChildren());
+			LLCCEP::ast<lexemType> *newChild = new (::std::nothrow) LLCCEP::ast<lexemType>(i->value(), i->getChildren());
 			addChild(newChild);
 		}
 	}
@@ -79,7 +79,7 @@ LLCCEP::ast<lexemType>::ast(lexemType value, ::std::vector<LLCCEP::ast<lexemType
 {
 	for (const auto &i: childrenToCopy) {
 		if (i) {
-			LLCCEP::ast<lexemType> newChild(i->lexemData, i->getChildren());
+			LLCCEP::ast<lexemType> *newChild = new (::std::nothrow) LLCCEP::ast<lexemType>(i->lexemData, i->getChildren());
 			addChild(newChild);
 		}
 	}
@@ -99,13 +99,29 @@ LLCCEP::ast<lexemType>::~ast()
 }
 
 template<typename lexemType>
-void LLCCEP::ast<lexemType>::addChild(const LLCCEP::ast<lexemType> &child)
+void LLCCEP::ast<lexemType>::addChild(LLCCEP::ast<lexemType> *child)
 {
 	AST_OK
 
-	LLCCEP::ast<lexemType> *ptr = new LLCCEP::ast<lexemType>(child);
-	ptr->parent = this;
-	children.push_back(ptr);
+	if (!child) {
+		throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
+			"An attempt of insertion a null child"))
+	}
+
+	if (child->parent) {
+		throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
+			"Ast [0x%p] already has got parent [0x%p]",
+			child, child->parent))
+	}
+
+	if (!child->ok()) {
+		throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
+			"An attempt of insertion not ok child [0x%p]",
+			child))
+	}
+
+	child->parent = this;
+	children.push_back(child);
 
 	AST_OK
 }

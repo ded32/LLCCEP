@@ -26,8 +26,8 @@ template<typename charT, typename traits>
 int main()
 {
 	LLCCEP::ast<testLexemType> testAst(testLexemType{"testRoot", 0});
-	testAst.addChild(LLCCEP::ast<testLexemType>(testLexemType{"testLeftNode", 1}));
-	testAst.addChild(LLCCEP::ast<testLexemType>(testLexemType{"testRightNode", 1}));
+	testAst.addChild(new (::std::nothrow) LLCCEP::ast<testLexemType>(testLexemType{"testLeftNode", 1}));
+	testAst.addChild(new (::std::nothrow) LLCCEP::ast<testLexemType>(testLexemType{"testRightNode", 1}));
 
 	testAst.dumpImage("astDump");
 

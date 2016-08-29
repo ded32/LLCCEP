@@ -1,6 +1,9 @@
 alpha [a-zA-Z]
 digit [0-9]
 
+%option yylineno
+%option noyywrap
+
 %{
 #include <stdio.h>
 #include <string>
@@ -8,6 +11,7 @@ digit [0-9]
 #include <STDExtras.hpp>
 #include <os-specific.hpp>
 
+#include "ast/ast.hpp"
 #include "SiHiParser.hpp"
 
 #ifndef YY_PARSER_EXISTS
@@ -16,6 +20,10 @@ size_t yycharno = 0;
 #else
 #define RET(val) ({update(); printf("%s", #val);})
 #endif // YY_PARSER_EXISTS
+
+extern int yyparse(LLCCEP_SiHi::ast *ast);
+
+::std::string yyfilename = "";
 
 static inline void update(void);
 static inline void lexerIssue(const char *fmt, ...);
@@ -127,9 +135,24 @@ static inline void lexerIssue(const char *fmt, ...)
 	char text[4096] = "";
 	vsprintf(text, fmt, list);
 
-	va_end(fmt);
+	va_end(list);
 
 	throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
-		"%s:" size_t_pf ":\n%s", "", yylineno,
+		"[%s:%d]:\n%s", "", yylineno,
 		text));
+}
+
+int main()
+{
+	yyin = stdin;
+
+	LLCCEP_SiHi::ast *res = 0;
+	yyparse(res);
+
+	if (res)
+		res->dumpImage("out.gv");
+
+	delete res;
+
+	return 0;
 }

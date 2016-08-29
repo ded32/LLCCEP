@@ -17,6 +17,7 @@ endif()
 
 add_library(STDExtras "${CMAKE_SOURCE_DIR}/../lib/STDExtras.cpp")
 add_library(DotViz "${CMAKE_SOURCE_DIR}/../third-party/DotViz/DotViz++.cpp")
+add_library(lexem "${CMAKE_SOURCE_DIR}/lexem/lexem.cpp")
 
 find_package(bison)
 find_package(flex)
@@ -29,4 +30,4 @@ add_library(SiHiParserLib "${BISON_SiHiParser_OUTPUT_SOURCE}")
 target_link_libraries(SiHiParserLib STDExtras DotViz)
 
 add_executable(SiHiCompiler "${FLEX_SiHiLexer_OUTPUTS}")
-target_link_libraries(SiHiCompiler SiHiParserLib STDExtras)
+target_link_libraries(SiHiCompiler lexem SiHiParserLib STDExtras)
