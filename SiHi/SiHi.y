@@ -187,274 +187,200 @@ relational_operator: '<' {
                            $$ = new LLCCEP_SiHi::ast({}, ">=", ABOVE_EQUAL);
                    };
 
-equality_expression: relational_expression {
+equality_expression: relational_expressiqon {
 		           $$ = $<ast>1;
 	           } | equality_expression equality_operator relational_expression {
                            $$ = $<ast>2;
-                           $$->insert_child($<ast>1);
-                           $$->insert_child($<ast>3);
+                           $$->addChild($<ast>1);
+                           $$->addChild($<ast>3);
                    };
 
 equality_operator: EQUALS {
-		         $$ = new LLCCEP_SiHi::ast({}, "==", EQUALS);
+		         $$ = createAst{EQUALITY_OPERATOR_LEXEM, {createAst{createLexem{$<string>1, EQUALS}}}};
                  } | NOT_EQUALS {
-                         $$ = new LLCCEP_SiHi::ast({}, "!=", NOT_EQUALS);
+                         $$ = createAst{EQUALITY_OPERATOR_LEXEM, {createAst{createLexem{$<string>1, NOT_EQUALS}}}};
                  };
 
 and_expression: equality_expression {
-	              $$ = $<ast>1;
+	              $$ = createAst{AND_EXPRESSION_LEXEM, {$<ast>1}};
 	      } | and_expression '&' equality_expression {
-                      $$ = new LLCCEP_SiHi::ast({$<ast>1, $<ast>3},
-                                                "&",
-                                                '&');
+                      $$ = createAst{AND_EXPRESSION_LEXEM, {$<ast>1, $<ast>3}};
               };
 
 exclusive_or_expression: and_expression {
-		               $$ =$<ast>1;
-  	               } | exclusive_or_expression '^' and_expression {
-                               $$ = new LLCCEP_SiHi::ast({$<ast>1, $<ast>3},
-                                                         "^",
-                                                         '^');
+		               $$ = createAst{EXCLUSIVE_OR_EXPRESSION_LEXEM, {$<ast>1}};
+  	               } | exclusive_or_expressqion '^' and_expression {
+                               $$ = createAst{EXCLUSIVE_OR_EXPRESSION_LEXEM, {$<ast>1, $<ast>3}};
                        };
 
 inclusive_or_expression: exclusive_or_expression {
-		               $$ = $<ast>1;
+		               $$ = createAst{INCLUSIVE_OR_EXPRESSION_LEXEM, {$<ast>1}};
  	               } | inclusive_or_expression '|' exclusive_or_expression {
-                               $$ = new LLCCEP_SiHi::ast({$<ast>1, $<ast>3},
-                                                         "|",
-                                                         '|');
+                               $$ = createAst{INCLUSIVE_OR_EXPRESSION_LEXEM, {$<ast>1}};
                        };
 
 conditional_expression: inclusive_or_expression {
-		              $$ = $1;
+		              $$ = createAst{CONDITIONAL_EXPRESSION_LEXEM, {$<ast>1}};
 	              } | inclusive_or_expression DONE expression UNLESS conditional_expression { 
-                              $$ = new LLCCEP_SiHi::ast({$<ast>1, $<ast>3, $<ast>5},
-                                                        "if -- else");
+                              $$ = createAst{CONDITIONAL_EXPRESSION_LEXEM, {$<ast>1, $<ast>3, $<ast>5}};
                       };
 
 assignment_expression: conditional_expression {
-		             $$ = $<ast>1;
+		             $$ = createAst{ASSIGNMENT_EXPRESSION_LEXEM, {$<ast>1}};
 	             } | unary_expression assignment_operator assignment_expression {
-                             $$ = $<ast>2;
-                             $$->insert_child($<ast>1);
-                             $$->insert_child($<ast>3);
+                             $$ = createAst{ASSIGNMENT_EXPRESSION_LEXEM, {$<ast>1, $<ast>2, $<ast>3}}.
                      };
 
 assignment_operator: '=' {
-		           $$ = new LLCCEP_SiHi::ast({},
-                                                     "=",
-                                                     '=');
+		           $$ = createAst{ASSIGN_LEXEM};
 	           } | MUL_ASSIGN {
-                           $$ = new LLCCEP_SiHi::ast({},
-                                                     "*=",
-                                                     MUL_ASSIGN);
+                           $$ = createAst{MUL_ASSIGN_LEXEM};
 	           } | DIV_ASSIGN {
-                           $$ = new LLCCEP_SiHi::ast({},
-                                                     "/=",
-                                                     DIV_ASSIGN);
+                           $$ = createAst{DIV_ASSIGN_LEXEM};
 	           } | MOD_ASSIGN {
-                           $$ = new LLCCEP_SiHi::ast({},
-                                                     "%=",
-                                                     MOD_ASSIGN);
+                           $$ = createAst{MOD_ASSIGN_LEXEM};
 	           } | ADD_ASSIGN {
-                           $$ = new LLCCEP_SiHi::ast({},
-                                                     "+=",
-                                                     ADD_ASSIGN);
+                           $$ = createAst{ADD_ASSIGN_LEXEM};
 	           } | SUB_ASSIGN {
-                           $$ = new LLCCEP_SiHi::ast({},
-                                                     "-=",
-                                                     SIB_ASSIGN);
+                           $$ = createAst{SUB_ASSIGN_LEXEM};
 	           } | SHL_ASSIGN {
-                           $$ = new LLCCEP_SiHi::ast({},
-                                                     "<<=",
-                                                     SHL_ASSIGN);
+                           $$ = createAst{SHL_ASSIGN_LEXEM};
 	           } | SHR_ASSIGN {
-                           $$ = new LLCCEP_SiHi::ast({},
-                                                     ">>=",
-                                                     SHR_ASSIGN);
+                           $$ = createAst{SHR_ASSIGN_LEXEM};
 	           } | AND_ASSIGN {
-                           $$ = new LLCCEP_SiHi::ast({},
-                                                     "&=",
-                                                     AND_ASSIGN);
+                           $$ = createAst{AND_ASSIGN_LEXEM};
 	           } | XOR_ASSIGN {
-                           $$ = new LLCCEP_SiHi::ast({},
-                                                     "^=",
-                                                     XOR_ASSIGN);
+                           $$ = createAst{XOR_ASSIGN_LEXEM};
 	           } | OR_ASSIGN {
-                           $$ = new LLCCEP_SiHi::ast({},
-                                                     "|=",
-                                                     OR_ASSIGN);
+                           $$ = createAst{OR_ASSIGN_LEXEM};
                    };
 
 expression: assignment_expression {
-	          $$ = $<ast>1;
+	          $$ = createAst{EXPRESSION_LEXEM, {$<ast>1}};
   	  } | expression ',' assignment_expression {
-                  $$ = new LLCCEP_SiHi::ast({$<ast>1, $<ast>3},
-                                            ",", ',');
+                  $$ = $<ast>1;
+                  $$->addChild($<ast>3);
           };
 
 constant_expression: conditional_expression {
-		           $$ = $<ast>1;
+		           $$ = createAst{{CONSTANT_EXPRESSION_LEXEM, {$<ast>1}};
 		   };
 
 declaration: declaration_specifiers {
-	           $$ = $<ast>1;
+	           $$ = createAst{DECLARATION_LEXEM, {$<ast>1, $<ast>2}};
    	   } | declaration_specifiers init_declarator_list {
-                   $$ = new LLCCEP_SiHi::ast({$<ast>1, $<ast>2}, 
-                                             "declaration",
-                                             DECLARATION);
+                   $$ = createAst{DECLARATION_LEXEM, {$<ast>1, $<ast>2}}; 
            };
  
 declaration_specifiers: type_specifier {
-		              $$ = $<ast>1;
+		              $$ = createAst{DECLARATION_SPECIFIERS_LEXEM, {$<ast>1}};
 		      };
 
 init_declarator_list: init_declarator {
-		            $$ = $<ast>1;
+		            $$ = createAst{INIT_DECLARATOR_LIST_LEXEM, {$<ast>1}};
 	            } | init_declarator_list ',' init_declarator {
-                            $$ = new LLCCEP_SiHi::ast({$<ast>1, $<ast>3},
-                                                      ",",
-                                                      ',');
+                            $$ = $<ast>1;
+                            $$->addChild($<ast>3);
                     };
 
 init_declarator: declarator {
-	               $$ = <ast>1;
+	               $$ = createAst{INIT_DECLARATOR_LEXEM, {$<ast>1}};
 	       } | declarator '=' initializer {
-                       $$ = new LLCCEP_SiHi::ast({$<ast>1, $<ast>3},
-                                                 "=",
-                                                 '=');
+                       $$ = createAst{INIT_DECLARATOR_LEXEM, {$<ast>1, $<ast>3}};
                };
 
 type_specifier: EMPTY {
-	              $$ = new LLCCEP_SiHi::ast({},
-                                                "empty",
-                                                EMPTY);
+	              $$ = createAst{TYPE_SPECIFIER_LEXEM, {createAst{createLexem{$<string>1, EMPTY}}}};
    	      } | REAL {
-                      $$ = new LLCCEP_SiHi::ast({},
-                                                "real",
-                                                REAL);
+                      $$ = createAst{TYPE_SPECIFIER_LEXEM, {createAst{createLexem{$<string>1, REAL}}}};
 	      } | STRING {
-                      $$ = new LLCCEP_SiHi::ast({},
-                                                "string",
-                                                STRING);
+                      $$ = createAst{TYPE_SPECIFIER_LEXEM, {createAst{createLexem{$<string>1, STRING}}}};
 	      } | ID {
-                      $$ = new LLCCEP_SiHi::ast({},
-                                                "typename: " + $<string>1,
-                                                TYPENAME);
+                      $$ = createAst{TYPE_SPECIFIER_LEXEM, {createAst{createLexem{$<string>1, ID}}}};
               };
 
 declarator: pointer direct_declarator {
-	          $$ = new LLCCEP_SiHi::ast({$<ast>1, $<ast>2},
-                                            "declarator",
-                                            DECLARATOR);
+	          $$ = createAst{DECLARATOR_LEXEM, {$<ast>1, $<ast>2}};
 	  } | direct_declarator {
-                  $$ = $<ast>1;
+                  $$ = createAst{DECLARATOR_LEXEM, {$<ast>1}};
           };
 
 direct_declarator: ID {
-		         $$ = new LLCCEP_SiHi::ast({}, 
-                                                   $<string>1, 
-                                                   ID);
+		         $$ = createAst{DIRECT_DECLARATOR_LEXEM, {createAst{createLexem{$<string>1, ID}}}};
  	         } | '(' declarator ')' {
-                         $$ = $<ast>2;
+                         $$ = createAst{DIRECT_DECLARATOR_LEXEM, {$<ast>2}};
                  } | direct_declarator '[' constant_expression ']' {
-                         $$ = new LLCCEP_SiHi::ast({$<ast>1, $<ast>3},
-                                                   "[]",
-                                                   ARRAY_DECLARATION);
+                         $$ = createAst{DIRECT_DECLARATOR_LEXEM, {$<ast>1, ${ast}3}};
                  } | direct_declarator '[' ']' {
-                         $$ = new LLCCEP_SiHi::ast({$<ast>1},
-                                                   "[]",
-                                                   ARRAY_DECLARATION);
+                         $$ = createAst{DIRECT_DECLARATOR_LEXEM, {$<ast>1}};
 	         } | direct_declarator '(' parameter_type_list ')' {
+                         $$ = createAst{DIRECT_DECLARATOR_LEXEM, {$<ast>1, $<ast>3}};
                  } | direct_declarator '(' identifier_list ')' {
+                         $$ = createAst{DIRECT_DECLARATOR_LEXEM, {$<ast>1, $<ast>3}};
 	         } | direct_declarator '(' ')' {
+                         $$ = createAst{DIRECT_DECLARATOR_LEXEM, {$<ast>1}};
                  };
 
 pointer: '*' {
-                 $$ = new LLCCEP_SiHi::ast({}, "*", POINTER);
+                 $$ = createAst{POINTER_LEXEM};
        } | '*' pointer {
-                 $$ = new LLCCEP_SiHi::ast({}, "*", POINTER);
+                 $$ = createAst{POINTER_LEXEM, {$<ast>2}};
        };
 
 
 parameter_type_list: parameter_list {
-		           $$ = $<ast>1;
+		           $$ = createAst{PARAMETER_TYPE_LIST_LEXEM, {$<ast>1}};
 	           } | parameter_list ',' VARARG {
-                           $$ = new LLCCEP_SiHi::ast({$<ast>1, new LLCCEP_SiHi::ast({}, "vararg", VARARG)}, 
-                                                     ",",
-                                                     PARAM_TYPE_LIST);
+                           $$ = $<ast>1;
+                           $$->addChild(createAst{createLexem{"...", VARARG}});
                    };
 
 parameter_list: parameter_declaration {
-                      $$ = $<ast>1;
+                      $$ = createAst{PARAMETER_LIST_LEXEM, {$<ast>1}};
 	      } | parameter_list ',' parameter_declaration {
-                      $$ = new LLCCEP_SiHi::ast({$<ast>1, $<ast>3},
-                                                ",",
-                                                PARAMETER_LIST);
+                      $$ = $<ast>1;
+                      $$->addChild($<ast>3);
               };
 
 parameter_declaration: declaration_specifiers declarator {
-		             $$ = new LLCCEP_SiHi::ast({$<ast>1, $<ast>2},
-                                                       "Parameter declaration",
-                                                       PARAMETER_DECLARATION);
+		             $$ = createAst{PARAMETER_DECLARATION_LEXEM, {$<ast>1, $<ast>2}};
 		     } | declaration_specifiers abstract_declarator {
-                             $$ = new LLCCEP_SiHi::ast({$<ast>1, $<ast>2},
-                                                       "Parameter declaration",
-                                                       PARAMETER_DECLARATION);
+                             $$ = createAst{PARAMETER_DECLARATION_LEXEM, {$<ast>1, $<ast>2}};
                      } | declaration_specifiers {
-                             $$ = new LLCCEP_SiHi::ast({$<ast>1},
-                                                       "Parameter declaration",
-                                                       PARAMETER_DECLARATION);
+                             $$ = createAst{PARAMETER_DECLARATION_LEXEM, {$<ast>1}};
                      };
 
 identifier_list: ID {
-	               $$ = new LLCCEP_SiHi::ast({},
-                                                 $<string>1,
-                                                 ID);
+	               $$ = createAst{IDENTIFIER_LIST_LEXEM, {createAst{$<string>1, ID}}};
 	       } | identifier_list ',' ID {
-                       $$ = new LLCCEP_SiHi::ast({$<ast>1, new LLCCEP_SiHi::ast({}, $<string>2, ID)},
-                                                 ",",
-                                                 IDENTIFIER_LIST);
+                       $$ = $<ast>1;
+                       $$->addChild(createAst{$<string>3, ID});
                };
 
 type_name: abstract_declarator {
-                 $$ = new LLCCEP_SiHi::ast({$<ast>1},
-                                           "typename",
-                                           TYPENAME);
+                 $$ = createAst{TYPE_NAME_LEXEM, {$<ast>1}};
          };
 
 abstract_declarator: pointer {
-		           $$ = $<ast>1;
+		           $$ = createAst{ABSTRACT_DECLARATOR_LEXEM, {$<ast>1}};
  	           } | direct_abstract_declarator {
-                           $$ = $<ast>1;
+                           $$ = createAst{ABSTRACT_DECLARATOR_LEXEM, {$<ast>1}};
 	           } | pointer direct_abstract_declarator {
-                           $$ = new LLCCEP_SiHi::ast({$<ast>1, $<ast>2},
-                                                     "Abstract declarator",
-                                                     ABSTRACT_DECLARATOR);
+                           $$ = createAst{ABSTRACT_DECLARATOR_LEXEM, {$<ast>1, $<ast>2}};
                    };
 
 direct_abstract_declarator: '(' abstract_declarator ')' {
-			          $$ = $<ast>2;
+			          $$ = createAst{DIRECT_ABSTRACT_DECLARATOR_LEXEM, {}};
 	                  } | '[' ']' {
-                                  $$ = new LLCCEP_SiHi::ast({}, 
-                                                            "[]",
-                                                            DIRECT_ABSTRACT_DECLARATOR);
+                                  $$ = createAst{DIRECT_ABSTRACT_DECLARATOR_LEXEM, {}};
 	                  } | '[' constant_expression ']' {
-                                  $$ = new LLCCEP_SiHi::ast({$<ast>2},
-                                                            "[]",
-                                                            DIRECT_ABSTRACT_DECLARATOR);
+                                  $$ = createAst{DIRECT_ABSTRACT_DECLARATOR_LEXEM, {$<ast>1}};
                           } | direct_abstract_declarator '[' ']' {
-                                  $$ = new LLCCEP_SiHi::ast({$<ast>1},
-                                                            "[]",
-                                                            DIRECT_ABSTRACT_DECLARATOR);
+                                  $$ = createAst{DIRECT_ABSTRACT_DECLARATOR_LEXEM, {$<ast>1}}
                           } | direct_abstract_declarator '[' constant_expression ']' {
-                                  $$ = new LLCCEP_SiHi::ast({$<ast>1, $<ast>2},
-                                                            "[]",
-                                                            DIRECT_ABSTRACT_DECLARATOR);
+                                  $$ = createAst{DIRECT_ABSTRACT_DECLARATOR_LEXEM, {$<ast>1, $<ast>3}};
                           } | '(' ')' {
-                                  $$ = new LLCCEP_SiHi::ast({},
-                                                            "()",
-                                                            DIRECT_ABSTRACT_DECLARATOR);
+                                  $$ = createAst{DIRECT_ABSTRACT_DECLARATOR_LEXEM, {}};
                           } | '(' parameter_type_list ')' {
                                   $$ = createAst{DIRECT_ABSTRACT_DECLARATOR_LEXEM, {$<ast>2}};
                           } | direct_abstract_declarator '(' ')' {
