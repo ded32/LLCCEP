@@ -21,13 +21,16 @@ size_t yycharno = 0;
 #define RET(val) ({update(); printf("%s", #val);})
 #endif // YY_PARSER_EXISTS
 
-extern int yyparse(LLCCEP_SiHi::ast *ast);
+extern int yyparse(LLCCEP_SiHi::ast **ast);
 
 ::std::string yyfilename = "";
 
 static inline void update(void);
 static inline void lexerIssue(const char *fmt, ...);
 
+#if __cplusplus > 199711L
+#define register      // Deprecated in C++11.
+#endif 
 %}
 
 %%
@@ -79,7 +82,7 @@ vararg           {RET(VARARG);}
 "<"   {RET('<');}
 ">"   {RET('>');}
 "!"   {RET('!');}
-"("   {RET('<');}
+"("   {RET('(');}
 ")"   {RET(')');}
 "{"   {RET('{');}
 "}"   {RET('}');}
@@ -147,10 +150,14 @@ int main()
 	yyin = stdin;
 
 	LLCCEP_SiHi::ast *res = 0;
-	yyparse(res);
+	yyparse(&res);
 
-	if (res)
+	if (res) {
 		res->dumpImage("out.gv");
+		DotViz::dvRender("out.gv", "out.pdf");
+	} else {
+		::std::cerr << "invalid output";
+	}
 
 	delete res;
 

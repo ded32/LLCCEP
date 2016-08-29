@@ -3,7 +3,8 @@
 
 #include "lexem.hpp"
 
-::std::string LLCCEP_SiHi::lexem::toString() const
+::std::string LLCCEP_SiHi::lexem::toString(bool enforceForImage) const
 {
-	return "\"" + value + "\": " + to_string(type);
+	::std::string quote = /*((enforceForImage)?*/("\\\"")/*:("\""))*/;
+	return quote + value + quote + ": " + to_string(type);
 }

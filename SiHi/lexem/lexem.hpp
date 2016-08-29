@@ -52,6 +52,7 @@ namespace LLCCEP_SiHi {
 #define LABELED_STATEMENT_LEXEM          createLexem{"Labeled statement", LLCCEP_SiHi::LABELED_STATEMENT}
 #define COMPOUND_STATEMENT_LEXEM         createLexem{"Compound statement", LLCCEP_SiHi::COMPOUND_STATEMENT}
 #define DECLARATION_STATEMENT_LEXEM      createLexem{"Declaration statement", LLCCEP_SiHi::DECLARATION_STATEMENT}
+#define DECLARATION_STATEMENT_LIST_LEXEM createLexem{"Declaration statement list", LLCCEP_SiHi::DECLARATION_STATEMENT_LIST}
 #define EXPRESSION_STATEMENT_LEXEM       createLexem{"Expression statement", LLCCEP_SiHi::EXPRESSION_STATEMENT}
 #define BRANCHED_STATEMENT_LEXEM         createLexem{"Branched statement", LLCCEP_SiHi::BRANCHED_STATEMENT}
 #define LOOPED_STATEMENT_LEXEM           createLexem{"Looped statement", LLCCEP_SiHi::LOOPED_STATEMENT}
@@ -130,7 +131,7 @@ namespace LLCCEP_SiHi {
 		::std::string value;
 		int type;
 
-		::std::string toString() const;
+		::std::string toString(bool enforceForImage = false) const;
 	};
 }
 

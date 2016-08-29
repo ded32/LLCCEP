@@ -2,7 +2,7 @@
 #include <string>
 #include "ast/ast.hpp"
 
-void yyerror(LLCCEP_SiHi::ast *, const char *msg);
+void yyerror(LLCCEP_SiHi::ast **, const char *msg);
 
 extern ::std::string yyfilename;
 extern int yylex(void);
@@ -11,7 +11,7 @@ extern int yylineno;
 
 %error-verbose
 
-%parse-param {LLCCEP_SiHi::ast *ast}
+%parse-param {LLCCEP_SiHi::ast **ast}
 
 %union {
 	::LLCCEP_SiHi::ast *ast;
@@ -45,6 +45,7 @@ extern int yylineno;
 
 %start translation_unit
 
+%left '+' '-' '*' '/' '%' '@' '&'
 %%
 primary_expression: ID {
                             $$ = createAst{PRIMARY_EXPRESSION_LEXEM, {createAst{createLexem{$<string>1, ID}}}};
@@ -441,35 +442,35 @@ labeled_statement_list: labeled_statement {
                       };
 
 branched_statement: IF expression statement {
-                           $$ = createAst{IF_LEXEM, {$<ast>2, $<ast>3}};
+                           $$ = createAst{BRANCHED_STATEMENT_LEXEM, {$<ast>2, $<ast>3}};
                    } | IF expression statement ELSE statement {
-                           $$ = createAst{IF_LEXEM, {$<ast>2, $<ast>3, $<ast>5}};
+                           $$ = createAst{BRANCHED_STATEMENT_LEXEM, {$<ast>2, $<ast>3, $<ast>5}};
                    } | CASE expression '{' labeled_statement_list '}' {
-                           $$ = createAst{CASE_LEXEM, {$<ast>2, $<ast>4}};
+                           $$ = createAst{BRANCHED_STATEMENT_LEXEM, {$<ast>2, $<ast>4}};
                    };
 
 looped_statement: WHILE expression statement {
-                        $$ = createAst{WHILE_LEXEM, {$<ast>2, $<ast>3}};
+                        $$ = createAst{LOOPED_STATEMENT_LEXEM, {$<ast>2, $<ast>3}};
                 } | DO expression statement WHILE statement {
-                        $$ = createAst{DO_WHILE_LEXEM, {$<ast>2, $<ast>3, $<ast>5}}
+                        $$ = createAst{LOOPED_STATEMENT_LEXEM, {$<ast>2, $<ast>3, $<ast>5}}
 	        } | FOR expression_statement ';' expression_statement ';' expression statement {
-                        $$ = createAst{FOR_LEXEM, {$<ast>2, $<ast>4, $<ast>6, $<ast>7}};
+                        $$ = createAst{LOOPED_STATEMENT_LEXEM, {$<ast>2, $<ast>4, $<ast>6, $<ast>7}};
                 };
 
 jump_statement: JUMP ID {
-                      $$ = createAst{JUMP_LEXEM, {createAst{createLexem{$<string>2, ID}}}};
+                      $$ = createAst{JUMP_STATEMENT_LEXEM, {createAst{createLexem{$<string>2, ID}}}};
               } | NEXT {
-                      $$ = createAst{NEXT_LEXEM};
+                      $$ = createAst{JUMP_STATEMENT_LEXEM};
               } | STOP {
-                      $$ = createAst{STOP_LEXEM};
+                      $$ = createAst{JUMP_STATEMENT_LEXEM};
               } | RETURN {
-                      $$ = createAst{RETURN_LEXEM};
+                      $$ = createAst{JUMP_STATEMENT_LEXEM};
 	      } | RETURN expression {
-                      $$ = createAst{RETURN_LEXEM, {$<ast>2}};
+                      $$ = createAst{JUMP_STATEMENT_LEXEM, {$<ast>2}};
               };
 
 translation_unit: external_declaration {
-                        ast = $$ = createAst{EXTERNAL_DECLARATION_LIST_LEXEM, {$<ast>1}};
+                        *ast = $$ = createAst{EXTERNAL_DECLARATION_LEXEM, {$<ast>1}};
                 } | translation_unit external_declaration {
                         $$ = $<ast>1;
                         $$->addChild($<ast>2);
@@ -482,7 +483,7 @@ external_declaration: function_definition {
                     };
 
 function_definition: function_signature compound_statement {
-                           $$ = createAst{FUNCTION_DEFINITION_LEXEM};
+                           $$ = createAst{FUNCTION_DEFINITION_LEXEM, {$<ast>1, $<ast>2}};
                    };
 
 function_signature: function_name function_args function_type {
@@ -496,11 +497,11 @@ function_name: FUNCTION ID {
 	     };
 
 function_args: {
-	             $$ = createAst{FUNCTION_ARGUMENTS_LEXEM};
+	             $$ = createAst{FUNCTION_ARGS_LEXEM};
              } | '(' ')' {
-                     $$ = createAst{FUNCTION_ARGUMENTS_LEXEM};
+                     $$ = createAst{FUNCTION_ARGS_LEXEM};
              } | '(' parameter_type_list ')' {
-                     $$ = createAst{FUNCTION_ARGUMENTS_LEXEM, {$<ast>2}};
+                     $$ = createAst{FUNCTION_ARGS_LEXEM, {$<ast>2}};
              };
 
 function_type: {
@@ -510,7 +511,7 @@ function_type: {
              };
 %%
 
-void yyerror(LLCCEP_SiHi::ast *, const char *msg)
+void yyerror(LLCCEP_SiHi::ast **, const char *msg)
 {
 	::std::cerr << "[" << yyfilename << ":" << yylineno << "]:\n"
                     << msg << "\n";
