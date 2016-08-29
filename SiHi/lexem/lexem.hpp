@@ -2,6 +2,7 @@
 #define SIHI_LEXEM_TYPE_HPP
 
 #include <string>
+#include <iostream>
 
 namespace LLCCEP_SiHi {
 #define createLexem LLCCEP_SiHi::lexem
@@ -131,8 +132,15 @@ namespace LLCCEP_SiHi {
 		::std::string value;
 		int type;
 
-		::std::string toString(bool enforceForImage = false) const;
+		::std::string toString(bool enforce = true) const;
 	};
+
+	template<typename charT, typename traits>
+	::std::basic_ostream<charT, traits> &operator<<(::std::basic_ostream<charT, traits> &out, lexem lex)
+	{
+		out << lex.toString(false);
+		return out;
+	}
 }
 
 #endif // SIHI_LEXEM_HPP

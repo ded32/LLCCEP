@@ -152,12 +152,10 @@ int main()
 	LLCCEP_SiHi::ast *res = 0;
 	yyparse(&res);
 
-	if (res) {
-		res->dumpImage("out.gv");
-		DotViz::dvRender("out.gv", "out.pdf");
-	} else {
+	if (res)
+		res->dumpPlain("out.ast");
+	else
 		::std::cerr << "invalid output";
-	}
 
 	delete res;
 
