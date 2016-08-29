@@ -1,0 +1,4 @@
+1) Andrew S. Tanenbaum, Todd Austin - Structured Computer Organization(Sixth edition)
+2) Terrence W. Pratt, Marvin V. Zelkowitz - Programming languages: design and implementation(Fourth edition)
+3) Donald Knuth - The Art of Computer Programming, vol.1. Fundamental Algorithms
+4) 
