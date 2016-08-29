@@ -106,7 +106,7 @@ vararg           {RET(VARARG);}
 
 ({alpha}|"_")({alpha}|{digit}|"_")* {RET(ID);}
 {digit}+("."{digit}*)?              {RET(NUMBER);}
-\"(\\.|[^\\"])*\"                   {RET(LITERAL);}
+\'(\\.|[^\\"])*\'                   {RET(LITERAL);}
 
 . {lexerIssue("Forbidden input characters: %s", yytext);}
 %%
