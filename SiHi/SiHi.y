@@ -45,7 +45,8 @@ extern int yylineno;
 
 %start translation_unit
 
-%left '+' '-' '*' '/' '%' '@' '&'
+%left '+' '-' '*' '/' '%' '@' '&' SHL SHR 
+
 %%
 primary_expression: ID {
                             $$ = createAst{PRIMARY_EXPRESSION_LEXEM, {createAst{createLexem{$<string>1, ID}}}};

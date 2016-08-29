@@ -26,6 +26,8 @@ bison_target(SiHiParser "${CMAKE_SOURCE_DIR}/SiHi.y" "${CMAKE_SOURCE_DIR}/SiHiPa
 flex_target(SiHiLexer "${CMAKE_SOURCE_DIR}/SiHi.l" "${CMAKE_SOURCE_DIR}/SiHiLexer.cpp")
 add_flex_bison_dependency(SiHiLexer SiHiParser)
 
+set(BISON_SiHiParser_COMPILE_FLAGS "${BISON_SiHiParser_COMPILE_FLAGS} -v")
+
 add_library(SiHiParserLib "${BISON_SiHiParser_OUTPUT_SOURCE}")
 target_link_libraries(SiHiParserLib STDExtras DotViz)
 
