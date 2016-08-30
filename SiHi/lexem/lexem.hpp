@@ -66,6 +66,11 @@ namespace LLCCEP_SiHi {
 #define FUNCTION_ARGS_LEXEM              createLexem{"Function arguments", LLCCEP_SiHi::FUNCTION_ARGS}
 #define FUNCTION_TYPE_LEXEM              createLexem{"Function type", LLCCEP_SiHi::FUNCTION_TYPE}
 #define LABELED_STATEMENT_LIST_LEXEM     createLexem{"Labeled statement list", LLCCEP_SiHi::LABELED_STATEMENT}
+#define CLASS_DECLARATION_LEXEM          createLexem{"Class declaration", LLCCEP_SiHi::CLASS_DECLARATION}
+#define CLASSNAME_LEXEM                  createLexem{"Class name", LLCCEP_SiHi::CLASSNAME}
+#define PREDECESSOR_LEXEM                createLexem{"Predecessor", LLCCEP_SiHi::PREDECESSOR}
+#define METHOD_PROPERTY_LIST_LEXEM       createLexem{"Method/property list", LLCCEP_SiHi::METHOD_PROPERTY_LIST}
+#define ACCESS_RULE_LEXEM                createLexem{"Access rule", LLCCEP_SiHi::ACCESS_RULE}
 
 	enum lex_t: int {
 		PRIMARY_EXPRESSION         = 1024,
@@ -125,7 +130,12 @@ namespace LLCCEP_SiHi {
 		FUNCTION_NAME              = 1078,
 		FUNCTION_ARGS              = 1079,
 		FUNCTION_TYPE              = 1080,
-		LABELED_STATEMENT_LIST     = 1081
+		LABELED_STATEMENT_LIST     = 1081,
+		CLASS_DECLARATION          = 1082,
+		CLASSNAME                  = 1083,
+		PREDECESSOR                = 1084,
+		METHOD_PROPERTY_LIST       = 1085,
+		ACCESS_RULE                = 1086
 	};
 
 	struct lexem {

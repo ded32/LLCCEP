@@ -59,6 +59,14 @@ done             {RET(DONE);}
 unless           {RET(UNLESS);}
 vararg           {RET(VARARG);}
 
+class            {RET(CLASS);}
+typealias        {RET(TYPEALIAS);}
+public           {RET(PUBLIC);}
+private          {RET(PRIVATE);}
+protected        {RET(PROTECTED);}
+static           {RET(STATIC);}
+
+"<-"  {RET(BACKARROW);}
 "->"  {RET(ARROW);}
 "++"  {RET(INCREMENT);}
 "--"  {RET(DECREMENT);}

@@ -24,7 +24,8 @@ extern int yylineno;
 %token <string> ADD_ASSIGN SUB_ASSIGN SHL_ASSIGN SHR_ASSIGN AND_ASSIGN
 %token <string> XOR_ASSIGN OR_ASSIGN EMPTY REAL STRING OTHER PASS
 %token <string> IF ELSE CASE WHILE DO FOR JUMP NEXT STOP RETURN
-%token <string> DONE UNLESS VARARG FUNCTION
+%token <string> DONE UNLESS VARARG FUNCTION CLASS TYPEALIAS BACKARROW
+%token <string> PUBLIC PRIVATE PROTECTED STATIC
 
 %type <ast> primary_expression postfix_expression argument_expression_list
 %type <ast> unary_expression unary_operator cast_expression multiplicative_expression
@@ -38,10 +39,13 @@ extern int yylineno;
 %type <ast> parameter_list parameter_declaration identifier_list type_name
 %type <ast> abstract_declarator direct_abstract_declarator initializer initializer_list
 %type <ast> statement labeled_statement compound_statement declaration_statement
-%type <ast> declaration_statement_list expression_statement branched_statement
-%type <ast> looped_statement jump_statement translation_unit external_declaration
-%type <ast> function_definition function_signature function_name function_args function_type
-%type <ast> labeled_statement_list
+%type <ast> declaration_statement_optional_semicolon declaration_statement_list 
+%type <ast> expression_statement branched_statement looped_statement jump_statement 
+%type <ast> translation_unit external_declaration function_definition function_signature 
+%type <ast> function_name function_args function_type labeled_statement_list
+%type <ast> class_declaration classname predecessor class_body method_property_list
+%type <ast> method_property access_rule_optional_static method property
+%type <ast> access_rule
 
 %start translation_unit
 
@@ -422,9 +426,15 @@ declaration_statement: declaration {
                              $$ = createAst{DECLARATION_STATEMENT_LEXEM, {$<ast>1}};
                      };
 
-declaration_statement_list: declaration_statement {
+declaration_statement_optional_semicolon: declaration_statement ';' {
+					        $$ = $<ast>1;
+                                        } | declaration_statement {
+                                                $$ = $<ast>1;
+                                        };
+
+declaration_statement_list: declaration_statement_optional_semicolon {
                                   $$ = createAst{DECLARATION_STATEMENT_LIST_LEXEM, {$<ast>1}};
-                          } | declaration_statement_list declaration_statement {
+                          } | declaration_statement_list declaration_statement_optional_semicolon {
                                   $$ = $<ast>1;
                                   $$->addChild($<ast>2);
                           };
@@ -454,7 +464,7 @@ looped_statement: WHILE expression statement {
                         $$ = createAst{LOOPED_STATEMENT_LEXEM, {$<ast>2, $<ast>3}};
                 } | DO expression statement WHILE statement {
                         $$ = createAst{LOOPED_STATEMENT_LEXEM, {$<ast>2, $<ast>3, $<ast>5}}
-	        } | FOR expression_statement ';' expression_statement ';' expression statement {
+	        } | FOR declaration_statement ';' expression_statement ';' expression statement {
                         $$ = createAst{LOOPED_STATEMENT_LEXEM, {$<ast>2, $<ast>4, $<ast>6, $<ast>7}};
                 };
 
@@ -480,6 +490,12 @@ translation_unit: external_declaration {
 external_declaration: function_definition {
 		            $$ = createAst{EXTERNAL_DECLARATION_LEXEM, {$<ast>1}};
                     } | declaration {
+                            $$ = createAst{EXTERNAL_DECLARATION_LEXEM, {$<ast>1}};
+                    } | function_signature {
+                            $$ = createAst{EXTERNAL_DECLARATION_LEXEM, {$<ast>1}};
+		    } | function_signature ';' {
+                            $$ = createAst{EXTERNAL_DECLARATION_LEXEM, {$<ast>1}};
+                    } | class_declaration {
                             $$ = createAst{EXTERNAL_DECLARATION_LEXEM, {$<ast>1}};
                     };
 
@@ -510,11 +526,67 @@ function_type: {
              } | ARROW type_specifier {
                      $$ = createAst{FUNCTION_TYPE_LEXEM, {$<ast>2}};
              };
+
+class_declaration: classname predecessor class_body {
+		        $$ = createAst{CLASS_DECLARATION_LEXEM, {$<ast>1, $<ast>2, $<ast>3}};
+                 };
+
+classname: CLASS ID {
+	         $$ = createAst{CLASSNAME_LEXEM, {createAst{createLexem{$<string>2, ID}}}};
+         };
+
+predecessor: {
+	           $$ = createAst{PREDECESSOR_LEXEM};
+           } | BACKARROW ID {
+	           $$ = createAst{PREDECESSOR_LEXEM, {createAst{createLexem{$<string>2, ID}}}};
+           };
+
+class_body: '{' method_property_list '}' {
+	          $$ = $<ast>2;
+          };
+
+method_property_list: method_property {
+		            $$ = createAst{METHOD_PROPERTY_LIST_LEXEM, {$<ast>1}};
+                    } | method_property_list method_property {
+                            $$ = $<ast>1;
+                            $$->addChild($<ast>2);
+                    };
+
+method_property: access_rule_optional_static method {
+	               $$ = $<ast>1;
+               } | access_rule_optional_static property {
+                       $$ = $<ast>1;
+               };
+
+access_rule_optional_static: STATIC access_rule {
+			           $$ = $<ast>2;
+                                   $$->addChild(createAst{createLexem{"static", STATIC}});
+                           } | access_rule {
+                                   $$ = $<ast>1;
+                           };
+
+method: function_definition {
+              $$ = $<ast>1;
+      };
+
+property: declaration {
+	        $$ = $<ast>1;
+        };
+
+access_rule: PUBLIC {
+	           $$ = createAst{ACCESS_RULE_LEXEM, {createAst{createLexem{"public", PUBLIC}}}};
+           } | PROTECTED {
+                   $$ = createAst{ACCESS_RULE_LEXEM, {createAst{createLexem{"protected", PROTECTED}}}};
+           } | PRIVATE {
+                   $$ = createAst{ACCESS_RULE_LEXEM, {createAst{createLexem{"private", PRIVATE}}}};
+           };
 %%
 
 void yyerror(LLCCEP_SiHi::ast **, const char *msg)
 {
-	::std::cerr << "[" << yyfilename << ":" << yylineno << "]:\n"
-                    << msg << "\n";
+	throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
+		"[%s:%d]:\n"
+		"%s",
+		yyfilename.c_str(), yylineno,
+                msg))
 }
-
