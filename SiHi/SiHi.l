@@ -45,6 +45,7 @@ static YYLTYPE yylexloc{};
  * Intermodular functions
  ************************************************/
 void yyerror(LLCCEP_SiHi::ast **ast, const char *str);
+void yyfreebuf(void);
 
 /*************************************************
  * Local functions 
@@ -77,7 +78,7 @@ static inline void yymarktok(void);
 /*************************************************
  * Preserves from 'register' storage class
  * usage in case of usage C++11 or later,
- * which is deprecated
+ * where it is deprecated
  ************************************************/
 #if __cplusplus > 199711L
 #define register      // Deprecated in C++11.
@@ -196,6 +197,12 @@ void yyerror(LLCCEP_SiHi::ast **ast, const char *str)
 	yymarktok();
 }
 
+void yyfreebuf(void)
+{
+	free((void *)yylexloc.buf);
+	yylexloc.buf = 0;
+}
+
 static inline void update(void)
 {
 	for (size_t i = 0; yytext[i]; i++) {
@@ -229,11 +236,10 @@ static inline void lexerIssue(const char *fmt, ...)
 
 static inline int yygetline(void)
 {
-	free((void *)yylexloc.buf);
-	yylexloc.buf = 0;
+	yyfreebuf();
 
 	yylexloc.posbuf = 0;
-	yylexloc.first_column = -1;
+	yylexloc.first_column = 1;
 	yylexloc.last_column = 0;
 	yylexloc.next_tok_first_column = 1;
 	yyinputended = 0;
@@ -283,7 +289,7 @@ static inline void yymarktok(void)
 	int start = yylexloc.first_column;
 	int end = yylexloc.last_column;
 
-	for (int i = 0; i < start + 8; i++)
+	for (int i = 0; i < start + 9; i++)
 		fprintf(stderr, " ");
 	for (int i = start; i <= end; i++)
 		fprintf(stderr, "^");

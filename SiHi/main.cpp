@@ -25,6 +25,7 @@ extern FILE *yyin;
  * Intermodular functions
  ************************************************/
 extern int yyparse(LLCCEP_SiHi::ast **parsingResult);
+extern void yyfreebuf(void);
 
 /*************************************************
  * Master
@@ -38,6 +39,8 @@ int main()
 	yyparse(&parsingResult);
 
 	if (parsingResult) {
+		yyfreebuf();
+
 		parsingResult->dumpImage("out.ast");
 		DotViz::dvRender("out.ast", "out.png");
 		delete parsingResult;
