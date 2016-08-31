@@ -38,8 +38,8 @@ extern ::std::string yyfilename;
 /*************************************************
  * Local variables.
  ************************************************/
-static YYLTYPE yylexloc{};
 static int yyinputended = 0;
+static YYLTYPE yylexloc{};
 
 /*************************************************
  * Intermodular functions
