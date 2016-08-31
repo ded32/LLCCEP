@@ -1,0 +1,41 @@
+SiHi code:
+__________________________________________________
+|                                                 |
+| function main {                                 |
+|     Real x = 0;                                 |
+|     x += 55;                                    |
+|     Real y = x;                                 |
+|     while y > 500 {                             |
+|         y++                                     |
+|     }                                           |
+|                                                 |
+|     return 60;                                  |
+| }                                               |
+|_________________________________________________|
+
+Assembly code;
+__________________________________________________
+|                                                 |
+| __user_function_main__:                         |
+| var x 
+| __operator_init_var_Real__ x
+| __operator_set_var_Real_Real__ x 0
+| __operator_add_eq_var_Real_Real__ x 55
+|
+|  var y
+| __operator_init_var_Real__ y
+| __operator_set_var_Real_Real__ y x
+|
+| __user_function_main_while0__:
+| __operator_cmp_var_Real_Real__ y 500
+| jmp @le, __user_function_main_while0_leave__
+| __operator_inc_var_Real y
+| jmp @al, __user_function_main_while0__
+| __user_function_main_while0_leave__:
+|
+| push 60
+| __operator_release_var_Real__ x
+| __operator_release_var_Real__ y
+|
+| ret
+|_________________________________________

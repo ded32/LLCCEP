@@ -39,9 +39,9 @@ int main()
 
 	if (parsingResult) {
 		parsingResult->dumpImage("out.ast");
-		delete parsingResult;
-
 		DotViz::dvRender("out.ast", "out.png");
+		delete parsingResult;
+	
 		::std::remove("out.ast");
 	} else {
 		::std::cerr << "Invalid input\n";

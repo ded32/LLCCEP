@@ -575,9 +575,7 @@ external_declaration: function_definition {
                             $$ = $<ast>1;
                     } | function_signature {
                             $$ = $<ast>1;
-		    } | function_signature ';' {
-                            $$ = $<ast>1;
-                    } | class_declaration {
+		    } | class_declaration {
                             $$ = $<ast>1;
                     };
 
@@ -624,8 +622,8 @@ class_body: '{' method_property_list '}' {
 	          $$ = $<ast>2;
           };
 
-method_property_list: {
-		            $$ = createAst{METHOD_PROPERTY_LIST_LEXEM, {}};
+method_property_list: method_property {
+		            $$ = createAst{METHOD_PROPERTY_LIST_LEXEM, {$<ast>1}};
 		    } | method_property_list method_property {
                             $$ = $<ast>1;
                             $$->addChild($<ast>2);
