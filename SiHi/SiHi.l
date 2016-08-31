@@ -6,6 +6,7 @@ digit [0-9]
 
 %{
 #include <stdio.h>
+#include <stdlib.h>
 #include <string>
 
 #include <STDExtras.hpp>
@@ -17,7 +18,14 @@ digit [0-9]
 
 YYLTYPE yylexloc{};
 int yyinputended = 0;
-#define RET(val) ({yybegintok(yytext + yylexloc.posbuf); yylval.string = yytext; return val;})
+#define RET(val) \
+{ \
+        yybegintok(yytext + yylexloc.posbuf); \
+	yylval.string = (char *)malloc(strlen(yytext) + 1); \
+	strcpy(yylval.string, yytext); \
+	\
+	return val; \
+}
 
 extern int yyparse(LLCCEP_SiHi::ast **ast);
 

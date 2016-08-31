@@ -10,13 +10,17 @@ extern int yylex(void);
 extern int yylineno;
 %}
 
-%error-verbose
+%define parse.lac full
+%define parse.error verbose
+
 %parse-param {LLCCEP_SiHi::ast **ast}
 
 %union {
 	::LLCCEP_SiHi::ast *ast;
-	const char *string;
+	char *string;
 }
+
+%destructor {free($$);} <string>
 
 %token <string> ID NUMBER LITERAL ARROW INCREMENT DECREMENT
 %token <string> REINTERPRET_CAST SHL SHR LESS_EQUAL ABOVE_EQUAL
@@ -314,7 +318,7 @@ pointer: '*' {
 
 
 parameter_type_list: {
-		           $$ = createAst(PARAMETER_TYPE_LIST_LEXEM, {})
+		           $$ = createAst(PARAMETER_TYPE_LIST_LEXEM, {});
 		   } | parameter_list {
                            $$ = $<ast>1;
 	           } | parameter_list ',' VARARG {
@@ -363,7 +367,7 @@ direct_abstract_declarator: '(' abstract_declarator ')' {
 	                  } | '[' constant_expression ']' {
                                   $$ = createAst{DIRECT_ABSTRACT_DECLARATOR_LEXEM, {$<ast>1}};
                           } | direct_abstract_declarator '[' ']' {
-                                  $$ = createAst{DIRECT_ABSTRACT_DECLARATOR_LEXEM, {$<ast>1}}
+                                  $$ = createAst{DIRECT_ABSTRACT_DECLARATOR_LEXEM, {$<ast>1}};
                           } | direct_abstract_declarator '[' constant_expression ']' {
                                   $$ = createAst{DIRECT_ABSTRACT_DECLARATOR_LEXEM, {$<ast>1, $<ast>3}};
                           } | '(' ')' {
@@ -460,7 +464,7 @@ branched_statement: IF expression statement {
 looped_statement: WHILE expression statement {
                         $$ = createAst{LOOPED_STATEMENT_LEXEM, {$<ast>2, $<ast>3}};
                 } | DO expression statement WHILE statement {
-                        $$ = createAst{LOOPED_STATEMENT_LEXEM, {$<ast>2, $<ast>3, $<ast>5}}
+                        $$ = createAst{LOOPED_STATEMENT_LEXEM, {$<ast>2, $<ast>3, $<ast>5}};
 	        } | FOR declaration_statement ';' expression_statement ';' expression statement {
                         $$ = createAst{LOOPED_STATEMENT_LEXEM, {$<ast>2, $<ast>4, $<ast>6, $<ast>7}};
                 };
