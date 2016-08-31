@@ -1,27 +1,61 @@
+/**************************************************
+ * SiHi parser source code
+ *
+ * Author: Andrew Bezzubtsev
+ * Date: 31/08/2016
+ * File: SiHi.y
+ * Bison version required: 3.0 or later
+ *
+ * This file contains grammatic and semantic rules
+ * needed to build AST, which can be dumped or
+ * translated into assembly/bytecode.
+ *************************************************/
+
 %{
 #include <string>
 #include "yyltype.h"
 #include "ast/ast.hpp"
 
+/**************************************************
+ * Intermodular functions
+ *************************************************/
 extern void yyerror(LLCCEP_SiHi::ast **, const char *msg);
-
-extern ::std::string yyfilename;
 extern int yylex(void);
-extern int yylineno;
 %}
 
+/**************************************************
+ * Bison defines to get more detailed
+ * errors' messages
+ *************************************************/
 %define parse.lac full
 %define parse.error verbose
 
+/**************************************************
+ * Add to parser parameters pointer to place,
+ * where to put pointer to generated AST.
+ *************************************************/
 %parse-param {LLCCEP_SiHi::ast **ast}
 
+/**************************************************
+ * Lexem's or rule's value now is:
+ * a) AST pointer
+ * b) pointer to buffer, synthezed by scanner
+ *************************************************/
 %union {
 	::LLCCEP_SiHi::ast *ast;
 	char *string;
 }
 
+/**************************************************
+ * Release buffer, synthezed by scanner on lexem
+ * destruction
+ *************************************************/
 %destructor {free($$);} <string>
 
+/**************************************************
+ * Tokens, can be read by scanner and their
+ * human-native string literal representation
+ *************************************************/
 %token <string> ID "identifier"
 %token <string> NUMBER "numeric value"
 %token <string> LITERAL "literal value"
@@ -72,6 +106,10 @@ extern int yylineno;
 %token <string> PROTECTED "protected"
 %token <string> STATIC "static"
 
+/**************************************************
+ * Each rule generates AST node of lexems, given to
+ * it, so all they should by typed as <ast>
+ *************************************************/
 %type <ast> primary_expression postfix_expression argument_expression_list
 %type <ast> unary_expression unary_operator cast_expression multiplicative_expression
 %type <ast> multiplicative_operator additive_expression additive_operator
@@ -91,6 +129,10 @@ extern int yylineno;
 %type <ast> class_declaration classname predecessor class_body method_property_list
 %type <ast> method_property access_rule_optional_static access_rule
 
+/**************************************************
+ * Start AST generation from 'translation_unit'
+ * rule.
+ *************************************************/
 %start translation_unit
 
 %%
@@ -298,9 +340,7 @@ constant_expression: conditional_expression {
 		           $$ = $<ast>1;
 		   };
 
-declaration: declaration_specifiers {
-	           $$ = createAst{DECLARATION_LEXEM, {$<ast>1}};
-   	   } | declaration_specifiers init_declarator_list {
+declaration: declaration_specifiers init_declarator_list {
                    $$ = createAst{DECLARATION_LEXEM, {$<ast>1, $<ast>2}}; 
            };
  

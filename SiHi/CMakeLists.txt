@@ -23,13 +23,15 @@ find_package(bison)
 find_package(flex)
 
 bison_target(SiHiParser "${CMAKE_SOURCE_DIR}/SiHi.y" "${CMAKE_SOURCE_DIR}/SiHiParser.cpp")
-flex_target(SiHiLexer "${CMAKE_SOURCE_DIR}/SiHi.l" "${CMAKE_SOURCE_DIR}/SiHiLexer.cpp")
-add_flex_bison_dependency(SiHiLexer SiHiParser)
+flex_target(SiHiScanner "${CMAKE_SOURCE_DIR}/SiHi.l" "${CMAKE_SOURCE_DIR}/SiHiScanner.cpp")
+add_flex_bison_dependency(SiHiScanner SiHiParser)
 
 set(BISON_SiHiParser_COMPILE_FLAGS "${BISON_SiHiParser_COMPILE_FLAGS} -v")
 
 add_library(SiHiParserLib "${BISON_SiHiParser_OUTPUT_SOURCE}")
+add_library(SiHiScannerLib "${FLEX_SiHiScanner_OUTPUTS}")
 target_link_libraries(SiHiParserLib STDExtras DotViz)
+target_link_libraries(SiHiScannerLib SiHiParserLib STDExtras DotViz)
 
-add_executable(SiHiCompiler "${FLEX_SiHiLexer_OUTPUTS}")
-target_link_libraries(SiHiCompiler lexem SiHiParserLib STDExtras)
+add_executable(SiHiCompiler "${CMAKE_SOURCE_DIR}/main.cpp")
+target_link_libraries(SiHiCompiler lexem SiHiScannerLib SiHiParserLib STDExtras)

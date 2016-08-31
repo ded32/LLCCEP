@@ -1,3 +1,17 @@
+/**************************************************
+ * SiHi scanner source code.
+ * 
+ * Author: Andrew Bezzubtsev
+ * Date: 31/08/2016
+ * File: SiHi.l
+ * Flex version required: 2.5 or later
+ *
+ * This file contains lexems descripting due regex.
+ * Some scanner local functions and variables
+ * are located in this file, and should be used to 
+ * get advanced and more detailed errors' messages.
+ *************************************************/
+
 alpha [a-zA-Z]
 digit [0-9]
 
@@ -12,12 +26,45 @@ digit [0-9]
 #include <STDExtras.hpp>
 #include <os-specific.hpp>
 
-#include "yyltype.h"
 #include "ast/ast.hpp"
+#include "yyltype.h"
 #include "SiHiParser.hpp"
 
-YYLTYPE yylexloc{};
-int yyinputended = 0;
+/*************************************************
+ * Intermodular variables
+ ************************************************/
+extern ::std::string yyfilename;
+
+/*************************************************
+ * Local variables.
+ ************************************************/
+static YYLTYPE yylexloc{};
+static int yyinputended = 0;
+
+/*************************************************
+ * Intermodular functions
+ ************************************************/
+void yyerror(LLCCEP_SiHi::ast **ast, const char *str);
+
+/*************************************************
+ * Local functions 
+ ************************************************/
+static inline void update(void);
+static inline void lexerIssue(const char *fmt, ...);
+static inline int yygetline(void);
+static inline int yygetnextchar(char *cb);
+static inline void yybegintok(const char *tok);
+static inline void yydumprow(void);
+static inline void yymarktok(void);
+
+/*************************************************
+ * Macro-functions
+ ************************************************/
+/*************************************************
+ * Updates token position and
+ * copys yytext contents into created buffer
+ * to preserve from undesirable aftereffects
+ ************************************************/
 #define RET(val) \
 { \
         yybegintok(yytext + yylexloc.posbuf); \
@@ -27,18 +74,25 @@ int yyinputended = 0;
 	return val; \
 }
 
-extern int yyparse(LLCCEP_SiHi::ast **ast);
-
-::std::string yyfilename = "";
-
-static inline void update(void);
-static inline void lexerIssue(const char *fmt, ...);
-void yyerror(LLCCEP_SiHi::ast **ast, const char *str);
-
+/*************************************************
+ * Preserves from 'register' storage class
+ * usage in case of usage C++11 or later,
+ * which is deprecated
+ ************************************************/
 #if __cplusplus > 199711L
 #define register      // Deprecated in C++11.
 #endif 
 
+/*************************************************
+ * Overload of standard bison macro YY_INPUT,
+ * which gets next character from stream.
+ * The overload does some more actions, which 
+ * gives more features in later error
+ * messaging. In particular, entire line,
+ * with no limitation is got into temporary
+ * buffer, if needed and, on new line reach,
+ * some yylexloc data are being changed.
+ ************************************************/
 #define YY_INPUT(buf, res, max) \
 { \
         res = yygetnextchar(buf); \
@@ -46,9 +100,6 @@ void yyerror(LLCCEP_SiHi::ast **ast, const char *str);
 		res = YY_NULL; \
 }
 
-static inline int yygetline(void);
-static inline int yygetnextchar(char *cb);
-static inline void yybegintok(const char *tok);
 %}
 
 %%
@@ -137,6 +188,14 @@ static           {RET(STATIC);}
 <<EOF>> {yyterminate();}
 %%
 
+void yyerror(LLCCEP_SiHi::ast **ast, const char *str)
+{
+	fprintf(stderr, "[%s:%d]:\n%s\n", yyfilename.c_str(),
+	        yylineno, str);
+	yydumprow();
+	yymarktok();
+}
+
 static inline void update(void)
 {
 	for (size_t i = 0; yytext[i]; i++) {
@@ -166,32 +225,6 @@ static inline void lexerIssue(const char *fmt, ...)
 	va_end(list);
 
 	yyerror(0, str);
-}
-
-static inline void yydumprow(void)
-{
-	fprintf(stderr, "%6d | %s", yylineno, yylexloc.buf);
-}
-
-static inline void yymarktok(void)
-{
-	int start = yylexloc.first_column;
-	int end = yylexloc.last_column;
-
-	for (int i = 0; i < start + 8; i++)
-		fprintf(stderr, " ");
-	for (int i = start; i <= end; i++)
-		fprintf(stderr, "^");
-
-	fprintf(stderr, "\n");
-}
-
-void yyerror(LLCCEP_SiHi::ast **ast, const char *str)
-{
-	fprintf(stderr, "[%s:%d]:\n%s\n", yyfilename.c_str(),
-	        yylineno, str);
-	yydumprow();
-	yymarktok();
 }
 
 static inline int yygetline(void)
@@ -240,20 +273,20 @@ static inline void yybegintok(const char *tok)
 	yylexloc.next_tok_first_column = yylexloc.posbuf;
 }
 
-int main()
+static inline void yydumprow(void)
 {
-	yyin = stdin;
+	fprintf(stderr, "%6d | %s", yylineno, yylexloc.buf);
+}
 
-	LLCCEP_SiHi::ast *res = 0;
-	yyparse(&res);
+static inline void yymarktok(void)
+{
+	int start = yylexloc.first_column;
+	int end = yylexloc.last_column;
 
-	if (res) {
-		res->dumpImage("out.ast");
-		DotViz::dvRender("out.ast", "out.png");
-		delete res;
-	} else {
-		::std::cerr << "invalid output\n";
-	}
+	for (int i = 0; i < start + 8; i++)
+		fprintf(stderr, " ");
+	for (int i = start; i <= end; i++)
+		fprintf(stderr, "^");
 
-	return 0;
+	fprintf(stderr, "\n");
 }
