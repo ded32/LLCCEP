@@ -10,8 +10,14 @@ namespace LLCCEP_SiHi {
 
 #define PRIMARY_EXPRESSION_LEXEM        createLexem{"Primary expression", LLCCEP_SiHi::PRIMARY_EXPRESSION}
 #define POSTFIX_EXPRESSION_LEXEM        createLexem{"Postfix expression", LLCCEP_SiHi::POSTFIX_EXPRESSION}
+#define POSTFIX_EXPRESSION_ARRAY_INDEX_ACCESS_LEXEM createLexem{"Postfix expression(array index access)", LLCCEP_SiHi::POSTFIX_EXPRESSION_ARRAY_INDEX_ACCESS}
+#define POSTFIX_EXPRESSION_FUNCTION_CALL_LEXEM      createLexem{"Postfix expression(function call)", LLCCEP_SiHi::POSTFIX_EXPRESSION_FUNCTION_CALL}
+#define POSTFIX_EXPRESSION_MEMBER_ACCESS_LEXEM      createLexem{"Postfix expression(member access)", LLCCEP_SiHi::POSTFIX_EXPRESSION_MEMBER_ACCESS}
+#define POSTFIX_EXPRESSION_MEMBER_ACCESS_PTR_LEXEM  createLexem{"Postfix expression(by-pointer member access)", LLCCEP_SiHi::POSTFIX_EXPRESSION_MEMBER_ACCESS_PTR}
+#define POSTFIX_EXPRESSION_INCREMENT_LEXEM          createLexem{"Postfix expression(increment)", LLCCEP_SiHi::POSTFIX_EXPRESSION_INCREMENT}
+#define POSTFIX_EXPRESSION_DECREMENT_LEXEM          createLexem{"Postfix expression(decrement)", LLCCEP_SiHi::POSTFIX_EXPRESSION_DECREMENT}
 #define ARGUMENT_EXPRESSION_LIST_LEXEM  createLexem{"Argument expression list", LLCCEP_SiHi::ARGUMENT_EXPRESSION_LIST}
-#define UNARY_EXPRESSION_LEXEM          createLexem{"Unary expression", LLCCEP_SiHi::UNARY_EXPRESSION}	
+#define UNARY_EXPRESSION_LEXEM          createLexem{"Unary expression", LLCCEP_SiHi::UNARY_EXPRESSION}
 #define UNARY_OPERATOR_LEXEM            createLexem{"Unary operator", LLCCEP_SiHi::UNARY_OPERATOR}
 #define CAST_EXPRESSION_LEXEM           createLexem{"Unary expression", LLCCEP_SiHi::UNARY_EXPRESSION}
 #define MULTIPLICATIVE_EXPRESSION_LEXEM createLexem{"Multiplicative expression", LLCCEP_SiHi::MULTIPLICATIVE_EXPRESSION}
@@ -39,6 +45,11 @@ namespace LLCCEP_SiHi {
 #define TYPE_SPECIFIER_LEXEM            createLexem{"Type specifier", LLCCEP_SiHi::TYPE_SPECIFIER}
 #define DECLARATOR_LEXEM                createLexem{"Declarator", LLCCEP_SiHi::DECLARATOR}
 #define DIRECT_DECLARATOR_LEXEM         createLexem{"Direct declarator", LLCCEP_SiHi::DIRECT_DECLARATOR}
+#define DIRECT_DECLARATOR_SCOPED_LEXEM  createLexem{"Direct declarator: scoped lexem", LLCCEP_SiHi::DIRECT_DECLARATOR_SCOPED}
+#define DIRECT_DECLARATOR_ARRAYED_LEXEM createLexem{"Direct declarator: arrayed lexem", LLCCEP_SiHi::DIRECT_DECLARATOR_ARRAYED}
+#define DIRECT_DECLARATOR_AUTO_ARRAYED_LEXEM createLexem{"Direct declarator: auto-arrayed lexem", LLCCEP_SiHi::DIRECT_DECLARATOR_ARRAYED}
+#define DIRECT_DECLARATOR_PARAMETERS_LIST_LEXEM createLexem{"Direct declarator: parameters list", LLCCEP_SiHi::DIRECT_DECLARATOR_PARAMETERS_LIST}
+#define DIRECT_DECLARATOR_IDENTIFIERS_LIST_LEXEM createLexem{"Direct declarator: identifiers list", LLCCEP_SiHi::DIRECT_DECLARATOR_IDENTIFIERS_LIST}
 #define POINTER_LEXEM                   createLexem{"Pointer", LLCCEP_SiHi::POINTER}
 #define PARAMETER_TYPE_LIST_LEXEM       createLexem{"Parameters type list", LLCCEP_SiHi::PARAMETER_TYPE_LIST}
 #define PARAMETER_LIST_LEXEM            createLexem{"Parmeter list", LLCCEP_SiHi::PARAMETER_LIST}
@@ -69,6 +80,7 @@ namespace LLCCEP_SiHi {
 #define CLASS_DECLARATION_LEXEM          createLexem{"Class declaration", LLCCEP_SiHi::CLASS_DECLARATION}
 #define CLASSNAME_LEXEM                  createLexem{"Class name", LLCCEP_SiHi::CLASSNAME}
 #define PREDECESSOR_LEXEM                createLexem{"Predecessor", LLCCEP_SiHi::PREDECESSOR}
+#define METHOD_PROPERTY_LEXEM            createLexem{"Method/property", LLCCEP_SiHi::METHOD_PROPERTY}
 #define METHOD_PROPERTY_LIST_LEXEM       createLexem{"Method/property list", LLCCEP_SiHi::METHOD_PROPERTY_LIST}
 #define ACCESS_RULE_LEXEM                createLexem{"Access rule", LLCCEP_SiHi::ACCESS_RULE}
 
@@ -134,8 +146,19 @@ namespace LLCCEP_SiHi {
 		CLASS_DECLARATION          = 1082,
 		CLASSNAME                  = 1083,
 		PREDECESSOR                = 1084,
-		METHOD_PROPERTY_LIST       = 1085,
-		ACCESS_RULE                = 1086
+		METHOD_PROPERTY            = 1085,
+		METHOD_PROPERTY_LIST       = 1086,
+		ACCESS_RULE                = 1087,
+		POSTFIX_EXPRESSION_ARRAY_INDEX_ACCESS = 1088,
+		POSTFIX_EXPRESSION_DECREMENT          = 1089,
+		POSTFIX_EXPRESSION_FUNCTION_CALL      = 1090,
+		POSTFIX_EXPRESSION_INCREMENT          = 1091,
+		POSTFIX_EXPRESSION_MEMBER_ACCESS      = 1092,
+		POSTFIX_EXPRESSION_MEMBER_ACCESS_PTR  = 1093,
+		DIRECT_DECLARATOR_ARRAYED             = 1094,
+		DIRECT_DECLARATOR_IDENTIFIERS_LIST    = 1095,
+		DIRECT_DECLARATOR_PARAMETERS_LIST     = 1096,
+		DIRECT_DECLARATOR_SCOPED              = 1097
 	};
 
 	struct lexem {

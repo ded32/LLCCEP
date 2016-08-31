@@ -1,4 +1,4 @@
-1) Andrew S. Tanenbaum, Todd Austin - Structured Computer Organization(Sixth edition)
+1) Andrew S. Tanenbaum, Todd Austin - Structured Computer Organisation(Sixth edition)
 2) Terrence W. Pratt, Marvin V. Zelkowitz - Programming languages: design and implementation(Fourth edition)
 3) Donald Knuth - The Art of Computer Programming, vol.1. Fundamental Algorithms
 4) Charles Donnely and Richard Stallman - Bison, The YACC-compatible Parser Generator

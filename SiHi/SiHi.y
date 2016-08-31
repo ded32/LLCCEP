@@ -1,8 +1,9 @@
 %{
 #include <string>
+#include "yyltype.h"
 #include "ast/ast.hpp"
 
-void yyerror(LLCCEP_SiHi::ast **, const char *msg);
+extern void yyerror(LLCCEP_SiHi::ast **, const char *msg);
 
 extern ::std::string yyfilename;
 extern int yylex(void);
@@ -10,7 +11,6 @@ extern int yylineno;
 %}
 
 %error-verbose
-
 %parse-param {LLCCEP_SiHi::ast **ast}
 
 %union {
@@ -44,40 +44,37 @@ extern int yylineno;
 %type <ast> translation_unit external_declaration function_definition function_signature 
 %type <ast> function_name function_args function_type labeled_statement_list
 %type <ast> class_declaration classname predecessor class_body method_property_list
-%type <ast> method_property access_rule_optional_static method property
-%type <ast> access_rule
+%type <ast> method_property access_rule_optional_static access_rule
 
 %start translation_unit
 
-%left '+' '-' '*' '/' '%' '@' '&' SHL SHR 
-
 %%
 primary_expression: ID {
-                            $$ = createAst{PRIMARY_EXPRESSION_LEXEM, {createAst{createLexem{$<string>1, ID}}}};
+                            $$ = createAst{createLexem{$<string>1, ID}};
                     } | NUMBER {
-                            $$ = createAst{PRIMARY_EXPRESSION_LEXEM, {createAst{createLexem{$<string>1, NUMBER}}}};
+                            $$ = createAst{createLexem{$<string>1, NUMBER}};
                     } | LITERAL {
-                            $$ = createAst{PRIMARY_EXPRESSION_LEXEM, {createAst{createLexem{$<string>1, LITERAL}}}};
+                            $$ = createAst{createLexem{$<string>1, LITERAL}};
                     } | '(' expression ')' {
-                            $$ = createAst{PRIMARY_EXPRESSION_LEXEM, {$<ast>2}};
+                            $$ = $<ast>2;
                     };
 
 postfix_expression: primary_expression {
-                            $$ = createAst{POSTFIX_EXPRESSION_LEXEM, {$<ast>1}};
+                            $$ = $<ast>1;
 	            } | postfix_expression '[' expression ']' {
-                            $$ = createAst{POSTFIX_EXPRESSION_LEXEM, {$<ast>1, $<ast>3}};
+                            $$ = createAst{POSTFIX_EXPRESSION_ARRAY_INDEX_ACCESS_LEXEM, {$<ast>1, $<ast>3}};
                     } | postfix_expression '(' ')' {
-                            $$ = createAst{POSTFIX_EXPRESSION_LEXEM, {$<ast>1}};
+                            $$ = createAst{POSTFIX_EXPRESSION_FUNCTION_CALL_LEXEM, {$<ast>1}};
 		    } | postfix_expression '(' argument_expression_list ')' {
-                            $$ = createAst{POSTFIX_EXPRESSION_LEXEM, {$<ast>1, $<ast>3}};
+                            $$ = createAst{POSTFIX_EXPRESSION_FUNCTION_CALL_LEXEM, {$<ast>1, $<ast>3}};
                     } | postfix_expression '.' ID {
-                            $$ = createAst{POSTFIX_EXPRESSION_LEXEM, {$<ast>1, createAst{createLexem{$<string>3, ID}}}};
+                            $$ = createAst{POSTFIX_EXPRESSION_MEMBER_ACCESS_LEXEM, {$<ast>1, createAst{createLexem{$<string>3, ID}}}};
                     } | postfix_expression ARROW ID {
-                            $$ = createAst{POSTFIX_EXPRESSION_LEXEM, {$<ast>1, createAst{createLexem{$<string>3, ID}}}};
+                            $$ = createAst{POSTFIX_EXPRESSION_MEMBER_ACCESS_PTR_LEXEM, {$<ast>1, createAst{createLexem{$<string>3, ID}}}};
                     } | postfix_expression INCREMENT {
-                            $$ = createAst{POSTFIX_EXPRESSION_LEXEM, {$<ast>1, createAst{createLexem{$<string>2, INCREMENT}}}};
+                            $$ = createAst{POSTFIX_EXPRESSION_INCREMENT_LEXEM, {$<ast>1}};
                     } | postfix_expression DECREMENT {
-                            $$ = createAst{POSTFIX_EXPRESSION_LEXEM, {$<ast>1, createAst{createLexem{$<string>2, DECREMENT}}}};
+                            $$ = createAst{POSTFIX_EXPRESSION_DECREMENT_LEXEM, {$<ast>1}};
                     };
 
 argument_expression_list: assignment_expression {
@@ -88,9 +85,10 @@ argument_expression_list: assignment_expression {
                         };
 
 unary_expression: postfix_expression {
-                        $$ = createAst{UNARY_EXPRESSION_LEXEM, {$<ast>1}};
+                        $$ = $<ast>1;
                 } | unary_operator cast_expression {
-                        $$ = createAst{UNARY_EXPRESSION_LEXEM, {$<ast>1, $<ast>2}};
+                        $$ = $<ast>1;
+                        $$->addChild($<ast>2);
 		};
 
 unary_operator: INCREMENT {
@@ -110,7 +108,7 @@ unary_operator: INCREMENT {
 	      };
 
 cast_expression: unary_expression {
-                       $$ = createAst{CAST_EXPRESSION_LEXEM, {$<ast>1}};
+                       $$ = $<ast>1;
 	       } | REINTERPRET_CAST '<' type_name '>' '(' cast_expression ')' {
                        $$ = createAst{CAST_EXPRESSION_LEXEM, {$<ast>3, $<ast>6}};
                };
@@ -192,31 +190,31 @@ equality_operator: EQUALS {
                  };
 
 and_expression: equality_expression {
-	              $$ = createAst{AND_EXPRESSION_LEXEM, {$<ast>1}};
+	              $$ = $<ast>1;
 	      } | and_expression '&' equality_expression {
                       $$ = createAst{AND_EXPRESSION_LEXEM, {$<ast>1, $<ast>3}};
               };
 
 exclusive_or_expression: and_expression {
-		               $$ = createAst{EXCLUSIVE_OR_EXPRESSION_LEXEM, {$<ast>1}};
+		               $$ = $<ast>1;
   	               } | exclusive_or_expression '^' and_expression {
                                $$ = createAst{EXCLUSIVE_OR_EXPRESSION_LEXEM, {$<ast>1, $<ast>3}};
                        };
 
 inclusive_or_expression: exclusive_or_expression {
-		               $$ = createAst{INCLUSIVE_OR_EXPRESSION_LEXEM, {$<ast>1}};
+		               $$ = $<ast>1;
  	               } | inclusive_or_expression '|' exclusive_or_expression {
-                               $$ = createAst{INCLUSIVE_OR_EXPRESSION_LEXEM, {$<ast>1}};
+                               $$ = createAst{INCLUSIVE_OR_EXPRESSION_LEXEM, {$<ast>1, $<ast>3}};
                        };
 
 conditional_expression: inclusive_or_expression {
-		              $$ = createAst{CONDITIONAL_EXPRESSION_LEXEM, {$<ast>1}};
+		              $$ = $<ast>1;
 	              } | inclusive_or_expression DONE expression UNLESS conditional_expression { 
                               $$ = createAst{CONDITIONAL_EXPRESSION_LEXEM, {$<ast>1, $<ast>3, $<ast>5}};
                       };
 
 assignment_expression: conditional_expression {
-		             $$ = createAst{ASSIGNMENT_EXPRESSION_LEXEM, {$<ast>1}};
+		             $$ = $<ast>1;
 	             } | unary_expression assignment_operator assignment_expression {
                              $$ = createAst{ASSIGNMENT_EXPRESSION_LEXEM, {$<ast>1, $<ast>2, $<ast>3}};
                      };
@@ -246,14 +244,13 @@ assignment_operator: '=' {
                    };
 
 expression: assignment_expression {
-	          $$ = createAst{EXPRESSION_LEXEM, {$<ast>1}};
+	          $$ = $<ast>1;
   	  } | expression ',' assignment_expression {
-                  $$ = $<ast>1;
-                  $$->addChild($<ast>3);
+                  $$ = createAst{EXPRESSION_LEXEM, {$<ast>1, $<ast>3}};
           };
 
 constant_expression: conditional_expression {
-		           $$ = createAst{CONSTANT_EXPRESSION_LEXEM, {$<ast>1}};
+		           $$ = $<ast>1;
 		   };
 
 declaration: declaration_specifiers {
@@ -263,53 +260,51 @@ declaration: declaration_specifiers {
            };
  
 declaration_specifiers: type_specifier {
-		              $$ = createAst{DECLARATION_SPECIFIERS_LEXEM, {$<ast>1}};
+		              $$ = $<ast>1;
 		      };
 
 init_declarator_list: init_declarator {
 		            $$ = createAst{INIT_DECLARATOR_LIST_LEXEM, {$<ast>1}};
 	            } | init_declarator_list ',' init_declarator {
                             $$ = $<ast>1;
-                            $$->addChild($<ast>3);
+                            $$->addChild($<ast>2);
                     };
 
 init_declarator: declarator {
-	               $$ = createAst{INIT_DECLARATOR_LEXEM, {$<ast>1}};
+	               $$ = $<ast>1;
 	       } | declarator '=' initializer {
                        $$ = createAst{INIT_DECLARATOR_LEXEM, {$<ast>1, $<ast>3}};
                };
 
 type_specifier: EMPTY {
-	              $$ = createAst{TYPE_SPECIFIER_LEXEM, {createAst{createLexem{$<string>1, EMPTY}}}};
+	              $$ = createAst{createLexem{$<string>1, EMPTY}};
    	      } | REAL {
-                      $$ = createAst{TYPE_SPECIFIER_LEXEM, {createAst{createLexem{$<string>1, REAL}}}};
+                      $$ = createAst{createLexem{$<string>1, REAL}};
 	      } | STRING {
-                      $$ = createAst{TYPE_SPECIFIER_LEXEM, {createAst{createLexem{$<string>1, STRING}}}};
+                      $$ = createAst{createLexem{$<string>1, STRING}};
 	      } | ID {
-                      $$ = createAst{TYPE_SPECIFIER_LEXEM, {createAst{createLexem{$<string>1, ID}}}};
+                      $$ = createAst{createLexem{$<string>1, ID}};
               };
 
 declarator: pointer direct_declarator {
 	          $$ = createAst{DECLARATOR_LEXEM, {$<ast>1, $<ast>2}};
 	  } | direct_declarator {
-                  $$ = createAst{DECLARATOR_LEXEM, {$<ast>1}};
+                  $$ = $<ast>1;
           };
 
 direct_declarator: ID {
-		         $$ = createAst{DIRECT_DECLARATOR_LEXEM, {createAst{createLexem{$<string>1, ID}}}};
+		         $$ = createAst{createLexem{$<string>1, ID}};
  	         } | '(' declarator ')' {
-                         $$ = createAst{DIRECT_DECLARATOR_LEXEM, {$<ast>2}};
+                         $$ = createAst{DIRECT_DECLARATOR_SCOPED_LEXEM, {$<ast>2}};
                  } | direct_declarator '[' constant_expression ']' {
-                         $$ = createAst{DIRECT_DECLARATOR_LEXEM, {$<ast>1, $<ast>3}};
+                         $$ = createAst{DIRECT_DECLARATOR_ARRAYED_LEXEM, {$<ast>1, $<ast>3}};
                  } | direct_declarator '[' ']' {
-                         $$ = createAst{DIRECT_DECLARATOR_LEXEM, {$<ast>1}};
+                         $$ = createAst{DIRECT_DECLARATOR_AUTO_ARRAYED_LEXEM, {$<ast>1}};
 	         } | direct_declarator '(' parameter_type_list ')' {
-                         $$ = createAst{DIRECT_DECLARATOR_LEXEM, {$<ast>1, $<ast>3}};
+                         $$ = createAst{DIRECT_DECLARATOR_PARAMETERS_LIST_LEXEM, {$<ast>1, $<ast>3}};
                  } | direct_declarator '(' identifier_list ')' {
-                         $$ = createAst{DIRECT_DECLARATOR_LEXEM, {$<ast>1, $<ast>3}};
-	         } | direct_declarator '(' ')' {
-                         $$ = createAst{DIRECT_DECLARATOR_LEXEM, {$<ast>1}};
-                 };
+                         $$ = createAst{DIRECT_DECLARATOR_IDENTIFIERS_LIST_LEXEM, {$<ast>1, $<ast>3}};
+	         };
 
 pointer: '*' {
                  $$ = createAst{POINTER_LEXEM};
@@ -318,8 +313,10 @@ pointer: '*' {
        };
 
 
-parameter_type_list: parameter_list {
-		           $$ = createAst{PARAMETER_TYPE_LIST_LEXEM, {$<ast>1}};
+parameter_type_list: {
+		           $$ = createAst(PARAMETER_TYPE_LIST_LEXEM, {})
+		   } | parameter_list {
+                           $$ = $<ast>1;
 	           } | parameter_list ',' VARARG {
                            $$ = $<ast>1;
                            $$->addChild(createAst{createLexem{"...", VARARG}});
@@ -348,13 +345,13 @@ identifier_list: ID {
                };
 
 type_name: abstract_declarator {
-                 $$ = createAst{TYPE_NAME_LEXEM, {$<ast>1}};
+                 $$ = $<ast>1;
          };
 
 abstract_declarator: pointer {
-		           $$ = createAst{ABSTRACT_DECLARATOR_LEXEM, {$<ast>1}};
+		           $$ = $<ast>1;
  	           } | direct_abstract_declarator {
-                           $$ = createAst{ABSTRACT_DECLARATOR_LEXEM, {$<ast>1}};
+                           $$ = $<ast>1;
 	           } | pointer direct_abstract_declarator {
                            $$ = createAst{ABSTRACT_DECLARATOR_LEXEM, {$<ast>1, $<ast>2}};
                    };
@@ -380,9 +377,9 @@ direct_abstract_declarator: '(' abstract_declarator ')' {
                           };
 
 initializer: assignment_expression {
-                   $$ = createAst{INITIALIZER_LEXEM, {$<ast>1}};
+                   $$ = $<ast>1;
            } | '{' initializer_list '}' {
-                   $$ = createAst{INITIALIZER_LEXEM, {$<ast>2}};
+                   $$ = $<ast>2;
            };
 
 initializer_list: initializer {
@@ -393,17 +390,17 @@ initializer_list: initializer {
                 };
 
 statement: labeled_statement {
-                 $$ = createAst{STATEMENT_LEXEM, {$<ast>1}};
+                 $$ = $<ast>1;
 	 } | compound_statement {
-                 $$ = createAst{STATEMENT_LEXEM, {$<ast>1}};
+                 $$ = $<ast>1;
          } | expression_statement {
-                 $$ = createAst{STATEMENT_LEXEM, {$<ast>1}};
+                 $$ = $<ast>1;
 	 } | branched_statement {
-                 $$ = createAst{STATEMENT_LEXEM, {$<ast>1}};
+                 $$ = $<ast>1;
          } | looped_statement {
-                 $$ = createAst{STATEMENT_LEXEM, {$<ast>1}};
+                 $$ = $<ast>1;
 	 } | jump_statement {
-                 $$ = createAst{STATEMENT_LEXEM, {$<ast>1}};
+                 $$ = $<ast>1;
          };
 
 labeled_statement: ID ':' statement {
@@ -415,15 +412,15 @@ labeled_statement: ID ':' statement {
                  };
 
 compound_statement: '{' '}' {
-                          $$ = createAst{COMPOUND_STATEMENT_LEXEM, {}};
+                          $$ = 0;
                   } | '{' declaration_statement_list '}' {
-                          $$ = createAst{COMPOUND_STATEMENT_LEXEM, {$<ast>2}};
+                          $$ = $<ast>2;
                   };
 
 declaration_statement: declaration {
-                             $$ = createAst{DECLARATION_STATEMENT_LEXEM, {$<ast>1}};
+                             $$ = $<ast>1;
                      } | statement {
-                             $$ = createAst{DECLARATION_STATEMENT_LEXEM, {$<ast>1}};
+                             $$ = $<ast>1;
                      };
 
 declaration_statement_optional_semicolon: declaration_statement ';' {
@@ -440,9 +437,9 @@ declaration_statement_list: declaration_statement_optional_semicolon {
                           };
 
 expression_statement: PASS {
-                            $$ = createAst{EXPRESSION_STATEMENT_LEXEM, {}}
+                            $$ = 0;
                     } | expression {
-                            $$ = createAst{EXPRESSION_STATEMENT_LEXEM, {$<ast>1}};
+                            $$ = $<ast>1;
                     };
 
 labeled_statement_list: labeled_statement {
@@ -488,15 +485,15 @@ translation_unit: external_declaration {
                 };
 
 external_declaration: function_definition {
-		            $$ = createAst{EXTERNAL_DECLARATION_LEXEM, {$<ast>1}};
+		            $$ = $<ast>1;
                     } | declaration {
-                            $$ = createAst{EXTERNAL_DECLARATION_LEXEM, {$<ast>1}};
+                            $$ = $<ast>1;
                     } | function_signature {
-                            $$ = createAst{EXTERNAL_DECLARATION_LEXEM, {$<ast>1}};
+                            $$ = $<ast>1;
 		    } | function_signature ';' {
-                            $$ = createAst{EXTERNAL_DECLARATION_LEXEM, {$<ast>1}};
+                            $$ = $<ast>1;
                     } | class_declaration {
-                            $$ = createAst{EXTERNAL_DECLARATION_LEXEM, {$<ast>1}};
+                            $$ = $<ast>1;
                     };
 
 function_definition: function_signature compound_statement {
@@ -509,16 +506,13 @@ function_signature: function_name function_args function_type {
 
 function_name: FUNCTION ID {
 	             $$ = createAst{FUNCTION_NAME_LEXEM, 
-                                    {createAst{createLexem{$<string>1, FUNCTION}},
-                                     createAst{createLexem{$<string>2, ID}}}};
+                                    {createAst{createLexem{$<string>2, ID}}}};
 	     };
 
-function_args: {
-	             $$ = createAst{FUNCTION_ARGS_LEXEM};
-             } | '(' ')' {
-                     $$ = createAst{FUNCTION_ARGS_LEXEM};
-             } | '(' parameter_type_list ')' {
-                     $$ = createAst{FUNCTION_ARGS_LEXEM, {$<ast>2}};
+function_args: parameter_type_list {
+	             $$ = $<ast>1;
+	     } | '(' parameter_type_list ')' {
+                     $$ = $<ast>2;
              };
 
 function_type: {
@@ -545,17 +539,15 @@ class_body: '{' method_property_list '}' {
 	          $$ = $<ast>2;
           };
 
-method_property_list: method_property {
-		            $$ = createAst{METHOD_PROPERTY_LIST_LEXEM, {$<ast>1}};
-                    } | method_property_list method_property {
+method_property_list: {
+		            $$ = createAst{METHOD_PROPERTY_LIST_LEXEM, {}};
+		    } | method_property_list method_property {
                             $$ = $<ast>1;
                             $$->addChild($<ast>2);
                     };
 
-method_property: access_rule_optional_static method {
-	               $$ = $<ast>1;
-               } | access_rule_optional_static property {
-                       $$ = $<ast>1;
+method_property: access_rule_optional_static external_declaration {
+	               $$ = createAst{METHOD_PROPERTY_LEXEM, {$<ast>1, $<ast>2}};
                };
 
 access_rule_optional_static: STATIC access_rule {
@@ -565,14 +557,6 @@ access_rule_optional_static: STATIC access_rule {
                                    $$ = $<ast>1;
                            };
 
-method: function_definition {
-              $$ = $<ast>1;
-      };
-
-property: declaration {
-	        $$ = $<ast>1;
-        };
-
 access_rule: PUBLIC {
 	           $$ = createAst{ACCESS_RULE_LEXEM, {createAst{createLexem{"public", PUBLIC}}}};
            } | PROTECTED {
@@ -581,12 +565,3 @@ access_rule: PUBLIC {
                    $$ = createAst{ACCESS_RULE_LEXEM, {createAst{createLexem{"private", PRIVATE}}}};
            };
 %%
-
-void yyerror(LLCCEP_SiHi::ast **, const char *msg)
-{
-	throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
-		"[%s:%d]:\n"
-		"%s",
-		yyfilename.c_str(), yylineno,
-                msg))
-}
