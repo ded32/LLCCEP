@@ -250,11 +250,10 @@ int main()
 	if (res) {
 		res->dumpImage("out.ast");
 		DotViz::dvRender("out.ast", "out.png");
+		delete res;
 	} else {
-		::std::cerr << "invalid output";
+		::std::cerr << "invalid output\n";
 	}
-
-	delete res;
 
 	return 0;
 }

@@ -22,14 +22,55 @@ extern int yylineno;
 
 %destructor {free($$);} <string>
 
-%token <string> ID NUMBER LITERAL ARROW INCREMENT DECREMENT
-%token <string> REINTERPRET_CAST SHL SHR LESS_EQUAL ABOVE_EQUAL
-%token <string> EQUALS NOT_EQUALS MUL_ASSIGN DIV_ASSIGN MOD_ASSIGN
-%token <string> ADD_ASSIGN SUB_ASSIGN SHL_ASSIGN SHR_ASSIGN AND_ASSIGN
-%token <string> XOR_ASSIGN OR_ASSIGN EMPTY REAL STRING OTHER PASS
-%token <string> IF ELSE CASE WHILE DO FOR JUMP NEXT STOP RETURN
-%token <string> DONE UNLESS VARARG FUNCTION CLASS TYPEALIAS BACKARROW
-%token <string> PUBLIC PRIVATE PROTECTED STATIC
+%token <string> ID "identifier"
+%token <string> NUMBER "numeric value"
+%token <string> LITERAL "literal value"
+%token <string> ARROW "->"
+%token <string> INCREMENT "++"
+%token <strnig> DECREMENT "--"
+%token <string> REINTERPRET_CAST "reinterpret_cast"
+%token <string> SHL "<<"
+%token <string> SHR ">>"
+%token <string> LESS_EQUAL "<="
+%token <string> ABOVE_EQUAL ">="
+%token <string> EQUALS "=="
+%token <string> NOT_EQUALS "!="
+%token <string> MUL_ASSIGN "*="
+%token <string> DIV_ASSIGN "/="
+%token <string> MOD_ASSIGN "%="
+%token <string> ADD_ASSIGN "+="
+%token <string> SUB_ASSIGN "-="
+%token <string> SHL_ASSIGN "<<="
+%token <string> SHR_ASSIGN ">>="
+%token <string> AND_ASSIGN "&="
+%token <string> XOR_ASSIGN "^="
+%token <string> OR_ASSIGN "|="
+%token <string> EMPTY "Empty"
+%token <string> REAL "Real"
+%token <string> STRING "String"
+%token <string> OTHER "other"
+%token <string> PASS "pass"
+%token <string> IF "if"
+%token <string> ELSE "else"
+%token <string> CASE "case"
+%token <string> WHILE "while"
+%token <string> DO "do"
+%token <string> FOR "for"
+%token <string> JUMP "jump"
+%token <string> NEXT "next"
+%token <string> STOP "stop"
+%token <string> RETURN "return"
+%token <string> DONE "done"
+%token <string> UNLESS "unless"
+%token <stirng> VARARG "..."
+%token <string> FUNCTION "function"
+%token <string> CLASS "class"
+%token <string> TYPEALIAS "typealias"
+%token <string> BACKARROW "<-"
+%token <string> PUBLIC "public"
+%token <string> PRIVATE "private"
+%token <string> PROTECTED "protected"
+%token <string> STATIC "static"
 
 %type <ast> primary_expression postfix_expression argument_expression_list
 %type <ast> unary_expression unary_operator cast_expression multiplicative_expression
