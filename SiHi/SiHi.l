@@ -106,7 +106,7 @@ static inline void yymarktok(void);
 %%
 "#begin".*?"#end" {update();}
 "#".*             {update();}
-[ \n\r\t]         {update();}
+[ \n\r\t]+        {update();}
 
 reinterpret_cast {RET(REINTERPRET_CAST);}
 Empty            {RET(EMPTY);}
@@ -205,7 +205,8 @@ void yyfreebuf(void)
 
 static inline void update(void)
 {
-	for (size_t i = 0; yytext[i]; i++) {
+	size_t i = 0;
+	while (yytext[i]) {
 		switch (yytext[i]) {
 		case '\n':
 		case '\r':
@@ -219,6 +220,8 @@ static inline void update(void)
 		default:
 		        yylexloc.first_column++;
 		}
+
+		i++;
 	}
 }
 
@@ -239,7 +242,7 @@ static inline int yygetline(void)
 	yyfreebuf();
 
 	yylexloc.posbuf = 0;
-	yylexloc.first_column = 1;
+	yylexloc.first_column = -1;
 	yylexloc.last_column = 0;
 	yylexloc.next_tok_first_column = 1;
 	yyinputended = 0;
@@ -275,7 +278,7 @@ static inline void yybegintok(const char *tok)
 {
 	yylexloc.line = yylineno;
 	yylexloc.first_column = yylexloc.next_tok_first_column;
-	yylexloc.last_column = yylexloc.first_column + strlen(tok);
+	yylexloc.last_column = yylexloc.first_column + strlen(tok) - 1;
 	yylexloc.next_tok_first_column = yylexloc.posbuf;
 }
 

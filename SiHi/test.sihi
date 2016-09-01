@@ -1,3 +1,11 @@
+class Point {
+	init {}
+	release {}
+
+	public Real x;
+	public Real y;
+}
+
 function main(Real argn, String argv[]) {
 	for Real i = 1; i < argn; i++ {
 		print('Argument #{i}: #{argv[i]}')

@@ -12,7 +12,7 @@ namespace LLCCEP_SiHi {
 		void generateCode() const;
 
 	private:
-		void generateCode(ast *ptr) const;
+		void generateCode(ast *ptr, bool inclass) const;
 
 		ast *syntaxTree;
 	};
