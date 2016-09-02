@@ -1,6 +1,7 @@
 #ifndef BACKEND_HPP
 #define BACKEND_HPP
 
+#include <iostream>
 #include "./../ast/ast.hpp"
 
 namespace LLCCEP_SiHi {
@@ -9,11 +10,11 @@ namespace LLCCEP_SiHi {
 		backend();
 		~backend();
 
-		void generateCode() const;
+		void generateCode(::std::ostream &out) const;
 
 	private:
-		void generateCode(ast *ptr, bool inclass) const;
-
+		void generateCode(::std::ostream &out, ast *ptr) const;
+		
 		ast *syntaxTree;
 	};
 

@@ -573,9 +573,7 @@ external_declaration: function_definition {
 		            $$ = $<ast>1;
                     } | declaration {
                             $$ = $<ast>1;
-                    } | function_signature {
-                            $$ = $<ast>1;
-		    } | class_declaration {
+                    } | class_declaration {
                             $$ = $<ast>1;
                     };
 
