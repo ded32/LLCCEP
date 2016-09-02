@@ -40,6 +40,14 @@ void LLCCEP_SiHi::backend::synthezeFunctionBody(::std::ostream &out, LLCCEP_SiHi
 		releaseArgument(i);
 }
 
+void LLCCEP_SiHi::backend::declareVariables(::std::ostream &out, LLCCEP_SiHi::ast *ast) const
+{
+	ASSERT_ARGN(3)
+	ASSERT_TYPE(LLCCEP_SiHi::DECLARATION)
+
+
+}
+
 void LLCCEP_SiHi::backend::generateCode(::std::ostream &out, LLCCEP_SiHi::ast *ast) const
 {
 	if (!ast) {

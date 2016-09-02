@@ -6,6 +6,17 @@
 
 namespace LLCCEP_SiHi {
 	class backend {
+		struct functionArgument {
+			::std::string type_name;
+			::std::string name;
+		};
+		
+		struct functionProto {
+			::std::string ret_t;
+			::std::string name;
+			::std::vector<functionArgument> args;
+		};
+
 	public:
 		backend();
 		~backend();
