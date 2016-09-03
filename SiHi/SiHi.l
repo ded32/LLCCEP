@@ -136,6 +136,8 @@ private          {RET(PRIVATE);}
 protected        {RET(PROTECTED);}
 static           {RET(STATIC);}
 
+release          {RET(RELEASE);}
+
 "<-"  {RET(BACKARROW);}
 "->"  {RET(ARROW);}
 "++"  {RET(INCREMENT);}

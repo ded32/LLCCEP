@@ -105,7 +105,7 @@ extern int yylex(void);
 %token <string> PRIVATE "private"
 %token <string> PROTECTED "protected"
 %token <string> STATIC "static"
-
+%token <string> RELEASE "release"
 /**************************************************
  * Each rule generates AST node of lexems, given to
  * it, so all they should by typed as <ast>
@@ -121,7 +121,7 @@ extern int yylex(void);
 %type <ast> type_specifier declarator direct_declarator pointer parameter_type_list
 %type <ast> parameter_list parameter_declaration identifier_list type_name
 %type <ast> abstract_declarator direct_abstract_declarator initializer initializer_list
-%type <ast> statement labeled_statement compound_statement declaration_statement
+%type <ast> statement releasement_statement labeled_statement compound_statement declaration_statement
 %type <ast> declaration_statement_optional_semicolon declaration_statement_list 
 %type <ast> expression_statement branched_statement looped_statement jump_statement 
 %type <ast> translation_unit external_declaration function_definition function_signature 
@@ -578,6 +578,8 @@ external_declaration: function_definition {
                     } | declaration {
                             $$ = $<ast>1;
                     } | class_declaration {
+                            $$ = $<ast>1;
+                    } | releasement_statement {
                             $$ = $<ast>1;
                     };
 
