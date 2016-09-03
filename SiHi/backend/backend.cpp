@@ -42,10 +42,22 @@ void LLCCEP_SiHi::backend::synthezeFunctionBody(::std::ostream &out, LLCCEP_SiHi
 
 void LLCCEP_SiHi::backend::declareVariables(::std::ostream &out, LLCCEP_SiHi::ast *ast) const
 {
-	ASSERT_ARGN(3)
-	ASSERT_TYPE(LLCCEP_SiHi::DECLARATION)
+	ASSERT_AST(ast)
+	ASSERT_ARGN(ast, 3)
+	ASSERT_TYPE(ast, LLCCEP_SiHi::DECLARATION)
 
 
+}
+
+void LLCCEP_SiHi::backend::releaseVariables(::std::ostream &out, LLCCEP_SiHi::ast *ast) const
+{
+	ASSERT_AST(ast)
+	ASSERT_ARGN(ast, 1)
+	ASSERT_TYPE(ast, LLCCEP_SiHi::RELEASEMENT)
+
+	for (const auto &i: ast->getChildren())
+		if (i)
+			releaseVariable(i);
 }
 
 void LLCCEP_SiHi::backend::generateCode(::std::ostream &out, LLCCEP_SiHi::ast *ast) const

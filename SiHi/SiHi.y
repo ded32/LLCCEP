@@ -488,6 +488,10 @@ statement: labeled_statement {
                  $$ = $<ast>1;
          };
 
+releasement_statement: RELEASE identifier_list {
+		              $$ = createAst{RELEASEMENT_LEXEM, {$<ast>2}};
+                     };
+
 labeled_statement: ID ':' statement {
                          $$ = createAst{LABELED_STATEMENT_LEXEM, {createAst{createLexem{$<string>1, ID}}, $<ast>3}};
                  } | constant_expression ':' statement {
