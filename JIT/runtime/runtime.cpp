@@ -5,6 +5,11 @@ LLCCEP_JIT::runtimeManager::runtimeManager():
 	softcore()
 { }
 
+void *LLCCEP_JIT::runtimeManager::getSoftcorePtr()
+{
+	return this;
+}
+
 void *LLCCEP_JIT::runtimeManager::getSwiEmulatePtr()
 {
 	union {

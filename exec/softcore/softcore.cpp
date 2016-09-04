@@ -14,6 +14,7 @@
 #include <STDExtras.hpp>
 #include <STLExtras.hpp>
 #include <os-specific.hpp>
+#include <convert.hpp>
 
 #include "softcore.hpp"
 #include "fp.hpp"
@@ -124,7 +125,7 @@ double LLCCEP_exec::softcore::get(LLCCEP_exec::arg data)
 	default:
 		throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
 			"Error!\n"
-			"Invalid or damaged binary file: invalid reading!\n"));
+			"Invalid or damaged binary file: invalid reading!\n"))
 	}
 
 	return 0;
@@ -316,7 +317,7 @@ void LLCCEP_exec::softcore::emulated_nop(LLCCEP_exec::instruction data)
 }
 
 void LLCCEP_exec::softcore::emulated_swi(LLCCEP_exec::instruction data)
-{	
+{
 	auto getFmtString = [](char c) -> ::std::string {
 		switch (c) {
 		case 'x':

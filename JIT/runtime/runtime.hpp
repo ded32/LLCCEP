@@ -9,6 +9,7 @@ namespace LLCCEP_JIT {
 	public:
 		runtimeManager();
 
+		void *getSoftcorePtr();
 		void *getSwiEmulatePtr();
 		void *getCmpPtr();
 		void *getRegPtr(size_t id);

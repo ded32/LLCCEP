@@ -2,6 +2,7 @@
 
 #include <STDExtras.hpp>
 #include <os-specific.hpp>
+#include <convert.hpp>
 
 #include "./../runtime/runtime.hpp"
 #include "./../program/program.hpp"
@@ -9,7 +10,13 @@
 
 #include "codegen.hpp"
 
-#define CODEGEN_BACKEND_OK DEFAULT_CHECK_BLOCK(this, ok, true)
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wunused-parameter"
+#elif defined(__GNUC__)
+#pragma GCC diagnostic ignored "-Wunused-parameter"
+#endif
+
+#define CODEGEN_BACKEND_OK DEFAULT_CHECK_BLOCK(this, ok(), true)
 
 LLCCEP_JIT::codegenBackend::codegenBackend():
 	globalRuntimeManager(),
@@ -19,6 +26,7 @@ LLCCEP_JIT::codegenBackend::codegenBackend():
 void LLCCEP_JIT::codegenBackend::setRuntimeManager(LLCCEP_JIT::runtimeManager *newRuntimeManager)
 {
 	globalRuntimeManager = newRuntimeManager;
+
 	CODEGEN_BACKEND_OK
 }
 
@@ -210,7 +218,7 @@ void LLCCEP_JIT::codegenBackend::genDiv(LLCCEP_exec::instruction data)
 	\
 	emit_pop_reg(LLCCEP_JIT::RDX); \
  \
-	CODEGEN_BACKEND_OK
+	CODEGEN_BACKEND_OK \
 });
 
 #define LOGIC(data, name) \
@@ -269,8 +277,24 @@ void LLCCEP_JIT::codegenBackend::genSwi(LLCCEP_exec::instruction data)
 	}
 
 	void *ptr = globalRuntimeManager->getSwiEmulatePtr();
+
+	auto bytes = to_bytes(data);
+	for (size_t i = 0; i < bytes.size() / 8; i++) {
+		uint64_t data = 0;
+
+		for (size_t j = 0; j < 8; j++)
+			reinterpret_cast<char *>(&data)[j] = bytes[i * 8 + j];
+
+		emit_push_imm(data);
+	}
+
+	emit_push_imm(reinterpret_cast<uint64_t>(globalRuntimeManager->getSoftcorePtr())); // push this
+
 	emit_mov_reg_imm(LLCCEP_JIT::RAX, reinterpret_cast<uint64_t>(ptr));
 	emit_call_reg(LLCCEP_JIT::RAX);
+
+	for (size_t i = 0; i < bytes.size() / 8; i++)
+		emit_pop_reg(LLCCEP_JIT::RAX);
 
 	CODEGEN_BACKEND_OK
 }
