@@ -52,7 +52,7 @@ namespace LLCCEP_JIT {
 		void getPointer(regID reg, LLCCEP_exec::arg data);
 		void getMemPtrFromImmediate(regID reg, LLCCEP_exec::arg data);
 
-		bool OK() const;
+		bool ok() const;
 
 	private:
 		runtimeManager *globalRuntimeManager;
@@ -60,4 +60,4 @@ namespace LLCCEP_JIT {
 	};
 }
 
-#endif // CODEvoid genHPP
+#endif // CODEGEN_HPP

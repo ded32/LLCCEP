@@ -529,7 +529,7 @@ void LLCCEP_JIT::codegenBackend::getMemPtrFromImmediate(LLCCEP_JIT::regID reg, L
 	CODEGEN_BACKEND_OK
 }
 
-bool LLCCEP_JIT::codegenBackend::OK() const
+bool LLCCEP_JIT::codegenBackend::ok() const
 {
 	return globalRuntimeManager && globalRuntimeManager->OK();
 }
