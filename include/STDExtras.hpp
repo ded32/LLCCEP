@@ -140,7 +140,7 @@ template<typename charT, typename traits>
 	charT buf = 0;
 	in >> buf;
 
-	if (in != buf) {
+	if (buf != cliteral) {
 		throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
 			"Invalid input formatting!"))
 	}

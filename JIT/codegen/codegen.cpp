@@ -10,24 +10,24 @@
 #include "codegen.hpp"
 
 LLCCEP_JIT::codegenBackend::codegenBackend():
-	_runtimeManager(),
-	_instructionPos()
+	globalRuntimeManager(),
+	instructionPos()
 { }
 
 void LLCCEP_JIT::codegenBackend::setRuntimeManager(LLCCEP_JIT::runtimeManager *newRuntimeManager)
 {
-	_runtimeManager = newRuntimeManager;
+	globalRuntimeManager = newRuntimeManager;
 }
 
 size_t LLCCEP_JIT::codegenBackend::getInstructionPos(size_t id)
 {
-	if (_instructionPos.find(id) == _instructionPos.end()) {
+	if (id >= instructionPos.size()) {
 		throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
 			"No instruction with " size_t_pf "id",
 			id))
 	}
 
-	return _instructionPos[id];
+	return instructionPos[id];
 }
 
 void LLCCEP_JIT::codegenBackend::generateProgram()
@@ -41,7 +41,7 @@ void LLCCEP_JIT::codegenBackend::generateProgram()
 		else
 			pass = false;
 
-		inst = _runtimeManager->getCodeReader()->getInstruction(_instructionPos.size());
+		inst = globalRuntimeManager->getCodeReader()->getInstruction(instructionPos.size());
 	} while (inst.opcode != INT8_MAX);
 }
 
@@ -77,11 +77,9 @@ void LLCCEP_JIT::codegenBackend::generateMachineCode(LLCCEP_exec::instruction da
 		&LLCCEP_JIT::codegenBackend::genRet
 	};
 
-	size_t old = size();
-	(this->*functions[data.opcode])(data);
-
-	size_t id = _instructionPos.size();
-	_instructionPos[id] = old - size();
+	size_t old = size();                    // save old code size
+	(this->*functions[data.opcode])(data);  // generate code
+	instructionPos.push_back(size() - old); // new instruction size is difference
 }
 
 void LLCCEP_JIT::codegenBackend::genMov(LLCCEP_exec::instruction data)
@@ -89,27 +87,25 @@ void LLCCEP_JIT::codegenBackend::genMov(LLCCEP_exec::instruction data)
 	getImmediate(LLCCEP_JIT::RAX, data.args[1]);
 	getPointer(LLCCEP_JIT::RBX, data.args[0]);
 
-	emit_mov_reg_reg_ptr(LLCCEP_JIT::RAX, LLCCEP_JIT::RBX);
+	emit_mov_reg_ptr_reg(LLCCEP_JIT::RBX, LLCCEP_JIT::RAX);
 }
 
 void LLCCEP_JIT::codegenBackend::genMva(LLCCEP_exec::instruction data)
 {
 	getImmediate(LLCCEP_JIT::RAX, data.args[1]);
-	getImmediate(LLCCEP_JIT::RBX, data.args[0]);
+	getMemPtrFromImmediate(LLCCEP_JIT::RBX, data.args[0]);
 
-	emit_mov_reg_reg_ptr(LLCCEP_JIT::RAX, LLCCEP_JIT::RBX);
+	emit_mov_reg_ptr_reg(LLCCEP_JIT::RBX, LLCCEP_JIT::RAX);
 }
 
 void LLCCEP_JIT::codegenBackend::genPush(LLCCEP_exec::instruction data)
 {
 	getImmediate(LLCCEP_JIT::RAX, data.args[0]);
-
 	emit_push_reg(LLCCEP_JIT::RAX);
 }
 
 void LLCCEP_JIT::codegenBackend::genPop(LLCCEP_exec::instruction data)
 {
-	(void)data;
 	emit_pop_reg(LLCCEP_JIT::RAX);
 }
 
@@ -119,8 +115,7 @@ void LLCCEP_JIT::codegenBackend::genTop(LLCCEP_exec::instruction data)
 
 	emit_pop_reg(LLCCEP_JIT::RBX);
 	emit_push_reg(LLCCEP_JIT::RBX);
-
-	emit_mov_reg_ptr_reg(LLCCEP_JIT::RBX, LLCCEP_JIT::RAX);
+	emit_mov_reg_ptr_reg(LLCCEP_JIT::RAX, LLCCEP_JIT::RBX);
 }
 
 #define FPU_BIOP_ARITHMETICS(data, op) \
@@ -213,10 +208,7 @@ void LLCCEP_JIT::codegenBackend::genOff(LLCCEP_exec::instruction data)
 }
 
 void LLCCEP_JIT::codegenBackend::genNop(LLCCEP_exec::instruction data)
-{
-	(void)data;
-	// Do nothing, to increase speed...
-}
+{ }
 
 void LLCCEP_JIT::codegenBackend::genSwi(LLCCEP_exec::instruction data)
 {
@@ -225,7 +217,7 @@ void LLCCEP_JIT::codegenBackend::genSwi(LLCCEP_exec::instruction data)
 		emit_push_imm(v_push);
 	}
 
-	void *ptr = _runtimeManager->getSwiEmulatePtr();
+	void *ptr = globalRuntimeManager->getSwiEmulatePtr();
 	emit_mov_reg_imm(LLCCEP_JIT::RAX, reinterpret_cast<uint64_t>(ptr));
 	emit_call_reg(LLCCEP_JIT::RAX);
 }
@@ -237,20 +229,25 @@ void LLCCEP_JIT::codegenBackend::genCmp(LLCCEP_exec::instruction data)
 
 #define INCDEC(data, op) \
 ({ \
+	getImmediate(LLCCEP_JIT::RAX, data.args[0]); \
+	emit_push_reg(LLCCEP_JIT::RAX); \
+ \
+	emit_fld(LLCCEP_JIT::RSP); \
+	emit_pop_reg(LLCCEP_JIT::RAX); \
+	emit_f##op##stp(); \
+ \
 	getPointer(LLCCEP_JIT::RAX, data.args[0]); \
-	emit_mov_reg_reg_ptr(LLCCEP_JIT::RAX, LLCCEP_JIT::RBX); \
-	emit_##op##_reg(LLCCEP_JIT::RBX); \
-	emit_mov_reg_ptr_reg(LLCCEP_JIT::RBX, LLCCEP_JIT::RAX); \
+	emit_fstp_reg_ptr(LLCCEP_JIT::RAX); \
 });
 
 void LLCCEP_JIT::codegenBackend::genInc(LLCCEP_exec::instruction data)
 {
-//	INCDEC(data, inc)
+	INCDEC(data, inc)
 }
 
 void LLCCEP_JIT::codegenBackend::genDec(LLCCEP_exec::instruction data)
 {
-//	INCDEC(data, inc)
+	INCDEC(data, inc)
 }
 
 #undef INCDEC
@@ -297,29 +294,28 @@ void LLCCEP_JIT::codegenBackend::genPatan(LLCCEP_exec::instruction data)
 
 void LLCCEP_JIT::codegenBackend::genLdc(LLCCEP_exec::instruction data)
 {
-	getImmediate(LLCCEP_JIT::RAX, data.args[1]);
 	getPointer(LLCCEP_JIT::RBX, data.args[0]);
-
 	emit_mov_reg_ptr_reg(LLCCEP_JIT::RAX, LLCCEP_JIT::RBX);
 }
 
 void LLCCEP_JIT::codegenBackend::genCall(LLCCEP_exec::instruction data)
 {
 	/* TODO:
-	 * By call to reg
+	 * Implement this, using conditional calls due to data.args[0]
+	 * value
 	 */
 }
 
 void LLCCEP_JIT::codegenBackend::genJmp(LLCCEP_exec::instruction data)
 {
 	/* TODO:
-	 * By jmp to reg
+	 * Implement this, using conditional jumps due to data.args[0]
+	 * value
 	 */
 }
 
 void LLCCEP_JIT::codegenBackend::genRet(LLCCEP_exec::instruction data)
 {
-	(void)data;
 	emit_ret();
 }
 
@@ -330,14 +326,14 @@ void LLCCEP_JIT::codegenBackend::getImmediate(regID reg, LLCCEP_exec::arg data)
 	};
 
 	switch (data.type) {
-	case LLCCEP_exec::ARG_T_REG: {
+	case LLCCEP_ASM::LEX_T_REG: {
 		if (static_cast<size_t>(data.val) > 32) {
 			throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
 				"Error!\n"
 				"Overbounding while reading from register"))
 		}
 
-		void *ptr = _runtimeManager->getRegPtr(static_cast<size_t>(data.val));
+		void *ptr = globalRuntimeManager->getRegPtr(static_cast<size_t>(data.val));
 		regID tmp = getTmpRegister();
 
 		emit_push_reg(tmp);
@@ -349,12 +345,12 @@ void LLCCEP_JIT::codegenBackend::getImmediate(regID reg, LLCCEP_exec::arg data)
 		break;
 	}
 
-	case LLCCEP_exec::ARG_T_MEM: {
+	case LLCCEP_ASM::LEX_T_MEM: {
 		regID tmp = getTmpRegister();
 		emit_push_reg(tmp);
 
 		void *mem = reinterpret_cast<void *>(
-				    reinterpret_cast<uint64_t>(_runtimeManager->getMemoryBeginning()) +
+				    reinterpret_cast<uint64_t>(globalRuntimeManager->getMemoryBeginning()) +
 				    static_cast<uint64_t>(static_cast<size_t>(data.val) *
 							       sizeof(double)));
 
@@ -365,7 +361,7 @@ void LLCCEP_JIT::codegenBackend::getImmediate(regID reg, LLCCEP_exec::arg data)
 		break;
 	}
 
-	case LLCCEP_exec::ARG_T_VAL: {
+	case LLCCEP_ASM::LEX_T_VAL: {
 		uint64_t val = *reinterpret_cast<uint64_t *>(&data.val);
 		emit_mov_reg_imm(reg, val); // copy the bits, not the casted value
 		break;
@@ -379,28 +375,60 @@ void LLCCEP_JIT::codegenBackend::getImmediate(regID reg, LLCCEP_exec::arg data)
 	}
 }
 
-void LLCCEP_JIT::codegenBackend::getPointer(regID reg, LLCCEP_exec::arg data)
+void LLCCEP_JIT::codegenBackend::getPointer(LLCCEP_JIT::regID reg, LLCCEP_exec::arg data)
 {
 	switch (data.type) {
-	case LLCCEP_exec::ARG_T_REG: {
+	case LLCCEP_ASM::LEX_T_REG: {
 		if (static_cast<size_t>(data.val) > 32) {
 			throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
 				"Error!\n"
 				"Overbounding while reading from register"))
 		}
 
-		void *ptr = _runtimeManager->getRegPtr(static_cast<size_t>(data.val));
+		void *ptr = globalRuntimeManager->getRegPtr(static_cast<size_t>(data.val));
 		emit_mov_reg_imm(reg, reinterpret_cast<uint64_t>(ptr));
 
 		break;
 	}
 
-	case LLCCEP_exec::ARG_T_MEM: {
-		void *mem = reinterpret_cast<void *>(
-				    reinterpret_cast<uint64_t>(_runtimeManager->getMemoryBeginning()) +
-				    static_cast<uint64_t>(static_cast<size_t>(data.val) *
-							  sizeof(double)));
-		emit_mov_reg_imm(reg, reinterpret_cast<uint64_t>(mem));
+	case LLCCEP_ASM::LEX_T_MEM: {
+		uint64_t mem = reinterpret_cast<uint64_t>(globalRuntimeManager->getMemoryBeginning()) +
+			       static_cast<uint64_t>(static_cast<size_t>(data.val) * sizeof(double));
+		emit_mov_reg_imm(reg, mem);
+
+		break;
+	}
+
+	default: {
+		throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
+			"Error!\n"
+			"Invalid reading of pointer data!\n"))
+	}
+	}
+}
+
+void LLCCEP_JIT::codegenBackend::getMemPtrFromImmediate(LLCCEP_JIT::regID reg, LLCCEP_exec::arg data)
+{
+	switch (data.type) {
+	case LLCCEP_ASM::LEX_T_VAL: {
+		uint64_t tmpPtr = reinterpret_cast<uint64_t>(globalRuntimeManager->getMemoryBeginning()) +
+				  static_cast<uint64_t>(static_cast<size_t>(data.val) * sizeof(double));
+		emit_mov_reg_imm(reg, tmpPtr);
+
+		break;
+	}
+
+	case LLCCEP_ASM::LEX_T_MEM: {
+		void *tmpPtr = reinterpret_cast<void *>(reinterpret_cast<uint64_t>(globalRuntimeManager->getMemoryBeginning()) +
+							 static_cast<uint64_t>(static_cast<size_t>(data.val) * sizeof(double)));
+		emit_mov_reg_imm(reg, static_cast<uint64_t>(*reinterpret_cast<double *>(tmpPtr)));
+
+		break;
+	}
+
+	case LLCCEP_ASM::LEX_T_REG: {
+		void *regPtr = reinterpret_cast<void *>(reinterpret_cast<uint64_t>(globalRuntimeManager->getRegPtr(data.val)));
+		emit_mov_reg_imm(reg, static_cast<uint64_t>(*reinterpret_cast<double *>(regPtr)));
 
 		break;
 	}
@@ -415,5 +443,5 @@ void LLCCEP_JIT::codegenBackend::getPointer(regID reg, LLCCEP_exec::arg data)
 
 bool LLCCEP_JIT::codegenBackend::OK() const
 {
-	return _runtimeManager && _runtimeManager->OK();
+	return globalRuntimeManager && globalRuntimeManager->OK();
 }

@@ -26,8 +26,8 @@ namespace LLCCEP_JIT {
 		void emit_nop();
 		
 		void emit_mov_reg_reg(regID dst, regID src);
-		void emit_mov_reg_ptr_reg(regID src, regID dst);
-		void emit_mov_reg_reg_ptr(regID src, regID dst);
+		void emit_mov_reg_ptr_reg(regID dst, regID src);
+		void emit_mov_reg_reg_ptr(regID dst, regID src);
 		void emit_mov_reg_imm(regID dst, uint64_t src);
 
 		void emit_shl_cl(regID what);
@@ -73,20 +73,12 @@ namespace LLCCEP_JIT {
 		void emit_call_reg(regID id);
 
 		void emit_cmp_reg_reg(regID op0, regID op1);
-		void emit_cmp_reg_ptr_reg(regID op0, regID op1);
-		void emit_cmp_reg_reg_ptr(regID op0, regID op1);
-
 		void emit_and_reg_reg(regID op0, regID op1);
-		void emit_and_reg_ptr_reg(regID op0, regID op1);
-		void emit_and_reg_reg_ptr(regID op0, regID op1);
-
 		void emit_or_reg_reg(regID op0, regID op1);
-		void emit_or_reg_ptr_reg(regID op0, regID op1);
-		void emit_or_reg_reg_ptr(regID op0, regID op1);
-
 		void emit_xor_reg_reg(regID op0, regID op1);
-		void emit_xor_reg_ptr_reg(regID op0, regID op1);
-		void emit_xor_reg_reg_ptr(regID op0, regID op1);
+
+		void emit_fincstp();
+		void emit_fdecstp();
 	};
 }
 

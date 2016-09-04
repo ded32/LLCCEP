@@ -50,12 +50,13 @@ namespace LLCCEP_JIT {
 
 		void getImmediate(regID reg, LLCCEP_exec::arg data);
 		void getPointer(regID reg, LLCCEP_exec::arg data);
+		void getMemPtrFromImmediate(regID reg, LLCCEP_exec::arg data);
 
 		bool OK() const;
 
 	private:
-		runtimeManager *_runtimeManager;
-		::std::map<size_t, size_t> _instructionPos;
+		runtimeManager *globalRuntimeManager;
+		::std::vector<size_t> instructionPos;
 	};
 }
 

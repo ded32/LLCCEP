@@ -15,7 +15,8 @@ HEADERS = rex/rex.hpp \
           ../exec/codeReader/codeReader.hpp \
           ../exec/window/window.hpp \
           ../exec/window/renderer/renderer.hpp \
-          ../exec/signal/signal.hpp
+          ../exec/signal/signal.hpp \
+          ../exec/messageBox/messageBox.hpp
 
 SOURCES = codegen/codegen.cpp \
           emitter/emitter.cpp \
@@ -31,5 +32,6 @@ SOURCES = codegen/codegen.cpp \
           ../exec/codeReader/codeReader.cpp \
           ../exec/window/window.cpp \
           ../exec/window/renderer/renderer.cpp \
+          ../exec/messageBox/messageBox.cpp \
           ../lib/command-line.cpp \
-          ../exec/signal/signal.cpp
+          ../exec/signal/signal.cpp \

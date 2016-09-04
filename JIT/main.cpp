@@ -17,7 +17,7 @@
 
 int main(int argn, char **argv)
 {
-	QCoreApplication app(argn, argv);
+	QApplication app(argn, argv);
 	LLCCEP_exec::cAttachSignalsHandler();
 
 	try {

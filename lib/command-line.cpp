@@ -9,20 +9,20 @@
 
 bool LLCCEP_command_line::isHelp(const char * const str)
 {
-	return !(::std::strcmp(str, "-h") ||
-		 ::std::strcmp(str, "--help"));
+	return !::std::strcmp(str, "-h") ||
+	       !::std::strcmp(str, "--help");
 }
 
 bool LLCCEP_command_line::isRamSize(const char * const str)
 {
-	return !(::std::strcmp(str, "-r") ||
-		 ::std::strcmp(str, "--ramsize"));
+	return !::std::strcmp(str, "-r") ||
+	       !::std::strcmp(str, "--ramsize");
 }
 
 bool LLCCEP_command_line::isOutput(const char * const str)
 {
-	return !(::std::strcmp(str, "-o") ||
-		 ::std::strcmp(str, "--output"));
+	return !::std::strcmp(str, "-o") ||
+	       !::std::strcmp(str, "--output");
 }
 
 commandLineParametersVM::commandLineParametersVM():

@@ -18,20 +18,20 @@ void *LLCCEP_JIT::runtimeManager::getSwiEmulatePtr()
 
 void *LLCCEP_JIT::runtimeManager::getCmpPtr()
 {
-	return reinterpret_cast<void *>(&_cmp);
+	return reinterpret_cast<void *>(&cmp);
 }
 
 void *LLCCEP_JIT::runtimeManager::getRegPtr(size_t id)
 {
-	return reinterpret_cast<void *>(&(_regs[id]));
+	return reinterpret_cast<void *>(&(regs[id]));
 }
 
 void *LLCCEP_JIT::runtimeManager::getMemoryBeginning()
 {
-	return _mm->getMemBeginning();
+	return mm->getMemBeginning();
 }
 
 LLCCEP_exec::codeReader *LLCCEP_JIT::runtimeManager::getCodeReader()
 {
-	return _reader;
+	return reader;
 }
