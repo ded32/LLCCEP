@@ -9,6 +9,8 @@
 
 #include "codegen.hpp"
 
+#define CODEGEN_BACKEND_OK DEFAULT_CHECK_BLOCK(this, ok, true)
+
 LLCCEP_JIT::codegenBackend::codegenBackend():
 	globalRuntimeManager(),
 	instructionPos()
@@ -17,10 +19,13 @@ LLCCEP_JIT::codegenBackend::codegenBackend():
 void LLCCEP_JIT::codegenBackend::setRuntimeManager(LLCCEP_JIT::runtimeManager *newRuntimeManager)
 {
 	globalRuntimeManager = newRuntimeManager;
+	CODEGEN_BACKEND_OK
 }
 
 size_t LLCCEP_JIT::codegenBackend::getInstructionPos(size_t id)
 {
+	CODEGEN_BACKEND_OK
+
 	if (id >= instructionPos.size()) {
 		throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
 			"No instruction with " size_t_pf "id",
@@ -28,10 +33,14 @@ size_t LLCCEP_JIT::codegenBackend::getInstructionPos(size_t id)
 	}
 
 	return instructionPos[id];
+
+	CODEGEN_BACKEND_OK
 }
 
 void LLCCEP_JIT::codegenBackend::generateProgram()
 {
+	CODEGEN_BACKEND_OK
+
 	LLCCEP_exec::instruction inst{};
 	bool pass = true;
 
@@ -43,10 +52,14 @@ void LLCCEP_JIT::codegenBackend::generateProgram()
 
 		inst = globalRuntimeManager->getCodeReader()->getInstruction(instructionPos.size());
 	} while (inst.opcode != INT8_MAX);
+
+	CODEGEN_BACKEND_OK
 }
 
 void LLCCEP_JIT::codegenBackend::generateMachineCode(LLCCEP_exec::instruction data)
 {
+	CODEGEN_BACKEND_OK
+
 	void (LLCCEP_JIT::codegenBackend:: *functions[])(LLCCEP_exec::instruction(data)) = {
 		&LLCCEP_JIT::codegenBackend::genMov,
 		&LLCCEP_JIT::codegenBackend::genMva,
@@ -80,46 +93,70 @@ void LLCCEP_JIT::codegenBackend::generateMachineCode(LLCCEP_exec::instruction da
 	size_t old = size();                    // save old code size
 	(this->*functions[data.opcode])(data);  // generate code
 	instructionPos.push_back(size() - old); // new instruction size is difference
+
+	CODEGEN_BACKEND_OK
 }
 
 void LLCCEP_JIT::codegenBackend::genMov(LLCCEP_exec::instruction data)
 {
+	CODEGEN_BACKEND_OK
+
 	getImmediate(LLCCEP_JIT::RAX, data.args[1]);
 	getPointer(LLCCEP_JIT::RBX, data.args[0]);
 
 	emit_mov_reg_ptr_reg(LLCCEP_JIT::RBX, LLCCEP_JIT::RAX);
+
+	CODEGEN_BACKEND_OK
 }
 
 void LLCCEP_JIT::codegenBackend::genMva(LLCCEP_exec::instruction data)
 {
+	CODEGEN_BACKEND_OK
+
 	getImmediate(LLCCEP_JIT::RAX, data.args[1]);
 	getMemPtrFromImmediate(LLCCEP_JIT::RBX, data.args[0]);
 
 	emit_mov_reg_ptr_reg(LLCCEP_JIT::RBX, LLCCEP_JIT::RAX);
+
+	CODEGEN_BACKEND_OK
 }
 
 void LLCCEP_JIT::codegenBackend::genPush(LLCCEP_exec::instruction data)
 {
+	CODEGEN_BACKEND_OK
+
 	getImmediate(LLCCEP_JIT::RAX, data.args[0]);
 	emit_push_reg(LLCCEP_JIT::RAX);
+
+	CODEGEN_BACKEND_OK
 }
 
 void LLCCEP_JIT::codegenBackend::genPop(LLCCEP_exec::instruction data)
 {
+	CODEGEN_BACKEND_OK
+
 	emit_pop_reg(LLCCEP_JIT::RAX);
+
+	CODEGEN_BACKEND_OK
 }
 
 void LLCCEP_JIT::codegenBackend::genTop(LLCCEP_exec::instruction data)
 {
+	CODEGEN_BACKEND_OK
+
 	getPointer(LLCCEP_JIT::RAX, data.args[0]);
 
 	emit_pop_reg(LLCCEP_JIT::RBX);
 	emit_push_reg(LLCCEP_JIT::RBX);
 	emit_mov_reg_ptr_reg(LLCCEP_JIT::RAX, LLCCEP_JIT::RBX);
+
+	CODEGEN_BACKEND_OK
 }
 
 #define FPU_BIOP_ARITHMETICS(data, op) \
 ({ \
+	CODEGEN_BACKEND_OK \
+ \
 	getImmediate(LLCCEP_JIT::RAX, data.args[1]); \
 	getImmediate(LLCCEP_JIT::RBX, data.args[2]); \
  \
@@ -134,6 +171,8 @@ void LLCCEP_JIT::codegenBackend::genTop(LLCCEP_exec::instruction data)
  \
 	getPointer(LLCCEP_JIT::RCX, data.args[0]); \
 	emit_fstp_reg_ptr(LLCCEP_JIT::RCX); \
+ \
+	CODEGEN_BACKEND_OK \
 });
 
 void LLCCEP_JIT::codegenBackend::genAdd(LLCCEP_exec::instruction data)
@@ -160,6 +199,8 @@ void LLCCEP_JIT::codegenBackend::genDiv(LLCCEP_exec::instruction data)
 
 #define CAST(target, arg) \
 ({ \
+	CODEGEN_BACKEND_OK \
+ \
 	emit_push_reg(LLCCEP_JIT::RDX); \
  \
 	getImmediate(LLCCEP_JIT::RDX, arg); \
@@ -168,10 +209,14 @@ void LLCCEP_JIT::codegenBackend::genDiv(LLCCEP_exec::instruction data)
 	emit_fistp(target); \
 	\
 	emit_pop_reg(LLCCEP_JIT::RDX); \
+ \
+	CODEGEN_BACKEND_OK
 });
 
 #define LOGIC(data, name) \
 ({ \
+	CODEGEN_BACKEND_OK \
+ \
 	getPointer(LLCCEP_JIT::RCX, data.args[0]); \
  \
 	CAST(LLCCEP_JIT::RAX, data.args[1]) \
@@ -179,6 +224,8 @@ void LLCCEP_JIT::codegenBackend::genDiv(LLCCEP_exec::instruction data)
  \
 	emit_##name##_reg_reg(LLCCEP_JIT::RAX, LLCCEP_JIT::RBX); \
 	emit_mov_reg_ptr_reg(LLCCEP_JIT::RAX, LLCCEP_JIT::RCX); \
+ \
+	CODEGEN_BACKEND_OK \
 });
 
 
@@ -208,10 +255,14 @@ void LLCCEP_JIT::codegenBackend::genOff(LLCCEP_exec::instruction data)
 }
 
 void LLCCEP_JIT::codegenBackend::genNop(LLCCEP_exec::instruction data)
-{ }
+{
+	CODEGEN_BACKEND_OK
+}
 
 void LLCCEP_JIT::codegenBackend::genSwi(LLCCEP_exec::instruction data)
 {
+	CODEGEN_BACKEND_OK
+
 	for (size_t i = 0; i < sizeof(data) / 8; i++) {
 		long long unsigned v_push = (reinterpret_cast<long long unsigned *>(&data))[i];
 		emit_push_imm(v_push);
@@ -220,15 +271,19 @@ void LLCCEP_JIT::codegenBackend::genSwi(LLCCEP_exec::instruction data)
 	void *ptr = globalRuntimeManager->getSwiEmulatePtr();
 	emit_mov_reg_imm(LLCCEP_JIT::RAX, reinterpret_cast<uint64_t>(ptr));
 	emit_call_reg(LLCCEP_JIT::RAX);
+
+	CODEGEN_BACKEND_OK
 }
 
 void LLCCEP_JIT::codegenBackend::genCmp(LLCCEP_exec::instruction data)
 {
-	(void)data;
+	CODEGEN_BACKEND_OK
 }
 
 #define INCDEC(data, op) \
 ({ \
+	CODEGEN_BACKEND_OK \
+ \
 	getImmediate(LLCCEP_JIT::RAX, data.args[0]); \
 	emit_push_reg(LLCCEP_JIT::RAX); \
  \
@@ -238,6 +293,8 @@ void LLCCEP_JIT::codegenBackend::genCmp(LLCCEP_exec::instruction data)
  \
 	getPointer(LLCCEP_JIT::RAX, data.args[0]); \
 	emit_fstp_reg_ptr(LLCCEP_JIT::RAX); \
+ \
+	CODEGEN_BACKEND_OK \
 });
 
 void LLCCEP_JIT::codegenBackend::genInc(LLCCEP_exec::instruction data)
@@ -254,6 +311,8 @@ void LLCCEP_JIT::codegenBackend::genDec(LLCCEP_exec::instruction data)
 
 #define FPU_UNIOP_MATH(data, op) \
 ({ \
+	CODEGEN_BACKEND_OK \
+ \
 	getImmediate(LLCCEP_JIT::RAX, data.args[1]); \
 	emit_push_reg(LLCCEP_JIT::RAX); \
  \
@@ -263,6 +322,8 @@ void LLCCEP_JIT::codegenBackend::genDec(LLCCEP_exec::instruction data)
  \
 	getPointer(LLCCEP_JIT::RCX, data.args[0]); \
 	emit_fstp_reg_ptr(LLCCEP_JIT::RCX); \
+ \
+	CODEGEN_BACKEND_OK \
 });
 
 void LLCCEP_JIT::codegenBackend::genSqrt(LLCCEP_exec::instruction data)
@@ -294,33 +355,50 @@ void LLCCEP_JIT::codegenBackend::genPatan(LLCCEP_exec::instruction data)
 
 void LLCCEP_JIT::codegenBackend::genLdc(LLCCEP_exec::instruction data)
 {
+	CODEGEN_BACKEND_OK
+
 	getPointer(LLCCEP_JIT::RBX, data.args[0]);
 	emit_mov_reg_ptr_reg(LLCCEP_JIT::RAX, LLCCEP_JIT::RBX);
+
+	CODEGEN_BACKEND_OK
 }
 
 void LLCCEP_JIT::codegenBackend::genCall(LLCCEP_exec::instruction data)
 {
+	CODEGEN_BACKEND_OK
+
 	/* TODO:
 	 * Implement this, using conditional calls due to data.args[0]
 	 * value
 	 */
+	CODEGEN_BACKEND_OK
 }
 
 void LLCCEP_JIT::codegenBackend::genJmp(LLCCEP_exec::instruction data)
 {
+	CODEGEN_BACKEND_OK
+
 	/* TODO:
 	 * Implement this, using conditional jumps due to data.args[0]
 	 * value
 	 */
+
+	CODEGEN_BACKEND_OK
 }
 
 void LLCCEP_JIT::codegenBackend::genRet(LLCCEP_exec::instruction data)
 {
+	CODEGEN_BACKEND_OK
+
 	emit_ret();
+
+	CODEGEN_BACKEND_OK
 }
 
 void LLCCEP_JIT::codegenBackend::getImmediate(regID reg, LLCCEP_exec::arg data)
 {
+	CODEGEN_BACKEND_OK
+
 	auto getTmpRegister = [reg] {
 		return (reg == LLCCEP_JIT::RAX)?(LLCCEP_JIT::RBX):(LLCCEP_JIT::RAX);
 	};
@@ -373,10 +451,14 @@ void LLCCEP_JIT::codegenBackend::getImmediate(regID reg, LLCCEP_exec::arg data)
 			"Invalid reading of immediate data!\n"))
 	}
 	}
+
+	CODEGEN_BACKEND_OK
 }
 
 void LLCCEP_JIT::codegenBackend::getPointer(LLCCEP_JIT::regID reg, LLCCEP_exec::arg data)
 {
+	CODEGEN_BACKEND_OK
+
 	switch (data.type) {
 	case LLCCEP_ASM::LEX_T_REG: {
 		if (static_cast<size_t>(data.val) > 32) {
@@ -405,10 +487,14 @@ void LLCCEP_JIT::codegenBackend::getPointer(LLCCEP_JIT::regID reg, LLCCEP_exec::
 			"Invalid reading of pointer data!\n"))
 	}
 	}
+
+	CODEGEN_BACKEND_OK
 }
 
 void LLCCEP_JIT::codegenBackend::getMemPtrFromImmediate(LLCCEP_JIT::regID reg, LLCCEP_exec::arg data)
 {
+	CODEGEN_BACKEND_OK
+
 	switch (data.type) {
 	case LLCCEP_ASM::LEX_T_VAL: {
 		uint64_t tmpPtr = reinterpret_cast<uint64_t>(globalRuntimeManager->getMemoryBeginning()) +
@@ -439,6 +525,8 @@ void LLCCEP_JIT::codegenBackend::getMemPtrFromImmediate(LLCCEP_JIT::regID reg, L
 			"Invalid reading of pointer data!\n"))
 	}
 	}
+
+	CODEGEN_BACKEND_OK
 }
 
 bool LLCCEP_JIT::codegenBackend::OK() const
