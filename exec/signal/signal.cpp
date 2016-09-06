@@ -9,12 +9,14 @@
 
 void LLCCEP_exec::cAttachSignalsHandler()
 {
+#if !defined DEBUGGER
 	::std::signal(SIGABRT, LLCCEP_exec::cSignalsHandler);
-	::std::signal(SIGFPE, LLCCEP_exec::cSignalsHandler);
-	::std::signal(SIGILL, LLCCEP_exec::cSignalsHandler);
-	::std::signal(SIGINT, LLCCEP_exec::cSignalsHandler);
+	::std::signal(SIGFPE,  LLCCEP_exec::cSignalsHandler);
+	::std::signal(SIGILL,  LLCCEP_exec::cSignalsHandler);
+	::std::signal(SIGINT,  LLCCEP_exec::cSignalsHandler);
 	::std::signal(SIGSEGV, LLCCEP_exec::cSignalsHandler);
 	::std::signal(SIGTERM, LLCCEP_exec::cSignalsHandler);
+#endif
 }
 
 void LLCCEP_exec::cSignalsHandler(int signo)

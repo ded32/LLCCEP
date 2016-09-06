@@ -36,7 +36,9 @@ LLCCEP_exec::softcore::softcore():
 	reader(),
 	ready(false),
 	quit(false)
-{ }
+{
+	memset(regs, 0, sizeof(double) * 32);
+}
 
 LLCCEP_exec::softcore::~softcore()
 { }
@@ -402,7 +404,7 @@ void LLCCEP_exec::softcore::emulated_swi(LLCCEP_exec::instruction data)
 					"Only values between 0 and 2 are allowed!\n"));
 			}
 
-			regs[2] = *reinterpret_cast<double *>(&stdf[static_cast<size_t>(regs[1])]);
+			regs[2] = *reinterpret_cast<double *>(stdf[static_cast<size_t>(regs[1])]);
 			break;
 		}
 
@@ -440,7 +442,8 @@ void LLCCEP_exec::softcore::emulated_swi(LLCCEP_exec::instruction data)
 			}
 
 			case 'c': {
-				::std::fprintf(out, "%c", static_cast<char>(regs[3]));
+				::std::cerr << out << " " << stdout << " " << stdin << " " << stderr;
+				::std::fprintf(out, "%c", static_cast<uint8_t>(regs[3]));
 				break;
 			}
 

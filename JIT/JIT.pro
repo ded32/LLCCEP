@@ -1,6 +1,13 @@
 QT += widgets multimedia network
 
 INCLUDEPATH += ./../include/
+CONFIG += gnu++14 debug
+
+QMAKE_CXXFLAGS_DEBUG += -g -O0
+QMAKE_CXXFLAGS_RELEASE += -flto -Ofast \
+                          -march=native \
+                          -funroll-loops \
+                          -fstack-guard-all
 
 HEADERS = rex/rex.hpp \
           codegen/codegen.hpp \
@@ -24,7 +31,7 @@ SOURCES = codegen/codegen.cpp \
           rm-field/rm-field.cpp \
           startup/startup.cpp \
           main.cpp \
-          stack-protector/stack-protector.cpp\
+          stack-protector/stack-protector.cpp \
           ../lib/STDExtras.cpp \
           runtime/runtime.cpp \
           ../exec/softcore/softcore.cpp \
@@ -35,3 +42,5 @@ SOURCES = codegen/codegen.cpp \
           ../exec/messageBox/messageBox.cpp \
           ../lib/command-line.cpp \
           ../exec/signal/signal.cpp \
+
+TARGET = "LLCCEP Emulator"

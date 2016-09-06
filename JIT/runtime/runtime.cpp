@@ -7,7 +7,7 @@ LLCCEP_JIT::runtimeManager::runtimeManager():
 
 void *LLCCEP_JIT::runtimeManager::getSoftcorePtr()
 {
-	return this;
+	return dynamic_cast<LLCCEP_exec::softcore *>(this);
 }
 
 void *LLCCEP_JIT::runtimeManager::getSwiEmulatePtr()

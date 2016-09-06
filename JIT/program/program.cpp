@@ -25,35 +25,35 @@ namespace LLCCEP_JIT {
 
 	void program::emit_mov_reg_reg(regID dst, regID src)
 	{
-		emit({0x48, dst, src});
+		emit({REX_W, dst, src});
 	}
 
 	void program::emit_mov_reg_ptr_reg(regID dst, regID src)
 	{
-		emit({0x48, 0x89});
+		emit({REX_W, 0x89});
 		emit_rm_field(0b00, src, dst);
 	}
 
 	void program::emit_mov_reg_reg_ptr(regID dst, regID src)
 	{
-		emit({0x48, 0x8B});
+		emit({REX_W, 0x8B});
 		emit_rm_field(0b00, src, dst);
 	}
 
 	void program::emit_mov_reg_imm(regID dst, uint64_t src)
 	{
-		emit({0x48, static_cast<uint8_t>(0xB8 + dst)});
+		emit({REX_W, static_cast<uint8_t>(0xB8 + dst)});
 		emit_data<uint64_t>(src);
 	}
 
 	void program::emit_shl_cl(regID what)
 	{
-		emit({0x48, 0xD3, static_cast<uint8_t>(0xE0 + what)});
+		emit({REX_W, 0xD3, static_cast<uint8_t>(0xE0 + what)});
 	}
 
 	void program::emit_shr_cl(regID what)
 	{
-		emit({0x48, 0xD3, static_cast<uint8_t>(0xE8 + what)});
+		emit({REX_W, 0xD3, static_cast<uint8_t>(0xE8 + what)});
 	}
 
 	void program::emit_jmp(uint32_t offset)
@@ -111,14 +111,6 @@ namespace LLCCEP_JIT {
 	void program::emit_push_reg(regID src)
 	{
 		emit({0xFF, static_cast<uint8_t>(0xF0 + src)});
-	}
-
-	void program::emit_push_imm(uint64_t src)
-	{
-		emit_byte(0x68);
-		emit_data<uint32_t>((reinterpret_cast<uint32_t *>(&src))[1]);
-		emit_byte(0x68);
-		emit_data<uint32_t>((reinterpret_cast<uint32_t *>(&src))[0]);
 	}
 
 	void program::emit_pop_reg(regID dst)

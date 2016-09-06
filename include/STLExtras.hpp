@@ -65,14 +65,10 @@ size_t get_length(::std::basic_ifstream<char_t> &fd)
 template<typename TYPE>
 void reopen_file(TYPE &f, std::string path)
 {
-	if (TYPEHASH(TYPE) != TYPEHASH(::std::ifstream) &&
-	    TYPEHASH(TYPE) != TYPEHASH(::std::ofstream)) {
-		throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
-					"%s type is not allowed to use in"
-					"reopen_file() function!\n",
-					typeid(TYPE).name()))
-	}
-
+	static_assert(TYPEHASH(TYPE) == TYPEHASH(::std::ifstream) ||
+		      TYPEHASH(TYPE) == TYPEHASH(::std::ofstream),
+		      "required std::ifstream or ::std::ofstream object as input");
+	
 	f.close();
 	f.clear();
 
