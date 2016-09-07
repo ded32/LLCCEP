@@ -9,7 +9,7 @@
 
 void LLCCEP_exec::cAttachSignalsHandler()
 {
-#if !defined DEBUGGER
+#ifndef DEBUGGER
 	::std::signal(SIGABRT, LLCCEP_exec::cSignalsHandler);
 	::std::signal(SIGFPE,  LLCCEP_exec::cSignalsHandler);
 	::std::signal(SIGILL,  LLCCEP_exec::cSignalsHandler);
@@ -25,10 +25,17 @@ void LLCCEP_exec::cSignalsHandler(int signo)
 		{SIGABRT, "Abnormal termination, alike abort()'s call gives."},
 		{SIGFPE, "Erroneous arithmetic operation. Maybe FPU divide by zero, or overflow."},
 		{SIGILL, "Illegal instruction found."},
-		{SIGINT, "Termination requested by application."},
-		{SIGSEGV, "Segmentation violation: don't permitted to use some data."},
+		{SIGINT, "Termination requested by user."},
+		{SIGSEGV, "Segmentation violation: not permitted to use some data."},
 		{SIGTERM, "Termination requested by application."}
 	};
+
+	if (sigmsg.find(signo) == sigmsg.end()) {
+		throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
+			"Error!\n"
+			"Unpermitted signo value to cSignalsHandler (0x%x)\n",
+			signo))
+	}
 
 	::std::string msg = ::std::string("Program was interrupted by a signal(") +
 			    to_string(signo) + ::std::string("):\n") + sigmsg[signo] +

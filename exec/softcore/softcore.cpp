@@ -404,7 +404,9 @@ void LLCCEP_exec::softcore::emulated_swi(LLCCEP_exec::instruction data)
 					"Only values between 0 and 2 are allowed!\n"));
 			}
 
-			regs[2] = *reinterpret_cast<double *>(stdf[static_cast<size_t>(regs[1])]);
+			regs[2] = *reinterpret_cast<double *>(&(stdf[static_cast<size_t>(regs[1])]));
+			::std::cerr << regs[2];
+
 			break;
 		}
 

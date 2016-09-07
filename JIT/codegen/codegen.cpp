@@ -273,31 +273,23 @@ void LLCCEP_JIT::codegenBackend::genSwi(LLCCEP_exec::instruction data)
 
 	void *ptr = globalRuntimeManager->getSwiEmulatePtr();
 
-	::std::cerr << ::std::showbase << ::std::hex << reinterpret_cast<uint64_t>(globalRuntimeManager);
+#ifndef _MSC_VER
 	emit_mov_reg_imm(LLCCEP_JIT::RDI, reinterpret_cast<uint64_t>(globalRuntimeManager)); // this
-#if !defined _MSC_VER
-
+#else
+	emit_mov_reg_imm(LLCCEP_JIT::RCX, reinterpret_cast<uint64_t>(globalRuntimeManager)); // this
 #endif
 
 	auto bytes = to_bytes(data);
 	for (size_t i = 0; i < bytes.size() / sizeof(uint64_t); i++) {      // push data
-
 		uint64_t imm = reinterpret_cast<uint64_t *>(&data)[bytes.size() / sizeof(uint64_t) - i - 1];
-		::std::cerr << ::std::showbase << ::std::hex << imm << " ";
-
 		emit_mov_reg_imm(LLCCEP_JIT::RAX, imm);
 		emit_push_reg(LLCCEP_JIT::RAX);
 	}
 
-	::std::cerr << "(calling " << ptr << ")\n";
 	emit_mov_reg_imm(LLCCEP_JIT::RAX, reinterpret_cast<uint64_t>(ptr));
 	emit_call_reg(LLCCEP_JIT::RAX);
 
-#if defined _MSC_VER
 	for (size_t i = 0; i < bytes.size() / sizeof(uint64_t); i++)
-#else
-	for (size_t i = 0; i < bytes.size() / sizeof(uint64_t) + 1; i++)
-#endif
 		emit_pop_reg(LLCCEP_JIT::RAX);
 
 	CODEGEN_BACKEND_OK
