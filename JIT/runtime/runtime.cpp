@@ -1,3 +1,5 @@
+#include <convert.hpp>
+
 #include "runtime.hpp"
 #include "../../exec/softcore/softcore.hpp"
 
@@ -12,13 +14,20 @@ void *LLCCEP_JIT::runtimeManager::getSoftcorePtr()
 
 void *LLCCEP_JIT::runtimeManager::getSwiEmulatePtr()
 {
-	union {
-		void (LLCCEP_exec::softcore:: *member)(LLCCEP_exec::instruction);
-		void *pointer;
-	} val;
+	return reinterpret_value<void (LLCCEP_exec::softcore:: *)(LLCCEP_exec::instruction),
+				 void *>(&LLCCEP_JIT::runtimeManager::emulated_swi);
+}
 
-	val.member = &LLCCEP_JIT::runtimeManager::emulated_swi;
-	return val.pointer;
+void *LLCCEP_JIT::runtimeManager::getStregsEmulatePtr()
+{
+	return reinterpret_value<void (LLCCEP_exec::softcore:: *)(LLCCEP_exec::instruction),
+				 void *>(&LLCCEP_JIT::runtimeManager::emulated_stregs);
+}
+
+void *LLCCEP_JIT::runtimeManager::getLdregsEmulatePtr()
+{
+	return reinterpret_value<void (LLCCEP_exec::softcore:: *)(LLCCEP_exec::instruction),
+				 void *>(&LLCCEP_JIT::runtimeManager::emulated_ldregs);
 }
 
 void *LLCCEP_JIT::runtimeManager::getCmpPtr()

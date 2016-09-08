@@ -47,10 +47,13 @@ namespace LLCCEP_JIT {
 		void genCall(LLCCEP_exec::instruction data);
 		void genJmp(LLCCEP_exec::instruction data);
 		void genRet(LLCCEP_exec::instruction data);
+		void genStregs(LLCCEP_exec::instruction data);
+		void genLdregs(LLCCEP_exec::instruction data);
 
 		void getImmediate(regID reg, LLCCEP_exec::arg data);
 		void getPointer(regID reg, LLCCEP_exec::arg data);
 		void getMemPtrFromImmediate(regID reg, LLCCEP_exec::arg data);
+		void genRuntimeFallback(void *funcPtr, LLCCEP_exec::instruction data);
 
 		bool ok() const;
 

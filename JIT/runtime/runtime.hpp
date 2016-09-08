@@ -11,6 +11,8 @@ namespace LLCCEP_JIT {
 
 		void *getSoftcorePtr();
 		void *getSwiEmulatePtr();
+		void *getStregsEmulatePtr();
+		void *getLdregsEmulatePtr();
 		void *getCmpPtr();
 		void *getRegPtr(size_t id);
 		void *getMemoryBeginning();

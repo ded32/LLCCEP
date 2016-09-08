@@ -68,7 +68,7 @@ void LLCCEP_JIT::codegenBackend::generateMachineCode(LLCCEP_exec::instruction da
 {
 	CODEGEN_BACKEND_OK
 
-	void (LLCCEP_JIT::codegenBackend:: *functions[])(LLCCEP_exec::instruction(data)) = {
+	void (LLCCEP_JIT::codegenBackend:: *functions[])(LLCCEP_exec::instruction) = {
 		&LLCCEP_JIT::codegenBackend::genMov,
 		&LLCCEP_JIT::codegenBackend::genMva,
 		&LLCCEP_JIT::codegenBackend::genPush,
@@ -95,7 +95,9 @@ void LLCCEP_JIT::codegenBackend::generateMachineCode(LLCCEP_exec::instruction da
 		&LLCCEP_JIT::codegenBackend::genLdc,
 		&LLCCEP_JIT::codegenBackend::genCall,
 		&LLCCEP_JIT::codegenBackend::genJmp,
-		&LLCCEP_JIT::codegenBackend::genRet
+		&LLCCEP_JIT::codegenBackend::genRet,
+		&LLCCEP_JIT::codegenBackend::genStregs,
+		&LLCCEP_JIT::codegenBackend::genLdregs
 	};
 
 	size_t old = size();                    // save old code size
@@ -271,26 +273,7 @@ void LLCCEP_JIT::codegenBackend::genSwi(LLCCEP_exec::instruction data)
 {
 	CODEGEN_BACKEND_OK
 
-	void *ptr = globalRuntimeManager->getSwiEmulatePtr();
-
-#ifndef _MSC_VER
-	emit_mov_reg_imm(LLCCEP_JIT::RDI, reinterpret_cast<uint64_t>(globalRuntimeManager)); // this
-#else
-	emit_mov_reg_imm(LLCCEP_JIT::RCX, reinterpret_cast<uint64_t>(globalRuntimeManager)); // this
-#endif
-
-	auto bytes = to_bytes(data);
-	for (size_t i = 0; i < bytes.size() / sizeof(uint64_t); i++) {      // push data
-		uint64_t imm = reinterpret_cast<uint64_t *>(&data)[bytes.size() / sizeof(uint64_t) - i - 1];
-		emit_mov_reg_imm(LLCCEP_JIT::RAX, imm);
-		emit_push_reg(LLCCEP_JIT::RAX);
-	}
-
-	emit_mov_reg_imm(LLCCEP_JIT::RAX, reinterpret_cast<uint64_t>(ptr));
-	emit_call_reg(LLCCEP_JIT::RAX);
-
-	for (size_t i = 0; i < bytes.size() / sizeof(uint64_t); i++)
-		emit_pop_reg(LLCCEP_JIT::RAX);
+	genRuntimeFallback(globalRuntimeManager->getSwiEmulatePtr(), data);
 
 	CODEGEN_BACKEND_OK
 }
@@ -412,6 +395,24 @@ void LLCCEP_JIT::codegenBackend::genRet(LLCCEP_exec::instruction data)
 	CODEGEN_BACKEND_OK
 
 	emit_ret();
+
+	CODEGEN_BACKEND_OK
+}
+
+void LLCCEP_JIT::codegenBackend::genStregs(LLCCEP_exec::instruction data)
+{
+	CODEGEN_BACKEND_OK
+
+	genRuntimeFallback(globalRuntimeManager->getStregsEmulatePtr(), data);
+
+	CODEGEN_BACKEND_OK
+}
+
+void LLCCEP_JIT::codegenBackend::genLdregs(LLCCEP_exec::instruction data)
+{
+	CODEGEN_BACKEND_OK
+
+	genRuntimeFallback(globalRuntimeManager->getLdregsEmulatePtr(), data);
 
 	CODEGEN_BACKEND_OK
 }
@@ -554,3 +555,30 @@ bool LLCCEP_JIT::codegenBackend::ok() const
 {
 	return globalRuntimeManager && globalRuntimeManager->OK();
 }
+
+void LLCCEP_JIT::codegenBackend::genRuntimeFallback(void *funcPtr, LLCCEP_exec::instruction data)
+{
+	CODEGEN_BACKEND_OK
+
+#ifdef _MSC_VER
+	emit_mov_reg_imm(LLCCEP_JIT::RCX, reinterpret_cast<uint64_t>(globalRuntimeManager->getSoftcorePtr()));
+#else
+	emit_mov_reg_imm(LLCCEP_JIT::RDI, reinterpret_cast<uint64_t>(globalRuntimeManager->getSoftcorePtr()));
+#endif // save this
+
+	for (int i = 0; i < 7; i++) {
+		uint64_t imm = reinterpret_cast<uint64_t *>(&data)[6 - i];
+		emit_mov_reg_imm(LLCCEP_JIT::RAX, imm);
+		emit_push_reg(LLCCEP_JIT::RAX);
+	}
+
+	emit_mov_reg_imm(LLCCEP_JIT::RAX, reinterpret_cast<uint64_t>(funcPtr));
+	emit_call_reg(LLCCEP_JIT::RAX);
+
+	for (int i = 0; i < 7; i++)
+		emit_pop_reg(LLCCEP_JIT::RAX);
+
+	CODEGEN_BACKEND_OK
+}
+
+#undef CODEGEN_BACKEND_OK
