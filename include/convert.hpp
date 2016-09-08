@@ -54,11 +54,11 @@ template<typename TYPE>
 	return ::std::vector<uint8_t>(cv.bytes, cv.bytes + sizeof(TYPE));
 }
 
-template<typename typeSrc, typename typeDst>
-constexpr typeDst reinterpret_value(typeSrc src)
+template<class typeSrc, class typeDst>
+constexpr typeDst reinterpret_value(typeSrc &&src)
 {
-	//static_assert(sizeof(typeSrc) == sizeof(typeDst),
-	//              "Can't reintepret value between different-sized data types");
+	static_assert(sizeof(typeSrc) == sizeof(typeDst),
+	              "Can't reintepret value between different-sized data types");
 	
 	return [src] {
 		union {
@@ -66,7 +66,7 @@ constexpr typeDst reinterpret_value(typeSrc src)
 			typeDst dst;
 		} cv;
 		
-		cv.src = src;
+		memcpy(&cv.src, &src, sizeof(typeSrc));
 		return cv.dst;
 	}();
 }
