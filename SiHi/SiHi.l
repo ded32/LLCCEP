@@ -136,6 +136,12 @@ private          {RET(PRIVATE);}
 protected        {RET(PROTECTED);}
 static           {RET(STATIC);}
 
+try              {RET(TRY);}
+catch            {RET(CATCH);}
+finally          {RET(FINALLY);}
+throw            {RET(THROW);}
+
+asm              {RET(ASM);}
 release          {RET(RELEASE);}
 
 "<-"  {RET(BACKARROW);}

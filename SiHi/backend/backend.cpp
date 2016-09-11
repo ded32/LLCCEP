@@ -3,6 +3,33 @@
 
 #include "backend.hpp"
 
+#define ASSERT_AST(ast) \
+{ \
+	if (!ast) { \
+		throw RUNTIME_EXCEPTION(CONSTRUCT_MSG( \
+			"Invalid ast pointer!")) \
+	} \
+}
+
+#define ASSERT_TYPE(ast, type) \
+{ \
+	ASSERT_AST(ast) \
+	if (ast->getValue().type != type) { \
+		throw RUNTIME_EXCEPTION(CONSTRUCT_MSG( \
+			"Unexpected lexem of %d type!", \
+			ast->getValue().type)) \
+	} \
+}
+
+#define ASSERT_ARGN(ast, argn) \
+{ \
+	ASSERT_AST(ast) \
+        if (ast->getChildren().size() != argn) { \
+	        throw RUNTIME_EXCEPTION(CONSTRUCT_MSG( \
+			"Invalid arguments amount!")) \
+	} \
+}
+
 LLCCEP_SiHi::backend::backend():
 	syntaxTree(0)
 { }
@@ -15,86 +42,46 @@ void LLCCEP_SiHi::backend::generateCode(::std::ostream &out) const
 	generateCode(out, syntaxTree);
 }
 
-void LLCCEP_SiHi::backend::rememberFunction(LLCCEP_SiHi::ast *ast)
+void LLCCEP_SiHi::backend::buildFunction(::std::ostream &out, LLCCEP_SiHi::ast *functionTree) const
 {
-	ASSERT_ARGN(2)
-	ASSERT_TYPE(LLCCEP_SiHi::FUNCTION_DEFINITION)
+	ASSERT_AST(functionTree)
+	ASSERT_TYPE(functionTree, LLCCEP_SiHi::FUNCTION_DEFINITION)
+	ASSERT_ARGN(functionTree, 2)
 
-	functionProto newFunctionProto{getFunctionName(ast),
-	                               getFunctionArguments(ast)};
-	functionProtos.push_back(newFunctionProto);
+	checkNoSuchFunction(functionTree);
+	addFunctionDefinition(out, functionTree);
+
+	ASSERT_AST(functionTree)
 }
 
-void LLCCEP_SiHi::backend::synthezeFunctionBody(::std::ostream &out, LLCCEP_SiHi::ast *ast)
+void LLCCEP_SiHi::backend::generateCode(::std::ostream &out, LLCCEP_SiHi::ast *declarationTree) const
 {
-	ASSERT_ARGN(2)
-	ASSERT_TYPE(LLCCEP_SiHi::FUNCTION_BODY)
+	ASSERT_AST(root)
+	ASSERT_TYPE(root, LLCCEP_SiHi::EXTERNAL_DECLARATION)
 
-	auto &args = getFunctionArguments(ast);
-	for (const auto &i: args)
-		synthezeArgument(i);
+	for (const auto &i: root->getChildren()) {
+		ASSERT_AST(i)
 
-	synthezeStatement(ast->getChildren()[1]);
+		switch (i->value().type) {
+		case LLCCEP_SiHi::FUNCTION_DEFINITION:
+			buildFunction(out, i);
+			break;
+		
+		case LLCCEP_SiHi::DECLARATION:
+			rememberDeclaration(out, i);
+			break;
+		
+		case LLCCEP_SiHi::CLASS_DECLARATION:
+			buildClass(out, i);
+			break;
+		
+		default:
+			throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
+				"Invalid declaration at the top level."))
+		}
 
-	for (const auto &i: args)
-		releaseArgument(i);
-}
-
-void LLCCEP_SiHi::backend::declareVariables(::std::ostream &out, LLCCEP_SiHi::ast *ast) const
-{
-	ASSERT_AST(ast)
-	ASSERT_ARGN(ast, 3)
-	ASSERT_TYPE(ast, LLCCEP_SiHi::DECLARATION)
-
-
-}
-
-void LLCCEP_SiHi::backend::releaseVariables(::std::ostream &out, LLCCEP_SiHi::ast *ast) const
-{
-	ASSERT_AST(ast)
-	ASSERT_ARGN(ast, 1)
-	ASSERT_TYPE(ast, LLCCEP_SiHi::RELEASEMENT)
-
-	for (const auto &i: ast->getChildren())
-		if (i)
-			releaseVariable(i);
-}
-
-void LLCCEP_SiHi::backend::generateCode(::std::ostream &out, LLCCEP_SiHi::ast *ast) const
-{
-	if (!ast) {
-		throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
-			"An attempt to generate code for null tree!"))
+		ASSERT_AST(i)
 	}
 
-	switch (ast->getValue().type) {
-	case LLCCEP_SiHi::EXTERNAL_DECLARATION:
-		for (auto &i: ast->getChildren())
-			generateCode(out, i);
-		break;
-	
-	case LLCCEP_SiHi::FUNCTION_DEFINITION:
-		ASSERT_ARGN(2)
-
-		rememberFunction(ast);
-		synthezeFunctionBody(out, ast);
-		break;
-
-	case LLCCEP_SiHi::DECLARATION:
-		ASSERT_ARGN(2)
-
-		declareVariables(out, ast);
-		break;
-
-	case LLCCEP_SiHi::CLASS_DECLARATION:
-		ASSERT_ARGN(3)
-
-		matchClassFields(ast);
-		synthezeClassMethods(out, ast);
-		break;
-
-	default:
-		throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
-			"Forbidden action at the top level"))
-	}
+	ASSERT_AST(root)
 }

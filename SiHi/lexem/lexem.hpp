@@ -68,7 +68,10 @@ namespace LLCCEP_SiHi {
 #define EXPRESSION_STATEMENT_LEXEM       createLexem{"Expression statement", LLCCEP_SiHi::EXPRESSION_STATEMENT}
 #define BRANCHED_STATEMENT_LEXEM         createLexem{"Branched statement", LLCCEP_SiHi::BRANCHED_STATEMENT}
 #define LOOPED_STATEMENT_LEXEM           createLexem{"Looped statement", LLCCEP_SiHi::LOOPED_STATEMENT}
-#define JUMP_STATEMENT_LEXEM             createLexem{"Jump statement"}
+#define JUMP_STATEMENT_LEXEM             createLexem{"\\\"jump\\\" statement"}
+#define NEXT_STATEMENT_LEXEM             createLexem{"\\\"next\\\" statement"}
+#define STOP_STATEMENT_LEXEM             createLexem{"\\\"stop\\\" statement"}
+#define RETURN_STATEMENT_LEXEM           createLexem{"\\\"return\\\" statement"}
 #define TRANSLATION_UNIT_LEXEM           createLexem{"Translation unit", LLCCEP_SiHi::TRANSLATION_UNIT}
 #define EXTERNAL_DECLARATION_LEXEM       createLexem{"External declaration", LLCCEP_SiHi::EXTERNAL_DECLARATION}
 #define FUNCTION_DEFINITION_LEXEM        createLexem{"Function definition", LLCCEP_SiHi::FUNCTION_DEFINITION}
@@ -84,6 +87,9 @@ namespace LLCCEP_SiHi {
 #define METHOD_PROPERTY_LIST_LEXEM       createLexem{"Method/property list", LLCCEP_SiHi::METHOD_PROPERTY_LIST}
 #define ACCESS_RULE_LEXEM                createLexem{"Access rule", LLCCEP_SiHi::ACCESS_RULE}
 #define RELEASEMENT_LEXEM                createLexem{"Variables/fields releasement", LLCCEP_SiHi::RELEASEMENT}
+#define EXCEPTION_HANDLING_STATEMENT_LEXEM createLexem{"Exception handling statement", LLCCEP_SiHi::EXCEPTION_HANDLING_STATEMENT}
+#define EXCEPTION_THROW_STATEMENT_LEXEM  createLexem{"Exception throw statement", LLCCEP_SiHi::EXCEPTION_THROW_STATEMENT}
+#define PASS_STATEMENT_LEXEM             createLexem{"Pass statement", LLCCEP_SiHi::PASS_STATEMENT}
 	enum lex_t: int {
 		PRIMARY_EXPRESSION                    = 1024,
 		POSTFIX_EXPRESSION                    = 1025,
@@ -159,7 +165,10 @@ namespace LLCCEP_SiHi {
 		DIRECT_DECLARATOR_IDENTIFIERS_LIST    = 1095,
 		DIRECT_DECLARATOR_PARAMETERS_LIST     = 1096,
 		DIRECT_DECLARATOR_SCOPED              = 1097,
-		RELEASEMENT                           = 1098
+		RELEASEMENT                           = 1098,
+		EXCEPTION_HANDLING_STATEMENT          = 1099,
+		EXCEPTION_THROW_STATEMENT             = 1100,
+		PASS_STATEMENT                        = 1101
 	};
 
 	struct lexem {

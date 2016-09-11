@@ -24,7 +24,7 @@ namespace LLCCEP_SiHi {
 		void generateCode(::std::ostream &out) const;
 
 	private:
-		void generateCode(::std::ostream &out, ast *ptr) const;
+		void generateCode(::std::ostream &out, ast *root) const;
 		
 		ast *syntaxTree;
 	};

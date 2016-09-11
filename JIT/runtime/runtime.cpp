@@ -14,20 +14,20 @@ void *LLCCEP_JIT::runtimeManager::getSoftcorePtr()
 
 void *LLCCEP_JIT::runtimeManager::getSwiEmulatePtr()
 {
-	return reinterpret_value<void (LLCCEP_exec::softcore:: *)(LLCCEP_exec::instruction),
-				 void *>(&LLCCEP_JIT::runtimeManager::emulated_swi);
+	auto func = ::std::mem_fn(&LLCCEP_JIT::runtimeManager::emulated_swi);
+	return func;
 }
 
 void *LLCCEP_JIT::runtimeManager::getStregsEmulatePtr()
 {
-	return reinterpret_value<void (LLCCEP_exec::softcore:: *)(LLCCEP_exec::instruction),
-				 void *>(&LLCCEP_JIT::runtimeManager::emulated_stregs);
+	return reinterpret_value<void (*)(LLCCEP_exec::instruction),
+				 void *>(&stregsPtr);
 }
 
 void *LLCCEP_JIT::runtimeManager::getLdregsEmulatePtr()
 {
-	return reinterpret_value<void (LLCCEP_exec::softcore:: *)(LLCCEP_exec::instruction),
-				 void *>(&LLCCEP_JIT::runtimeManager::emulated_ldregs);
+	return reinterpret_value<void (*)(LLCCEP_exec::instruction),
+				 void *>(&ldregsPtr);
 }
 
 void *LLCCEP_JIT::runtimeManager::getCmpPtr()

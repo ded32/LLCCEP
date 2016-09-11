@@ -56,56 +56,62 @@ extern int yylex(void);
  * Tokens, can be read by scanner and their
  * human-native string literal representation
  *************************************************/
-%token <string> ID "identifier"
-%token <string> NUMBER "numeric value"
-%token <string> LITERAL "literal value"
-%token <string> ARROW "->"
-%token <string> INCREMENT "++"
-%token <strnig> DECREMENT "--"
+%token <string> ID               "identifier"
+%token <string> NUMBER           "numeric value"
+%token <string> LITERAL          "literal value"
+%token <string> ARROW            "->"
+%token <string> INCREMENT        "++"
+%token <string> DECREMENT        "--"
 %token <string> REINTERPRET_CAST "reinterpret_cast"
-%token <string> SHL "<<"
-%token <string> SHR ">>"
-%token <string> LESS_EQUAL "<="
-%token <string> ABOVE_EQUAL ">="
-%token <string> EQUALS "=="
-%token <string> NOT_EQUALS "!="
-%token <string> MUL_ASSIGN "*="
-%token <string> DIV_ASSIGN "/="
-%token <string> MOD_ASSIGN "%="
-%token <string> ADD_ASSIGN "+="
-%token <string> SUB_ASSIGN "-="
-%token <string> SHL_ASSIGN "<<="
-%token <string> SHR_ASSIGN ">>="
-%token <string> AND_ASSIGN "&="
-%token <string> XOR_ASSIGN "^="
-%token <string> OR_ASSIGN "|="
-%token <string> EMPTY "Empty"
-%token <string> REAL "Real"
-%token <string> STRING "String"
-%token <string> OTHER "other"
-%token <string> PASS "pass"
-%token <string> IF "if"
-%token <string> ELSE "else"
-%token <string> CASE "case"
-%token <string> WHILE "while"
-%token <string> DO "do"
-%token <string> FOR "for"
-%token <string> JUMP "jump"
-%token <string> NEXT "next"
-%token <string> STOP "stop"
-%token <string> RETURN "return"
-%token <string> DONE "done"
-%token <string> UNLESS "unless"
-%token <stirng> VARARG "..."
-%token <string> FUNCTION "function"
-%token <string> CLASS "class"
-%token <string> TYPEALIAS "typealias"
-%token <string> BACKARROW "<-"
-%token <string> PUBLIC "public"
-%token <string> PRIVATE "private"
-%token <string> PROTECTED "protected"
-%token <string> STATIC "static"
-%token <string> RELEASE "release"
+%token <string> SHL              "<<"
+%token <string> SHR              ">>"
+%token <string> LESS_EQUAL       "<="
+%token <string> ABOVE_EQUAL      ">="
+%token <string> EQUALS           "=="
+%token <string> NOT_EQUALS       "!="
+%token <string> MUL_ASSIGN       "*="
+%token <string> DIV_ASSIGN       "/="
+%token <string> MOD_ASSIGN       "%="
+%token <string> ADD_ASSIGN       "+="
+%token <string> SUB_ASSIGN       "-="
+%token <string> SHL_ASSIGN       "<<="
+%token <string> SHR_ASSIGN       ">>="
+%token <string> AND_ASSIGN       "&="
+%token <string> XOR_ASSIGN       "^="
+%token <string> OR_ASSIGN        "|="
+%token <string> EMPTY            "empty"
+%token <string> REAL             "real"
+%token <string> STRING           "string"
+%token <string> OTHER            "other"
+%token <string> PASS             "pass"
+%token <string> IF               "if"
+%token <string> ELSE             "else"
+%token <string> CASE             "case"
+%token <string> WHILE            "while"
+%token <string> DO               "do"
+%token <string> FOR              "for"
+%token <string> JUMP             "jump"
+%token <string> NEXT             "next"
+%token <string> STOP             "stop"
+%token <string> RETURN           "return"
+%token <string> DONE             "done"
+%token <string> UNLESS           "unless"
+%token <string> VARARG           "vararg"
+%token <string> FUNCTION         "function"
+%token <string> CLASS            "class"
+%token <string> TYPEALIAS        "typealias"
+%token <string> BACKARROW        "<-"
+%token <string> PUBLIC           "public"
+%token <string> PRIVATE          "private"
+%token <string> PROTECTED        "protected"
+%token <string> STATIC           "static"
+%token <string> RELEASE          "release"
+%token <string> TRY              "try"
+%token <string> CATCH            "catch"
+%token <string> FINALLY          "finally"
+%token <string> THROW            "throw"
+%token <string> ASM              "asm"
+
 /**************************************************
  * Each rule generates AST node of lexems, given to
  * it, so all they should by typed as <ast>
@@ -128,6 +134,8 @@ extern int yylex(void);
 %type <ast> function_name function_args function_type labeled_statement_list
 %type <ast> class_declaration classname predecessor class_body method_property_list
 %type <ast> method_property access_rule_optional_static access_rule
+%type <ast> declaration_optional_semicolon statement_optional_semicolon
+%type <ast> exception_handling_statement exception_throw_statement
 
 /**************************************************
  * Start AST generation from 'translation_unit'
@@ -486,6 +494,12 @@ statement: labeled_statement {
                  $$ = $<ast>1;
 	 } | jump_statement {
                  $$ = $<ast>1;
+         } | exception_handling_statement {
+                 $$ = $<ast>1;
+         } | exception_throw_statement {
+                 $$ = $<ast>1;
+         } | releasement_statement {
+                 $$ = $<ast>1;
          };
 
 releasement_statement: RELEASE identifier_list {
@@ -512,9 +526,21 @@ declaration_statement: declaration {
                              $$ = $<ast>1;
                      };
 
-declaration_statement_optional_semicolon: declaration_statement ';' {
+declaration_optional_semicolon: declaration ';' {
+			             $$ = $<ast>1;
+                              } | declaration {
+                                     $$ = $<ast>1;
+                              };
+
+statement_optional_semicolon: statement ';' {
+			          $$ = $<ast>1;
+                            } | statement {
+                                  $$ = $<ast>1;
+                            };
+
+declaration_statement_optional_semicolon: declaration_optional_semicolon {
 					        $$ = $<ast>1;
-                                        } | declaration_statement {
+					} | statement_optional_semicolon {
                                                 $$ = $<ast>1;
                                         };
 
@@ -526,7 +552,7 @@ declaration_statement_list: declaration_statement_optional_semicolon {
                           };
 
 expression_statement: PASS {
-                            $$ = 0;
+                            $$ = createAst{PASS_STATEMENT_LEXEM};
                     } | expression {
                             $$ = $<ast>1;
                     };
@@ -550,21 +576,31 @@ looped_statement: WHILE expression statement {
                         $$ = createAst{LOOPED_STATEMENT_LEXEM, {$<ast>2, $<ast>3}};
                 } | DO expression statement WHILE statement {
                         $$ = createAst{LOOPED_STATEMENT_LEXEM, {$<ast>2, $<ast>3, $<ast>5}};
-	        } | FOR declaration_statement ';' expression_statement ';' expression statement {
+	        } | FOR declaration_statement ';' expression_statement ';' statement statement {
                         $$ = createAst{LOOPED_STATEMENT_LEXEM, {$<ast>2, $<ast>4, $<ast>6, $<ast>7}};
                 };
 
 jump_statement: JUMP ID {
                       $$ = createAst{JUMP_STATEMENT_LEXEM, {createAst{createLexem{$<string>2, ID}}}};
               } | NEXT {
-                      $$ = createAst{JUMP_STATEMENT_LEXEM};
+                      $$ = createAst{NEXT_STATEMENT_LEXEM};
               } | STOP {
-                      $$ = createAst{JUMP_STATEMENT_LEXEM};
+                      $$ = createAst{STOP_STATEMENT_LEXEM};
               } | RETURN {
-                      $$ = createAst{JUMP_STATEMENT_LEXEM};
+                      $$ = createAst{RETURN_STATEMENT_LEXEM};
 	      } | RETURN expression {
-                      $$ = createAst{JUMP_STATEMENT_LEXEM, {$<ast>2}};
+                      $$ = createAst{RETURN_STATEMENT_LEXEM, {$<ast>2}};
               };
+
+exception_handling_statement: TRY statement CATCH declaration statement {
+			            $$ = createAst{EXCEPTION_HANDLING_STATEMENT_LEXEM, {$<ast>2, $<ast>4, $<ast>5}};
+			    } | TRY statement CATCH declaration statement FINALLY statement {
+                                    $$ = createAst{EXCEPTION_HANDLING_STATEMENT_LEXEM, {$<ast>2, $<ast>4, $<ast>5, $<ast>6}};
+                            };
+
+exception_throw_statement: THROW statement {
+			         $$ = createAst{EXCEPTION_THROW_STATEMENT_LEXEM, {$<ast>2}};
+			 };
 
 translation_unit: external_declaration {
                         *ast = $$ = createAst{EXTERNAL_DECLARATION_LEXEM, {$<ast>1}};
@@ -575,11 +611,9 @@ translation_unit: external_declaration {
 
 external_declaration: function_definition {
 		            $$ = $<ast>1;
-                    } | declaration {
+                    } | declaration_optional_semicolon {
                             $$ = $<ast>1;
                     } | class_declaration {
-                            $$ = $<ast>1;
-                    } | releasement_statement {
                             $$ = $<ast>1;
                     };
 
