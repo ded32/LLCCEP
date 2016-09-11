@@ -30,6 +30,15 @@
 	} \
 }
 
+#define CHECK_TREE(ast, type, argn) \
+{ \
+	ASSERT_AST(ast) \
+	ASSERT_TYPE(ast, type) \
+	\
+	if (argn != -1) \
+	        ASSERT_ARGN(ast, argn) \
+}
+
 LLCCEP_SiHi::backend::backend():
 	syntaxTree(0)
 { }
@@ -40,6 +49,21 @@ LLCCEP_SiHi::backend::~backend()
 void LLCCEP_SiHi::backend::generateCode(::std::ostream &out) const
 {
 	generateCode(out, syntaxTree);
+}
+
+void LLCCEP_SiHi::backend::checkNoSuchFunction(LLCCEP_SiHi::ast *functionTree) const
+{
+	CHECK_TREE(functionTree, LLCCEP_SiHi::FUNCTION_DEFINITION, 2)
+	CHECK_TREE(functionTree->getChildren()[0],
+	           LLCCEP_SiHi::FUNCTION_SIGNATURE, 3)
+	CHECK_TREE(functionTree->getChildren()[1],
+	           LLCCEP_SiHi::DECLARATION_STATEMENT_LIST, -1)
+
+	auto functionProto = buildFunctionProto(functionTree);
+	auto similarProto = vec_find(getFunctions(), functionProto)
+	if (similarProto != getFunctions().end()) {
+		codegenIssue("'%s' function with with similar signature "
+		             "was declared!");
 }
 
 void LLCCEP_SiHi::backend::buildFunction(::std::ostream &out, LLCCEP_SiHi::ast *functionTree) const
