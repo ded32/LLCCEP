@@ -51,6 +51,67 @@ void LLCCEP_SiHi::backend::generateCode(::std::ostream &out) const
 	generateCode(out, syntaxTree);
 }
 
+void LLCCEP_SiHi::backend::generatePrimaryExpression(::std::ostream &out, LLCCEP_SiHi::ast *primaryExpression)
+{
+	ASSERT_AST(primaryExpression)
+
+	switch (primaryExpression->value().type) {
+	case ID:
+		out << "____id_" << primaryExpression->value().value << "_id___";
+		break;
+
+	case NUMBER:
+		out << primaryExpression->value().value;
+		break;
+
+	case LITERAL:
+		out << "ldstring " << primaryExpression->value().value;
+		break;
+
+	default:
+	       generateExpressionCode(out, primaryExpression);
+	}
+}
+
+void LLCCEP_SiHi::backend::generatePostfixExpression(::std::ostream &out, LLCCEP_SiHi::ast *postfixExpression)
+{
+	ASSERT_AST(postfixExperession)
+
+	switch (postfixExperession->value().type) {
+	case LLCCEP_SiHi::POSTFIX_EXPRESSION_ARRAY_INDEX_ACCESS:
+
+	}		
+}
+
+::std::vector<LLCCEP_SiHi::backend::functionDeclaration> LLCCEP_SiHi::backend::getFunctions() const
+{
+	if (currentFunctionProcessing) {
+		codegenIssue("An attempt of function declaration inside "
+			     "another one");
+	}
+
+	if (currentClassProcessing)
+		return currentClassProcessing->methods;
+
+	return functions;
+}
+
+LLCCEP_SiHi::backend::functionDeclaration LLCCEP_SiHi::backend::buildFunctionProto(LLCCEP_SiHi::ast *functionTree)
+{
+	auto createParametersList = [](LLCCEP_SiHi::ast *functionArgs) {
+
+	};
+
+	CHECK_TREE(functionTree, LLCCEP_SiHi::FUNCTION_DEFINITION, 2)
+	CHECK_TREE(functionTree->getChildren()[0],
+		   LLCCEP_SiHi::FUNCTION_SIGNATURE, 3)
+	CHECK_TREE(functionTree->getChildren()[1],
+		   LLCCEP_SiHi::DECLARATION_STATEMENT_LIST, -1)
+
+	return functionDeclaration{functionTree->value().value,
+	                           };
+}
+
 void LLCCEP_SiHi::backend::checkNoSuchFunction(LLCCEP_SiHi::ast *functionTree) const
 {
 	CHECK_TREE(functionTree, LLCCEP_SiHi::FUNCTION_DEFINITION, 2)
@@ -64,6 +125,9 @@ void LLCCEP_SiHi::backend::checkNoSuchFunction(LLCCEP_SiHi::ast *functionTree) c
 	if (similarProto != getFunctions().end()) {
 		codegenIssue("'%s' function with with similar signature "
 		             "was declared!");
+	}
+
+	addFunctionProto(functionProto);
 }
 
 void LLCCEP_SiHi::backend::buildFunction(::std::ostream &out, LLCCEP_SiHi::ast *functionTree) const

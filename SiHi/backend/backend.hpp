@@ -18,18 +18,6 @@ namespace LLCCEP_SiHi {
 			ast *returnType;
 		};
 
-		struct classMember {
-			enum {
-				CLASS_MEMBER_T_METHOD,
-				CLASS_MEMBER_T_PROPERTY
-			} type;
-
-			union {
-				functionDeclaration method;
-				variableDeclaration property;
-			} memberValue;
-		};
-
 		struct typeAlias {
 			ast *sourceType;
 			::std::string name;
@@ -49,7 +37,8 @@ namespace LLCCEP_SiHi {
 
 		struct classDeclaration {
 			::std::string name;
-			::std::vector<classMember> members;
+			::std::vector<functionDeclaration> methods;
+			::std::vector<variableDeclaration> properties;
 			::std::vector<classType> internalTypes;
 		};
 

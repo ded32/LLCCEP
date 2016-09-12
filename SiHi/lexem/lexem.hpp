@@ -1,4 +1,4 @@
-#ifndef SIHI_LEXEM_TYPE_HPP
+#ifnde SIHI_LEXEM_TYPE_HPP
 #define SIHI_LEXEM_TYPE_HPP
 
 #include <string>
