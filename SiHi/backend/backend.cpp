@@ -129,7 +129,6 @@ void LLCCEP_SiHi::backend::generatePostfixExpression(::std::ostream &out, LLCCEP
 		out << "__operator_inc_"
 		    << getTypeOf(postfixExpression->getChildren()[0])
 		    << "__";
-
 		break;
 
 	case LLCCEP_SiHi::POSTFIX_EXPRESSION_DECREMENT:
@@ -139,11 +138,70 @@ void LLCCEP_SiHi::backend::generatePostfixExpression(::std::ostream &out, LLCCEP
 		out << "__operator_dec_" 
 		    << getTypeOf(postfixExpression->getChildren()[0]) 
 		    << "__";
-
 		break;
 
 	default:
 		generatePrimaryExpression(out, postfixExpression);
+	}
+}
+
+void LLCCEP_SiHi::backend::generateUnaryExpression(::std::ostream &out, LLCCEP_SiHi::ast *unaryExpression) const
+{
+	ASSERT_AST(unaryExpression)
+	ASSERT_ARGN(unaryExpression, 2)
+
+	switch (unaryExpression->value().type) {
+	case INCREMENT:
+		generateCastExpression(unaryExpression->getChildren()[0]);
+		out << "__operator_inc_"
+		    << getTypeOf(unaryExpression->getChildren()[0])
+		    << "__";
+		break;
+
+	case DECREMENT:
+		generateCastExpression(unaryExpression->getChildren()[0]);
+		out << "__operator_dec_"
+		    << getTypeOf(unaryExpression->getChildren()[0])
+		    << "__";
+		break;
+
+	case '&':
+		generateCastExpression(unaryExpression->getChildren()[0]);
+		out << "__operator_ptrOf_"
+		    << getTypeOf(unaryExpression->getChildren()[0])
+		    << "__";
+		break;
+
+	case '@':
+		generateCastExpression(unaryExpression->getChildren()[0]);
+		out << "__operator_denamePtr_"
+		    << getTypeOf(unaryExpression->getChildren()[0]);
+		    << "__";
+		break;
+
+	case '+':
+		generateCastExpression(unaryExpression->getChildren()[0]);
+		out << "__operator_unary_add_"
+		    << getTypeOf(unaryExpression->getChildren()[0]);
+		    << "__";
+		break;
+
+	case '-':
+		generateCastExpression(unaryExpression->getChildren()[0]);
+		out << "__operator_unary_sub_"
+		    << getTypeOf(unaryExpression->getChildren()[0])
+		    << "__";
+		break;
+	
+	case '~':
+		generateCastExpression(unartExpression->getChildren()[0]);
+		out << "__operator_not_"
+		    << getTypeOf(unaryExpression->getChildren()[0])
+		    << "__";
+		break;
+
+	default:
+		break;
 	}
 }
 
