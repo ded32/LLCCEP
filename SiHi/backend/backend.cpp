@@ -82,6 +82,9 @@ void LLCCEP_SiHi::backend::generatePostfixExpression(::std::ostream &out, LLCCEP
 		ASSERT_ARGN(postfixExpression, 2)
 
 		generatePostfixExpression(out, postfixExpression->getChildren()[0]);
+		getTypeSize(getTypeOf(postfixExpression->getChildren()[0]));
+		getOffset(postfixExpression->getChildren()[1]);
+
 		out << "__operator_index_"
 		    << getTypeOf(postfixExpression->getChildren()[0])
 		    << "__ ";
