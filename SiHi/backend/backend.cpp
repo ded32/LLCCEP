@@ -80,11 +80,6 @@ void LLCCEP_SiHi::backend::generatePostfixExpression(::std::ostream &out, LLCCEP
 	switch (postfixExperession->value().type) {
 	case LLCCEP_SiHi::POSTFIX_EXPRESSION_ARRAY_INDEX_ACCESS:
 		generatePostfixExpression(out, postfixExperession->getChildren()[0]);
-		out << "mov $00, &31\n";     /* $00 = lop */
-		generateExpression(out, postfixExperession->getChildren()[1]);
-		out << "add $00, $00, &31\n" /* $00 += rop   */
-		    << "mav &31, $00\n";     /* &31 = *($00) */
-
 		break;
 
 	case LLCCEP_SiHi::POSTFIX_EXPRESSION_FUNCTION_CALL:
@@ -93,7 +88,7 @@ void LLCCEP_SiHi::backend::generatePostfixExpression(::std::ostream &out, LLCCEP
 		if (postfixExperession->getChildren().size() == 2)
 			generateArgumentsPush(out, postfixExperession->getChildren()[1]);
 
-		out << "call &31\n";
+		out << "call __operator_" << getType(postfixExperession->getChildren()[0]) << "_call__\n";
 		break;
 
 	case LLCCEP_SiHi::POSTFIX_EXPRESSION_MEMBER_ACCESS:
