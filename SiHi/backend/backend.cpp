@@ -51,110 +51,97 @@ void LLCCEP_SiHi::backend::generateCode(::std::ostream &out) const
 	generateCode(out, syntaxTree);
 }
 
-void LLCCEP_SiHi::backend::generatePrimaryExpression(::std::ostream &out, LLCCEP_SiHi::ast *primaryExpression)
+void LLCCEP_SiHi::backend::generatePrimaryExpression(::std::ostream &out, LLCCEP_SiHi::ast *primaryExpression) const
 {
 	ASSERT_AST(primaryExpression)
 
 	switch (primaryExpression->value().type) {
 	case ID:
-		out << "____id_" << primaryExpression->value().value << "_id___";
+		generateGetPtr(out, primaryExpression);
 		break;
 
 	case NUMBER:
-		out << primaryExpression->value().value;
+		generateGetNumber(out, primaryExpression);
 		break;
-
+	
 	case LITERAL:
-		out << "ldstring " << primaryExpression->value().value;
+		generateGetLiteral(out, primaryExpression);
 		break;
 
 	default:
-	       generateExpressionCode(out, primaryExpression);
+		generateExpression(out, primaryExpression);
 	}
 }
 
-void LLCCEP_SiHi::backend::generatePostfixExpression(::std::ostream &out, LLCCEP_SiHi::ast *postfixExpression)
+void LLCCEP_SiHi::backend::generatePostfixExpression(::std::ostream &out, LLCCEP_SiHi::ast *postfixExpression) const
 {
-	ASSERT_AST(postfixExperession)
+	ASSERT_AST(postfixExpression)
 
-	switch (postfixExperession->value().type) {
+	switch (postfixExpression->value().type) {
 	case LLCCEP_SiHi::POSTFIX_EXPRESSION_ARRAY_INDEX_ACCESS:
-		generatePostfixExpression(out, postfixExperession->getChildren()[0]);
+		ASSERT_ARGN(postfixExpression, 2)
+
+		generatePostfixExpression(out, postfixExpression->getChildren()[0]);
+		out << "__operator_index_"
+		    << getTypeOf(postfixExpression->getChildren()[0])
+		    << "__ ";
+
 		break;
 
 	case LLCCEP_SiHi::POSTFIX_EXPRESSION_FUNCTION_CALL:
-		generatePostfixExpression(out, postfixExperession->getChildren()[0]);
+		generatePostfixExpression(out, postfixExpression->getChildren()[0]);
 
-		if (postfixExperession->getChildren().size() == 2)
-			generateArgumentsPush(out, postfixExperession->getChildren()[1]);
+		if (postfixExpression->getChildren().size() == 2)
+			generateArgumentsSave(out, postfixExpression->getChildren()[1]);
 
-		out << "call __operator_" << getType(postfixExperession->getChildren()[0]) << "_call__\n";
+		out << "__operator_call_"
+		    << getTypeOf(postfixExpression->getChildren()[0])
+		    << "__";
+
 		break;
 
 	case LLCCEP_SiHi::POSTFIX_EXPRESSION_MEMBER_ACCESS:
-		generatePostfixExpression(out, postfixExperession->getChildren()[0]);
-		getMemberOffset
+		ASSERT_ARGN(2)
+
+		generatePostfixExpression(postfixExpression->getChildren()[0]);
+		out << "__operator_dot_"
+		    << getTypeOf(postfixExpression->getChildren()[0])
+		    << "__";
+
 		break;
+
+	case LLCCEP_SiHi::POSTFIX_EXPRESSION_MEMBER_ACCESS_PTR:
+		ASSERT_ARGN(2)
+		
+		generatePostfixExpression(out, postfixExpression->getChildren()[0]);
+		out << "__operator_arrow_"
+		    << getTypeOf(postfixExpression->getChildren()[0])
+		    << "__";
+		break;
+
+	case LLCCEP_SiHi::POSTFIX_EXPRESSION_INCREMENT:
+		ASSERT_ARGN(1)
+
+		generatePostfixExpression(out, postfixExpression->getChildren()[0]);
+		out << "__operator_inc_"
+		    << getTypeOf(postfixExpression->getChildren()[0])
+		    << "__";
+
+		break;
+
+	case LLCCEP_SiHi::POSTFIX_EXPRESSION_DECREMENT:
+		ASSERT_ARGN(1)
+
+		generatePostfixExpression(out, postfixExpression->getChildren()[0]);
+		out << "__operator_dec_" 
+		    << getTypeOf(postfixExpression->getChildren()[0]) 
+		    << "__";
+
+		break;
+
+	default:
+		generatePrimaryExpression(out, postfixExpression);
 	}
-}
-
-::std::vector<LLCCEP_SiHi::backend::functionDeclaration> LLCCEP_SiHi::backend::getFunctions() const
-{
-	if (currentFunctionProcessing) {
-		codegenIssue("An attempt of function declaration inside "
-			     "another one");
-	}
-
-	if (currentClassProcessing)
-		return currentClassProcessing->methods;
-
-	return functions;
-}
-
-LLCCEP_SiHi::backend::functionDeclaration LLCCEP_SiHi::backend::buildFunctionProto(LLCCEP_SiHi::ast *functionTree)
-{
-	auto createParametersList = [](LLCCEP_SiHi::ast *functionArgs) {
-
-	};
-
-	CHECK_TREE(functionTree, LLCCEP_SiHi::FUNCTION_DEFINITION, 2)
-	CHECK_TREE(functionTree->getChildren()[0],
-		   LLCCEP_SiHi::FUNCTION_SIGNATURE, 3)
-	CHECK_TREE(functionTree->getChildren()[1],
-		   LLCCEP_SiHi::DECLARATION_STATEMENT_LIST, -1)
-
-	return functionDeclaration{functionTree->value().value,
-	                           };
-}
-
-void LLCCEP_SiHi::backend::checkNoSuchFunction(LLCCEP_SiHi::ast *functionTree) const
-{
-	CHECK_TREE(functionTree, LLCCEP_SiHi::FUNCTION_DEFINITION, 2)
-	CHECK_TREE(functionTree->getChildren()[0],
-	           LLCCEP_SiHi::FUNCTION_SIGNATURE, 3)
-	CHECK_TREE(functionTree->getChildren()[1],
-	           LLCCEP_SiHi::DECLARATION_STATEMENT_LIST, -1)
-
-	auto functionProto = buildFunctionProto(functionTree);
-	auto similarProto = vec_find(getFunctions(), functionProto)
-	if (similarProto != getFunctions().end()) {
-		codegenIssue("'%s' function with with similar signature "
-		             "was declared!");
-	}
-
-	addFunctionProto(functionProto);
-}
-
-void LLCCEP_SiHi::backend::buildFunction(::std::ostream &out, LLCCEP_SiHi::ast *functionTree) const
-{
-	ASSERT_AST(functionTree)
-	ASSERT_TYPE(functionTree, LLCCEP_SiHi::FUNCTION_DEFINITION)
-	ASSERT_ARGN(functionTree, 2)
-
-	checkNoSuchFunction(functionTree);
-	addFunctionDefinition(out, functionTree);
-
-	ASSERT_AST(functionTree)
 }
 
 void LLCCEP_SiHi::backend::generateCode(::std::ostream &out, LLCCEP_SiHi::ast *declarationTree) const
