@@ -1,8 +1,8 @@
 %{
 #include "section/section.hpp"
 #include "declaration/declaration.hpp"
-#include "instruction/instruction.hpp"
-#include "instructionArgument/instructionArgument.hpp"
+#include "statement/statement.hpp"
+#include "instruction/argument/argument.hpp"
 
 #include "yyltype.h"
 

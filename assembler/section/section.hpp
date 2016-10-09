@@ -7,10 +7,14 @@
 #include "../declaration/declaration.hpp"
 #include "../statement/statement.hpp"
 
+#define createSectionList new sectionList
+#define createSection new section
+
 namespace LLCCEP_ASM {
 	enum section_t {
 		SECTION_T_DECLARATIVE,
-		SECTION_T_IMPERATIVE
+		SECTION_T_IMPERATIVE,
+		SECTION_T_INVALID
 	};
 
 	union sectionData {
@@ -19,11 +23,11 @@ namespace LLCCEP_ASM {
 	};
 
 	class section {
-		struct sectionInfo_t {
-			section_t type;
-			sectionData data;
-			::std::string name;
-		} info;
+		section_t type;
+		sectionData data;
+		::std::string name;
+		
+		void build(::std::ostream &out, builderInformation *info);
 
 	public:
 		section();
@@ -32,15 +36,17 @@ namespace LLCCEP_ASM {
 		void setName(::std::string name);
 		void setData(sectionDeclarations *decls);
 		void setData(sectionStatements *stats);
-		void setData(sectionData data);
 
 		::std::string getName() const;
 		section_t getType() const;
 		sectionData getData() const;
+
+		friend class sectionList;
 	};
 
 	class sectionList {
 		::std::vector<section *> sections;
+		builderInformation *builderInfo;
 
 	public:
 		sectionList();

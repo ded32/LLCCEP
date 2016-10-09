@@ -1,4 +1,8 @@
 #include <string>
+#include <STDExtras.hpp>
+#include <tools/check/name.hpq>
+
+#include "instruction.hpp"
 
 LLCCEP_ASM::instruction::instruction():
 	instructionName(),
@@ -10,10 +14,10 @@ LLCCEP_ASM::instruction::~instruction()
 
 void LLCCEP_ASM::instruction::setName(::std::string name)
 {
-	if (!instructionName.length()) {
+	if (!okName(name)) {
 		throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
 			"Attempt of setting instructon name to "
-			"empty string"));
+			"non-id string"));
 	}
 
 	instructionName = name;

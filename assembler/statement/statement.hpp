@@ -16,10 +16,10 @@ namespace LLCCEP_ASM {
 	};
 
 	class statement {
-		struct statementInfo {
-			statement_t type;
-			statementData data;
-		};
+		statement_t type;
+		statementData data;
+
+		void build(::std::ostream &out, builderInfo *info);
 
 	public:
 		statement();
@@ -30,6 +30,8 @@ namespace LLCCEP_ASM {
 
 		statement_t getType() const;
 		statementData getData() const;
+
+		friend class section;
 	};
 }
 
