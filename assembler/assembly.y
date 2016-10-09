@@ -71,10 +71,10 @@ declaration_list: declaration {
                         $$->addDeclaration($<sectionDeclaration>2);
                 };
 
-declaration: ID ':' declaration_info {
+declaration: ID '=' ALLOC declaration_info {
 	           $$ = createDeclaration();
-                   $$->setDeclarationName($<string>1);
-                   $$->setDeclarationSize($<integer>1);
+                   $$->setName($<string>1);
+                   $$->setSize($<integer>1);
            };
 
 declaration_info: INTEGER {
