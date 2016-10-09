@@ -20,7 +20,7 @@ find_package(flex)
 
 bison_target(assemblyParser "${CMAKE_SOURCE_DIR}/assembly.y" "${CMAKE_SOURCE_DIR}/assemblyParser.cpp")
 flex_target(assemblyScanner "${CMAKE_SOURCE_DIR}/assembly.l" "${CMAKE_SOURCE_DIR}/assemblyScanner.cpp")
-add_flex_bison_dependency(SiHiScanner SiHiParser)
+add_flex_bison_dependency(assemblyScanner assemblyParser)
 
 add_library(assemblyParserLib "${BISON_assemblyParser_OUTPUT_SOURCE}")
 add_library(assemblyScannerLib "${FLEX_assemblyScanner_OUTPUTS}")

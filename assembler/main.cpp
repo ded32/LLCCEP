@@ -8,8 +8,6 @@
 #include <STDExtras.hpp>
 #include <command-line.hpp>
 
-#include "compiler/compiler.hpp"
-
 #define FILEFAIL(path, f) \
 { \
 	if (f.fail()) { \
@@ -19,20 +17,33 @@
 	} \
 }
 
+::std::string yyfilename;
+extern FILE *yyin;
+
+extern int yyparse(LLCCEP_ASM::sectionList **parsingResult);
+
 int main(int argn, char **argv)
 {	
 	try {
-		LLCCEP_ASM::compiler compiler;
+		LLCCEP_ASM::sectionList **sectionList = NULL;
+		size_t secno = 0;
+
 		::std::string output = "a.exec";
 		::std::vector<::std::string> input;
+
 		commandLineParametersAssembler clp;
 		clp.parse(argn, argv);
 
 		if (clp.getOutput().length())
 			output = clp.getOutput();
 
-		input = clp.getInput();
-		compiler.compile(input, output);
+		for (const auto &i: input) {
+			sectionList = (LLCCEP_ASM::sectionList **)realloc(sectionList, sizeof(sectionList *) * secno++);
+
+			yyfilename = i;
+			yyin = fopen(i.c_str(), "r");
+			yyparse(&sectionList[secno - 1]);
+		}
 	} catch (::LLCCEP::runtime_exception &exc) {
 		QUITE_ERROR(yes, "%s\n", exc.msg());
 	} catch (...) {
