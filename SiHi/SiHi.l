@@ -144,6 +144,9 @@ throw            {RET(THROW);}
 asm              {RET(ASM);}
 release          {RET(RELEASE);}
 
+init             {RET(INIT);}
+deinit           {RET(DEINIT);}
+
 "<-"  {RET(BACKARROW);}
 "->"  {RET(ARROW);}
 "++"  {RET(INCREMENT);}

@@ -105,6 +105,8 @@ extern int yylex(void);
 %token <string> PRIVATE          "private"
 %token <string> PROTECTED        "protected"
 %token <string> STATIC           "static"
+%token <string> INIT             "init"
+%token <string> DEINIT           "deinit"
 %token <string> RELEASE          "release"
 %token <string> TRY              "try"
 %token <string> CATCH            "catch"
@@ -136,6 +138,7 @@ extern int yylex(void);
 %type <ast> method_property access_rule_optional_static access_rule
 %type <ast> declaration_optional_semicolon statement_optional_semicolon
 %type <ast> exception_handling_statement exception_throw_statement
+%type <ast> init_declaration deinit_declaration
 
 /**************************************************
  * Start AST generation from 'translation_unit'
@@ -669,7 +672,19 @@ method_property_list: method_property {
 
 method_property: access_rule_optional_static external_declaration {
 	               $$ = createAst{METHOD_PROPERTY_LEXEM, {$<ast>1, $<ast>2}};
+               } | init_declaration {
+                       $$ = $<ast>1;
+               } | deinit_declaration {
+                       $$ = $<ast>1;
                };
+
+init_declaration: INIT function_args compound_statement {
+	                $$ = createAst{INIT_LEXEM, {$<ast>2, $<ast>3}};
+                };
+
+deinit_declaration: DEINIT compound_statement {
+		          $$ = createAst{DEINIT_LEXEM, {$<ast>2}};
+                  };
 
 access_rule_optional_static: STATIC access_rule {
 			           $$ = $<ast>2;

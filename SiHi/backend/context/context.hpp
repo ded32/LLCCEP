@@ -1,24 +1,24 @@
 #ifndef LLCCEP_SIHI_CONTEXT_HPP
 #define LLCCEP_SIHI_CONTEXT_HPP
 
-#include <backend/variableDeclaration/variableDeclaration.hpp>
-
-#include <string>
-
 namespace LLCCEP_SiHi {
+	enum context_t {
+		CONTEXT_T_ORDINARY = 0,
+		CONTEXT_T_CLASS    = 1,
+		CONTEXT_T_PARAM    = 3,
+		CONTEXT_T_BLOCK    = 4
+	};
+
 	class context {
-		::std::vector<::std::string> contextVariables;
-	
+		context_t cxt;
+		::std::vector<::std::string> varNames;
+
 	public:
 		context();
 		~context();
 
-		void addVariable(::std::string name);
-		void deleteVariable(::std::string name);
-
-		bool variableDeclared(::std::string name) const;
-
-		::std::string toString() const;
+		void getContextType();
+		::std::vector<::std::string> getVarList();
 	};
 }
 

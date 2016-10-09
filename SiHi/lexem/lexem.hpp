@@ -1,4 +1,4 @@
-#ifnde SIHI_LEXEM_TYPE_HPP
+#ifndef SIHI_LEXEM_TYPE_HPP
 #define SIHI_LEXEM_TYPE_HPP
 
 #include <string>
@@ -90,6 +90,8 @@ namespace LLCCEP_SiHi {
 #define EXCEPTION_HANDLING_STATEMENT_LEXEM createLexem{"Exception handling statement", LLCCEP_SiHi::EXCEPTION_HANDLING_STATEMENT}
 #define EXCEPTION_THROW_STATEMENT_LEXEM  createLexem{"Exception throw statement", LLCCEP_SiHi::EXCEPTION_THROW_STATEMENT}
 #define PASS_STATEMENT_LEXEM             createLexem{"Pass statement", LLCCEP_SiHi::PASS_STATEMENT}
+#define INIT_LEXEM                       createLexem{"Class constructor", LLCCEP_SiHi::INIT}
+#define DEINIT_LEXEM                     createLexem{"Class destructor", LLCCEP_SiHi::DEINIT}
 	enum lex_t: int {
 		PRIMARY_EXPRESSION                    = 1024,
 		POSTFIX_EXPRESSION                    = 1025,
@@ -168,7 +170,9 @@ namespace LLCCEP_SiHi {
 		RELEASEMENT                           = 1098,
 		EXCEPTION_HANDLING_STATEMENT          = 1099,
 		EXCEPTION_THROW_STATEMENT             = 1100,
-		PASS_STATEMENT                        = 1101
+		PASS_STATEMENT                        = 1101,
+		INIT                                  = 1102,
+		DEINIT                                = 1103
 	};
 
 	struct lexem {
