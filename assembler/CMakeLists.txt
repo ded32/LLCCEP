@@ -13,19 +13,22 @@ else()
 endif()
 
 include_directories("${CMAKE_SOURCE_DIR}/../include/")
-include_directories("${CMAKE_SOURCE_DIR}/include/")
 
-find_package(bison)
-find_package(flex)
-
-bison_target(assemblyParser "${CMAKE_SOURCE_DIR}/assembly.y" "${CMAKE_SOURCE_DIR}/assemblyParser.cpp")
-flex_target(assemblyScanner "${CMAKE_SOURCE_DIR}/assembly.l" "${CMAKE_SOURCE_DIR}/assemblyScanner.cpp")
-add_flex_bison_dependency(assemblyScanner assemblyParser)
-
-add_library(assemblyParserLib "${BISON_assemblyParser_OUTPUT_SOURCE}")
-add_library(assemblyScannerLib "${FLEX_assemblyScanner_OUTPUTS}")
+add_library(lexer "${CMAKE_SOURCE_DIR}/lexer/lexer.cpp")
+add_library(analyzer "${CMAKE_SOURCE_DIR}/analyzer/analyzer.cpp")
+add_library(codegen "${CMAKE_SOURCE_DIR}/codegen/codegen.cpp")
+add_library(compiler "${CMAKE_SOURCE_DIR}/compiler/compiler.cpp")
+add_library(linker "${CMAKE_SOURCE_DIR}/linker/linker.cpp")
+add_library(preprocessor "${CMAKE_SOURCE_DIR}/preprocessor/preprocessor.cpp")
+add_library(STDExtras "${CMAKE_SOURCE_DIR}/../lib/STDExtras.cpp")
 add_library(commandLine "${CMAKE_SOURCE_DIR}/../lib/command-line.cpp")
-add_library()
+target_link_libraries(lexer STDExtras)
+target_link_libraries(analyzer lexer STDExtras)
+target_link_libraries(linker STDExtras)
+target_link_libraries(preprocessor STDExtras)
+target_link_libraries(codegen STDExtras linker lexer analyzer)
+target_link_libraries(compiler lexer analyzer codegen linker preprocessor)
+target_link_libraries(commandLine STDExtras)
 
 add_executable(LLCCEP_assembler "${CMAKE_SOURCE_DIR}/main.cpp")
 target_link_libraries(LLCCEP_assembler lexer analyzer linker codegen 
