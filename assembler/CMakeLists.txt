@@ -3,11 +3,17 @@ project(LLCCEP_assembler)
 
 set(BUILD_MODE "Debug" CACHE STRING "Do you want to build assembler for debug")
 set(CMAKE_CXX_FLAGS "-std=gnu++11")
-	
+
 if(BUILD_MODE STREQUAL "Debug")
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -O0")
+	set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/Debug/lib")
+	set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/Debug/lib")
+	set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/Debug/bin")
 elseif(BUILD_MODE STREQUAL "Release")
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Ofast -flto -funroll-loops -march=native")
+	set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/Release/lib")
+	set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/Release/lib")
+	set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/Release/bin")
 else()	
 	message(SEND_ERROR "BUILD_MODE is not 'Debug' or 'Release'.")
 endif()

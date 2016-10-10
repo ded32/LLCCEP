@@ -64,11 +64,7 @@ size_t get_length(::std::basic_ifstream<char_t> &fd)
 
 template<typename TYPE>
 void reopen_file(TYPE &f, std::string path)
-{
-	static_assert(TYPEHASH(TYPE) == TYPEHASH(::std::ifstream) ||
-		      TYPEHASH(TYPE) == TYPEHASH(::std::ofstream),
-		      "required std::ifstream or ::std::ofstream object as input");
-	
+{	
 	f.close();
 	f.clear();
 
