@@ -9,4 +9,5 @@ than Intel or AT&T assembly.
 Debug, finally, JIT...
 
 Report about bugs here:
-<a href=https://github.com/Andrew-Bezzubtsev/LLCCEP/issues/new>THE BUGTRACKER</a>
+[THE BUGTRACKER](https://github.com/Andrew-Bezzubtsev/LLCCEP/issues/new)
+
