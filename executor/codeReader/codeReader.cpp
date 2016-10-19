@@ -21,16 +21,17 @@
 #define PROGRAM_READER_NOTOK CHECK_PROGRAM_READER(false)
 
 LLCCEP_exec::codeReader::codeReader():
-	_input(),
-	_path(),
-	_data()
+	input(),
+	path(),
+	data()
 { }
 
 LLCCEP_exec::codeReader::codeReader(::std::string in_path):
-	_input(),
-	_path(),
-	_data()
+	input(),
+	path(),
+	data()
 {
+	/* Initialize input file */
 	initializeInputFile(in_path);
 }
 
@@ -38,14 +39,17 @@ void LLCCEP_exec::codeReader::initializeInputFile(::std::string in_path)
 {
 	PROGRAM_READER_NOTOK
 
-	_input.open(in_path);
-	if (_input.fail()) {
+	/* Open input */
+	input.open(in_path);
+	/* Check for there is no failure */
+	if (input.fail()) {
 		throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
 			"Can't open '%s' for read: %s!",
-			in_path.c_str(), ::std::strerror(errno)));
+			in_path.c_str(), 
+			::std::extras::strerror_safe(errno).c_str()));
 	}
 
-	_path = in_path;
+	path = in_path;
 
 	PROGRAM_READER_OK
 }
@@ -54,36 +58,47 @@ void LLCCEP_exec::codeReader::readProgramHeader()
 {
 	PROGRAM_READER_OK
 
+	/* Size of header */
 	uint8_t sz = 0;
 
-	_input.seekg(0);
-	sz = _input.get();
+	/* Go to beginning of the file */
+	input.seekg(0);
+	/* Get first byte of the file */
+	sz = input.get();
 
+	/* If word length differes */
 	if (sz > sizeof(size_t)) {
+		/* Throw exception about this */
 		throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
 			"Can't execute the program:\n"
-			"The word-length on machine, compiled\n"
-			"this code is greater than on this.\n"
+			"The word length on machine, compiled\n"
+			"the program is greater than on this one.\n"
 			"(" size_t_pf "-bit machine required)",
 			static_cast<size_t>(sz)));
 	}
 
-	_input.read(reinterpret_cast<char *>(&_data.main_id),
+	/* Read header, just the ID of main label */
+	input.read(reinterpret_cast<char *>(&data.main_id),
 		    sizeof(size_t));
 
-	size_t pl = get_length(_input) - sz - 1;
-	if (pl % 28) {
+	/* Get program length */
+	size_t pl = get_length(input) - sz - 1;
+
+	/* If there is no some instruction whole */
+	if (pl % LLCCEP_exec::INSTRUCTION_LENGTH) {
+		/* Throw exception about it */
 		throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
 			"Can't execute the program:\n"
 			"Invalid or damaged binary file!\n"
 			"Namely, the length of input, "
 			"excluding header, not product of 28,\n"
-			"which is instruction length. %zu",
-			pl));
+			"which is instruction length."));
 	}
 
-	_data.size = pl / 28;
-	_data.offset = sz + 1;
+	/* Set size of program, in instructions */
+	data.size = pl / 28;
+	/* Set offset */
+	data.offset = sz + 1;
 
 	PROGRAM_READER_OK
 }
@@ -92,7 +107,7 @@ LLCCEP_exec::instruction LLCCEP_exec::codeReader::getInstruction(size_t id)
 {
 	PROGRAM_READER_OK
 
-	if (id >= _data.size) {
+	if (id >= data.size) {
 		return LLCCEP_exec::instruction{
 			INT8_MAX,
 			{{LLCCEP_ASM::LEX_T_NO, 0},
@@ -101,8 +116,8 @@ LLCCEP_exec::instruction LLCCEP_exec::codeReader::getInstruction(size_t id)
 	}
 
 	LLCCEP_exec::instruction res{};
-	_input.seekg(_data.offset + id * 28);
-	res.opcode = _input.get();
+	input.seekg(data.offset + id * 28);
+	res.opcode = input.get();
 
 	if (res.opcode >= LLCCEP_ASM::INST_NUM) {
 		throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
@@ -110,9 +125,9 @@ LLCCEP_exec::instruction LLCCEP_exec::codeReader::getInstruction(size_t id)
 	}
 
 	for (unsigned i = 0; i < 3; i++) {
-		res.args[i].type = static_cast<LLCCEP_ASM::lex_t>(_input.get());
-		_input.read(reinterpret_cast<char *>(&res.args[i].val),
-			    sizeof(double));
+		res.args[i].type = static_cast<LLCCEP_ASM::lex_t>(input.get());
+		input.read(reinterpret_cast<char *>(&res.args[i].val),
+			   sizeof(double));
 	}
 
 	PROGRAM_READER_OK
@@ -124,22 +139,22 @@ LLCCEP_exec::codeData LLCCEP_exec::codeReader::getProgramData() const
 {
 	PROGRAM_READER_OK
 
-	return _data;
+	return data;
 }
 
 void LLCCEP_exec::codeReader::closeInput()
 {
 	PROGRAM_READER_OK
 
-	_input.close();
-	_path = "";
+	input.close();
+	path = "";
 
 	PROGRAM_READER_NOTOK
 }
 
 bool LLCCEP_exec::codeReader::OK() const
 {
-	return _input.is_open() && _input && _path.length();
+	return input.is_open() && input && path.length();
 }
 
 #undef CHECK_PROGRAM_READER

@@ -62,8 +62,7 @@ void LLCCEP_exec::softcore::executeProgram()
 			"Error!\n"
 			"Softcore at %p is not ready for "
 			"program execution: "
-			"no input!\n",
-			this))
+			"no input!\n", this))
 	}
 
 	pc = reader->getProgramData().main_id;
@@ -205,12 +204,14 @@ void LLCCEP_exec::softcore::executeNextInstruction()
 		&LLCCEP_exec::softcore::emulated_ldregs
 	};
 
+	LLCCEP_exec::instruction inst{};
+
 	if (pc >= reader->getProgramData().size) {
 		quit = true;
 		return;
 	}
 
-	LLCCEP_exec::instruction inst = reader->getInstruction(pc);
+	inst = reader->getInstruction(pc);
 	if (inst.opcode >= LLCCEP_ASM::INST_NUM) {
 		throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
 			"Opcode overbound!"))
@@ -236,9 +237,7 @@ void LLCCEP_exec::softcore::emulated_push(LLCCEP_exec::instruction data)
 }
 
 void LLCCEP_exec::softcore::emulated_pop(LLCCEP_exec::instruction data)
-{	
-	(void)data;
-
+{
 	if (!stk.size()) {
 		throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
 			"Error!\n"

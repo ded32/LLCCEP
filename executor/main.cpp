@@ -16,62 +16,81 @@
 
 int main(int argn, char **argv)
 {
+	/* Initialize QT application */
 	QApplication app(argn, argv);
+
+	/* Handle signals, sent by program by
+	   telling about them to user and
+	   ending the execution */
 	LLCCEP_exec::cAttachSignalsHandler();
 
+	/* Windows, created by the executing program */
 	::std::vector<LLCCEP_exec::window *> windows;
-	int ret = 0;
 
 	try {
+		/* Command-line parameters */
 		commandLineParametersVM clp;
+		/* Parse command-line parameters */
 		clp.parse(argn, argv);
+		/* If needed to show help, show it
+		   and end the execution */
 		if (clp.getHelpNeeded()) {
 			clp.usage();
 			return 0;
 		}
 
+		/* Soft-processor */
 		LLCCEP_exec::softcore sc;
+		/* Memeory manager */
 		LLCCEP_exec::memoryManager mm;
+		/* Program reader */
 		LLCCEP_exec::codeReader cr;
 
-		// Init codeReader
+		/* Read program's common information */
 		cr.initializeInputFile(clp.getInput());
 		cr.readProgramHeader();
 
-		// Init memoryManager
+		/* Allocate memory, how much is
+		   permitted by user */
 		mm.allocateElements(clp.getRamSize());
 
-		// Init softcore
+		/* Initialize soft-processor data */
 		sc.setMm(&mm);
 		sc.setCodeReader(&cr);
 
-		// Execute program
+		/* Execute program */
 		sc.executeProgram();
+		/* Get vector of non-closed windows */
 		windows = sc.getWindows();
 
-		// Release memoryManager data
+		/* Release memory */
 		mm.freeElements();
 
-		// Release codeReader data
+		/* Close input program file */
 		cr.closeInput();
 
+		/* If windows exist, process their
+		   messages and get execution result */
 		if (windows.size())
-			ret = app.exec();
+			app.exec();
 
+		/* Release all allocated windows */
 		for (const auto &i: windows) {
 			i->close();
 			delete i;
 		}
-
-		windows.clear();
 	} catch (::LLCCEP::runtime_exception &exc) {
+		/* Spawn message box in case of
+		   internal exception */
 		LLCCEP_exec::messageBox("Program was interrupted by an exception",
 					exc.msg(),
 					QMessageBox::Close,
 					QMessageBox::Close,
 					QMessageBox::Critical).spawn();
-		QUITE_ERROR(yes, "%s", exc.msg());
+		/* Dump to console error information */
+		QUITE_ERROR(yes, "Program was interrupted by an exception:\n"
+				 "--> %s", exc.msg());
 	} DEFAULT_HANDLING
 
-	return ret;
+	return 0;
 }

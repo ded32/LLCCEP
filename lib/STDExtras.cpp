@@ -12,6 +12,11 @@
 #error Undefined OS
 #endif
 
+/* To provide access to
+   strerror_s and
+   strerrorlen_s functions */
+#define __STDC_WANT_LIB_EXT1__ 1
+
 #include <cstdio>
 #include <cstdlib>
 #include <climits>
@@ -20,6 +25,7 @@
 #include <stdexcept>
 #include <sstream>
 #include <vector>
+#include <string>
 
 #if defined(__linux__)
 #include <linux/limits.h>
@@ -85,6 +91,25 @@ namespace LLCCEP {
 	{
 		return runtime_error::what();	
 	}
+}
+
+::std::string std::extras::strerror_safe(int errid)
+{
+	::std::string res;
+
+#if defined(__linux__) || defined(_WIN32)
+	size_t len = strerrorlen_s(errid) + 1;
+	char *buffer = new char[len];
+
+	strerror_s(buffer, len, errid);
+	res = ::std::string(buffer);
+#elif defined(__MACH__)
+	res = strerror(errid);
+#else
+#error Unknown OS
+#endif
+
+	return res;
 }
 
 ::std::string getAbsolutePath(::std::string relpath)

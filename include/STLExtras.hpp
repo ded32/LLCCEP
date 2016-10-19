@@ -15,6 +15,7 @@
 #include <STDExtras.hpp>
 
 #define TYPEHASH(t) typeid(t).hash_code()
+#define NULL_REFERENCE(type) (type &)(*(reinterpret_cast<type *>(0)))
 
 template<typename TYPE>
 ::std::vector<TYPE> subvector(::std::vector<TYPE> &src, size_t id0, size_t id1)

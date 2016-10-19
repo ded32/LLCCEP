@@ -2,6 +2,7 @@
 #include <string>
 
 #include <cstddef>
+#include <cstdarg>
 
 #include <STDExtras.hpp>
 #include <STLExtras.hpp>

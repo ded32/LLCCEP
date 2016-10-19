@@ -80,6 +80,12 @@ namespace LLCCEP {
 	};
 }
 
+namespace std {
+	namespace extras {
+		::std::string strerror_safe(int errid);
+	}
+}
+
 #define RUNTIME_EXCEPTION(...) ::LLCCEP::runtime_exception(__FILE__, __LINE__,\
                                                            __PRETTY_FUNCTION__, ##__VA_ARGS__);
 
