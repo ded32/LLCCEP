@@ -115,8 +115,11 @@ catch (::std::exception &exc) {\
 	                        "%sOK, but is%s!", \
 	                        this, \
 	                        (cond)?(""):("not "), \
-	                        (cond)?("not "):(""))) \
+	                        (cond)?(" not"):(""))) \
 	        } \
+	} else { \
+		throw RUNTIME_EXCEPTION(CONSTRUCT_MSG( \
+			"Invalid 'this' pointer!")) \
 	} \
 }
 

@@ -118,7 +118,7 @@ void LLCCEP_ASM::lexer::getNextLine(::std::vector<LLCCEP_ASM::lexem> &lex)
 				lexerIssue("Character-instead-number's length is not one character(inside quotes)");
 
 			char c = tmp.val[0];
-			tmp.val = to_string<int>(static_cast<int>(c));
+			tmp.val = to_string<double>(static_cast<double>(c));
 			i++;
 		} else if (tmpString[i] == '&') {
 			tmp.type = LLCCEP_ASM::LEX_T_REG;

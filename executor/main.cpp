@@ -60,25 +60,9 @@ int main(int argn, char **argv)
 
 		/* Execute program */
 		sc.executeProgram();
-		/* Get vector of non-closed windows */
-		windows = sc.getWindows();
 
-		/* Release memory */
 		mm.freeElements();
-
-		/* Close input program file */
 		cr.closeInput();
-
-		/* If windows exist, process their
-		   messages and get execution result */
-		if (windows.size())
-			app.exec();
-
-		/* Release all allocated windows */
-		for (const auto &i: windows) {
-			i->close();
-			delete i;
-		}
 	} catch (::LLCCEP::runtime_exception &exc) {
 		/* Spawn message box in case of
 		   internal exception */
@@ -89,7 +73,7 @@ int main(int argn, char **argv)
 					QMessageBox::Critical).spawn();
 		/* Dump to console error information */
 		QUITE_ERROR(yes, "Program was interrupted by an exception:\n"
-				 "--> %s", exc.msg());
+				 "%s", exc.msg());
 	} DEFAULT_HANDLING
 
 	return 0;

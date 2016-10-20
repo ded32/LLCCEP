@@ -1,7 +1,7 @@
 QT += widgets multimedia
 
 INCLUDEPATH += ./../include/
-CONFIG += gnu++14 release
+CONFIG += gnu++14 debug
 
 QMAKE_CXXFLAGS_DEBUG += -g -O0
 QMAKE_CXXFLAGS_RELEASE += -flto -Ofast \

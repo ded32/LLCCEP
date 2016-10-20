@@ -14,8 +14,7 @@
 #include "./../../assembler/lexer/lexer.hpp"
 #include "./../../common/def/def_inst.hpp"
 
-#define CHECK_PROGRAM_READER(cond) \
-	DEFAULT_CHECK_BLOCK(cond, this, OK());
+#define CHECK_PROGRAM_READER(cond) DEFAULT_CHECK_BLOCK(cond, this, OK());
 
 #define PROGRAM_READER_OK CHECK_PROGRAM_READER(true)
 #define PROGRAM_READER_NOTOK CHECK_PROGRAM_READER(false)
@@ -154,7 +153,7 @@ void LLCCEP_exec::codeReader::closeInput()
 
 bool LLCCEP_exec::codeReader::OK() const
 {
-	return input.is_open() && input && path.length();
+	return input.is_open() && path.length();
 }
 
 #undef CHECK_PROGRAM_READER
