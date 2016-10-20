@@ -14,7 +14,6 @@
 #include <STDExtras.hpp>
 #include <STLExtras.hpp>
 #include <os-specific.hpp>
-#include <convert.hpp>
 
 #include "softcore.hpp"
 #include "fp.hpp"
@@ -26,97 +25,50 @@
 #include "./../../assembler/lexer/lexer.hpp"
 
 LLCCEP_exec::softcore::softcore():
-	mm(0),
-	reader(0),
-	bindedApplication(0),
 	stk(),
 	call(),
-	registersStore(),
-	cmp(0x8),
-	ready(0x0),
-	quit(false),
+	cmp(0b1000),
 	regs(),
 	pc(0),
-	windows()
-{
-	/* Fill registers with zeros */
-	memset(regs, 0, sizeof(double) * 32);
-}
+	windows(),
+	mm(),
+	reader(),
+	ready(false),
+	quit(false)
+{ }
 
 LLCCEP_exec::softcore::~softcore()
-{
-	/* Execute QT application if needed */
-	if (windows.size())
-		bindedApplication->exec();
-
-	/* For all windows, just living
-	 * at the time
-	 */
-	for (const auto &i: windows) {
-		/* Close the window */
-		i->close();
-		/* Free memory, allocated for it */
-		delete i;
-	}
-}
+{ }
 
 void LLCCEP_exec::softcore::setMm(LLCCEP_exec::memoryManager *newMm)
 {
-	/* If memory manager is already
-	 * setted up and ok */
-	if (ready & LLCCEP_exec::softcore::MM_READY) {
-		throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
-			"An attempt of re-setting memory manager\n"
-			"for softcore [" ptr_pf "]",
-			this));
-	}
-
-	if (!newMm) {
-		throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
-			"An attempt of setting memory manager pointer to invalid\n"
-			"for softcore [" ptr_pf "]",
-			this));
-	}
-
 	mm = newMm;
-	ready |= LLCCEP_exec::softcore::MM_READY;
+	ready |= 0b10;
 }
 
 void LLCCEP_exec::softcore::setCodeReader(LLCCEP_exec::codeReader *newReader)
 {
-	if (ready & LLCCEP_exec::softcore::CR_READY) {
-		throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
-			"An attempt of re-setting code reader\n"
-			"for softocore [" ptr_pf "]",
-			this));
-	}
-
-	if (!newReader) {
-		throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
-			"An attempt of setting reader pointer to invalid\n"
-			"for softcore [" ptr_pf "]",
-			this));
-	}
-
 	reader = newReader;
-	ready |= LLCCEP_exec::softcore::CR_READY;
+	ready |= 0b01;
 }
 
 void LLCCEP_exec::softcore::executeProgram()
 {
-	if (ready != LLCCEP_exec::softcore::EVERYTHING_READY) {
+	if (ready != 0b11) {
 		throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
 			"Error!\n"
-			"Softcore at " ptr_pf " is not ready for "
+			"Softcore at %p is not ready for "
 			"program execution: "
-			"no input!\n", this))
+			"no input!\n",
+			this))
 	}
 
 	pc = reader->getProgramData().main_id;
 
-	QEventLoop ev;
 	while (!quit) {
 		executeNextInstruction();
+
+		QEventLoop ev;
 		ev.processEvents(QEventLoop::AllEvents, 100);
 	}
 
@@ -128,10 +80,15 @@ void LLCCEP_exec::softcore::executeProgram()
 	}
 }
 
+::std::vector<LLCCEP_exec::window *> LLCCEP_exec::softcore::getWindows() const
+{
+	return windows;
+}
 
 bool LLCCEP_exec::softcore::OK() const
 {
-	return (cmp & 0b1000) && mm && reader && (ready & LLCCEP_exec::softcore::EVERYTHING_READY);
+	return (cmp & 0b1000) && mm && reader &&
+	       (ready & 0b11);
 }
 
 double LLCCEP_exec::softcore::get(LLCCEP_exec::arg data)
@@ -141,14 +98,16 @@ double LLCCEP_exec::softcore::get(LLCCEP_exec::arg data)
 		if (static_cast<size_t>(data.val) >= 32) {
 			throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
 				"Error!\n"
-				"Overbounding while reading data from register!\n"));
+				"Overbounding while reading data from register!\n"
+				));
 		} else {
-			return regs[static_cast<size_t>(data.val)];
+			return regs[static_cast<long long>(data.val)];
 		}
 		break;
 
 	case LLCCEP_ASM::LEX_T_MEM:
-		if (DBL_AE(data.val, mm->getMemSize()) || DBL_LESS(data.val, 0)) {
+		if (DBL_AE(data.val, mm->getMemSize()) ||
+		    DBL_LESS(data.val, 0)) {
 			throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
 				"Error!\n"
 				"Overbouding while reading data from RAM!\n"));
@@ -175,7 +134,8 @@ void LLCCEP_exec::softcore::set(LLCCEP_exec::arg data, double val)
 {
 	switch (data.type) {
 	case LLCCEP_ASM::LEX_T_REG:
-		if (DBL_AE(data.val, 32) || DBL_LESS(data.val, 0)) {
+		if (DBL_AE(data.val, 32) ||
+		    DBL_LESS(data.val, 0)) {
 			throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
 				"Error!\n"
 				"Overbounding while writing data to register!\n"));
@@ -193,6 +153,12 @@ void LLCCEP_exec::softcore::set(LLCCEP_exec::arg data, double val)
 		} else {
 			(*mm)[static_cast<size_t>(data.val)] = val;
 		}
+		break;
+
+	case LLCCEP_ASM::LEX_T_VAL:
+		throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
+			"Error!\n"
+			"An attempt of writing data to non-memory!\n"));
 		break;
 
 	default:
@@ -236,16 +202,15 @@ void LLCCEP_exec::softcore::executeNextInstruction()
 		&LLCCEP_exec::softcore::emulated_ldregs
 	};
 
-	LLCCEP_exec::instruction inst{};
 	if (pc >= reader->getProgramData().size) {
 		quit = true;
 		return;
 	}
 
-	inst = reader->getInstruction(pc);
+	LLCCEP_exec::instruction inst = reader->getInstruction(pc);
 	if (inst.opcode >= LLCCEP_ASM::INST_NUM) {
 		throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
-			"Opcode overbound!"));
+			"Opcode overbound!"))
 	}
 
 	(this->*funcs[inst.opcode])(inst);
@@ -268,13 +233,14 @@ void LLCCEP_exec::softcore::emulated_push(LLCCEP_exec::instruction data)
 }
 
 void LLCCEP_exec::softcore::emulated_pop(LLCCEP_exec::instruction data)
-{
-	static_cast<void>(data);
+{	
+	(void)data;
 
 	if (!stk.size()) {
 		throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
 			"Error!\n"
-			"Can't pop: stack is empty!\n"));
+			"Stack is empty!\n"
+			"Can't pop!"))
 	}
 
 	stk.pop();
@@ -285,7 +251,8 @@ void LLCCEP_exec::softcore::emulated_top(LLCCEP_exec::instruction data)
 	if (!stk.size()) {
 		throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
 			"Error!\n"
-			"Can't get top: stack is empty!\n"));
+			"Stack is empty!\n"
+			"Can't get top!"))
 	}
 
 	set(data.args[0], stk.top());
@@ -344,12 +311,12 @@ void LLCCEP_exec::softcore::emulated_off(LLCCEP_exec::instruction data)
 }
 
 void LLCCEP_exec::softcore::emulated_nop(LLCCEP_exec::instruction data)
-{
-	static_cast<void>(data);
+{	
+	(void)data;
 }
 
 void LLCCEP_exec::softcore::emulated_swi(LLCCEP_exec::instruction data)
-{
+{	
 	auto getFmtString = [](char c) -> ::std::string {
 		switch (c) {
 		case 'x':
@@ -368,6 +335,7 @@ void LLCCEP_exec::softcore::emulated_swi(LLCCEP_exec::instruction data)
 			throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
 				"Error!\n"
 				"Invalid format!\n"));
+			return "";
 		}
 	};
 
@@ -378,7 +346,7 @@ void LLCCEP_exec::softcore::emulated_swi(LLCCEP_exec::instruction data)
 				"Error!\n"
 				"Overbounding while access to windows: "
 				"no window with " size_t_pf " ID!\n",
-				id));
+				id))
 		}
 
 		return windows[id];
@@ -433,7 +401,7 @@ void LLCCEP_exec::softcore::emulated_swi(LLCCEP_exec::instruction data)
 					"Only values between 0 and 2 are allowed!\n"));
 			}
 
-			regs[2] = *reinterpret_cast<double *>(&(stdf[static_cast<size_t>(regs[1])]));
+			regs[2] = *reinterpret_cast<double *>(&stdf[static_cast<size_t>(regs[1])]);
 			break;
 		}
 
@@ -461,18 +429,17 @@ void LLCCEP_exec::softcore::emulated_swi(LLCCEP_exec::instruction data)
 		 * - o -- octal number
 		 *************************************************/
 		case 1: {
-			FILE *out = *reinterpret_cast<FILE **>(&regs[1]);
-			char fmt = static_cast<char>(regs[2]);
+			FILE *out = reinterpret_cast<FILE *>(*reinterpret_cast<void **>(&regs[1]));
 			checkf(out, 1);
 
-			switch (fmt) {
+			switch (static_cast<char>(regs[2])) {
 			case 'n': {
 				::std::fprintf(out, "%lg", regs[3]);
 				break;
 			}
 
 			case 'c': {
-				::std::fprintf(out, "%c", static_cast<uint8_t>(regs[3]));
+				::std::fprintf(out, "%c", static_cast<char>(regs[3]));
 				break;
 			}
 
@@ -878,34 +845,29 @@ void LLCCEP_exec::softcore::emulated_ret(LLCCEP_exec::instruction data)
 
 void LLCCEP_exec::softcore::emulated_stregs(LLCCEP_exec::instruction data)
 {
-	static_cast<void>(data);
+	(void)data;
 
 	double *newRegs = new (::std::nothrow) double[32];
+	memcpy(newRegs, regs, 32 * sizeof(double));
 	if (!newRegs) {
 		throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
-			"Cannot allocate memory for registers copy"));
+			"Cannot allocate memory for registers copy"))
 	}
 
-	memcpy(newRegs, regs, 32 * sizeof(double));
 	registersStore.push_back(newRegs);
 }
 
 void LLCCEP_exec::softcore::emulated_ldregs(LLCCEP_exec::instruction data)
 {
-	static_cast<void>(data);
+	(void)data;
 
 	if (!registersStore.size()) {
 		throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
 			"Error: registersStore is empty, "
-			"cannot rollback registers states"));
+			"cannot rollback registers states"))
 	}
 
 	double *oldRegs = *(registersStore.end() - 1);
-	if (!oldRegs) {
-		throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
-			"Invalid registers storage pointer: cannot rollback"))
-	}
-
 	memcpy(regs, oldRegs, 32 * sizeof(double));
 
 	delete oldRegs;

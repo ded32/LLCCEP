@@ -15,13 +15,12 @@ LLCCEP_ASM::codeGenerator::codeGenerator()
 LLCCEP_ASM::codeGenerator::~codeGenerator()
 { }
 
-LLCCEP_ASM::codeGenerator::op LLCCEP_ASM::codeGenerator::prepareOperation(
-		::std::vector<lexem> &lex)
+LLCCEP_ASM::codeGenerator::op LLCCEP_ASM::codeGenerator::prepareOperation(::std::vector<lexem> &lex)
 {
 	LLCCEP_ASM::analyzer analyzer;
+	LLCCEP_ASM::codeGenerator::op res{};
 	analyzer.analyze(lex);
 
-	LLCCEP_ASM::codeGenerator::op res{};
 	res.instruction = LLCCEP_ASM::isInstruction(lex[0].val);
 	for (unsigned i = 0; i < 3; i++) {
 		if (i >= lex.size() - 1) {
@@ -39,7 +38,7 @@ void LLCCEP_ASM::codeGenerator::dumpOperationBitset(::std::ostream &out, LLCCEP_
 {
 	auto dumpDouble = [&out](double val) {
 		for (size_t i = 0; i < sizeof(double); i++)
-			out << reinterpret_cast<uint8_t *>(&val)[i];
+			out << (reinterpret_cast<uint8_t *>(&val))[i];
 	};
 
 	out << static_cast<uint8_t>(data.instruction);
