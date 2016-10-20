@@ -1,8 +1,0 @@
-/Users/andrew/Documents/projects/personal/LLCCEP/SiHi/CMakeFiles/edit_cache.dir
-/Users/andrew/Documents/projects/personal/LLCCEP/SiHi/CMakeFiles/SiHiCompiler.dir
-/Users/andrew/Documents/projects/personal/LLCCEP/SiHi/CMakeFiles/SiHiScannerLib.dir
-/Users/andrew/Documents/projects/personal/LLCCEP/SiHi/CMakeFiles/SiHiParserLib.dir
-/Users/andrew/Documents/projects/personal/LLCCEP/SiHi/CMakeFiles/DotViz.dir
-/Users/andrew/Documents/projects/personal/LLCCEP/SiHi/CMakeFiles/lexem.dir
-/Users/andrew/Documents/projects/personal/LLCCEP/SiHi/CMakeFiles/rebuild_cache.dir
-/Users/andrew/Documents/projects/personal/LLCCEP/SiHi/CMakeFiles/STDExtras.dir
