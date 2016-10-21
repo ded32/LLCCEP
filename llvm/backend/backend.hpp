@@ -18,6 +18,10 @@
 #include <memory>
 
 namespace LLCCEP_llvm {
+	const ::std::string PUSH_INTERNAL_CALLEE = "__internal_push";
+	const ::std::string POP_INTERNAL_CALLEE = "__internal_pop";
+	const ::std::string TOP_INTERNAL_CALLEE = "__internal_top";
+
 	class backend {
 		llvm::LLVMContext context;
 		llvm::IRBuilder<> builder;
@@ -28,39 +32,39 @@ namespace LLCCEP_llvm {
 		backend();
 		~backend();
 
-		void generate(instructionInfo_t instructionInfo);
+		llvm::Value *generate(instructionInfo_t instructionInfo);
 
 	private:
-		void generateMov(instructionInfo_t instructionInfo);
-		void generateMva(instructionInfo_t instructionInfo);
-		void generatePush(instructionInfo_t instructionInfo);
-		void generatePop(instructionInfo_t instructionInfo);
-		void generateTop(instructionInfo_t instructionInfo);
-		void generateAdd(instructionInfo_t instructionInfo);
-		void generateSub(instructionInfo_t instructionInfo);
-		void generateMul(instructionInfo_t instructionInfo);
-		void generateDiv(instructionInfo_t instructionInfo);
-		void generateAnd(instructionInfo_t instructionInfo);
-		void generateOr(instructionInfo_t instructionInfo);
-		void generateXor(instructionInfo_t instructionInfo);
-		void generateOff(instructionInfo_t instructionInfo);
-		void generateNop(instructionInfo_t instructionInfo);
-		void generateSwi(instructionInfo_t instructionInfo);
-		void generateCmp(instructionInfo_t instructionInfo);
-		void generateInc(instructionInfo_t instructionInfo);
-		void generateDec(instructionInfo_t instructionInfo);
-		void generateSqrt(instructionInfo_t instructionInfo);
-		void generateSin(instructionInfo_t instructionInfo);
-		void generateCos(instructionInfo_t instructionInfo);
-		void generatePtan(instructionInfo_t instructionInfo);
-		void generatePatan(instructionInfo_t instructionInfo);
-		void generateLdc(instructionInfo_t instructionInfo);
-		void generateCall(instructionInfo_t instructionInfo);
-		void generateJmp(instructionInfo_t instructionInfo);
-		void generateRet(instructionInfo_t instructionInfo);
-		void generateStregs(instructionInfo_t instructionInfo);
-		void generateLdregs(instructionInfo_t instructionInfo);
+		llvm::Value *generateMov(instructionInfo_t instructionInfo);
+		llvm::Value *generateMva(instructionInfo_t instructionInfo);
+		llvm::Value *generatePush(instructionInfo_t instructionInfo);
+		llvm::Value *generatePop(instructionInfo_t instructionInfo);
+		llvm::Value *generateTop(instructionInfo_t instructionInfo);
+		llvm::Value *generateAdd(instructionInfo_t instructionInfo);
+		llvm::Value *generateSub(instructionInfo_t instructionInfo);
+		llvm::Value *generateMul(instructionInfo_t instructionInfo);
+		llvm::Value *generateDiv(instructionInfo_t instructionInfo);
+		llvm::Value *generateAnd(instructionInfo_t instructionInfo);
+		llvm::Value *generateOr(instructionInfo_t instructionInfo);
+		llvm::Value *generateXor(instructionInfo_t instructionInfo);
+		llvm::Value *generateOff(instructionInfo_t instructionInfo);
+		llvm::Value *generateNop(instructionInfo_t instructionInfo);
+		llvm::Value *generateSwi(instructionInfo_t instructionInfo);
+		llvm::Value *generateCmp(instructionInfo_t instructionInfo);
+		llvm::Value *generateInc(instructionInfo_t instructionInfo);
+		llvm::Value *generateDec(instructionInfo_t instructionInfo);
+		llvm::Value *generateSqrt(instructionInfo_t instructionInfo);
+		llvm::Value *generateSin(instructionInfo_t instructionInfo);
+		llvm::Value *generateCos(instructionInfo_t instructionInfo);
+		llvm::Value *generatePtan(instructionInfo_t instructionInfo);
+		llvm::Value *generatePatan(instructionInfo_t instructionInfo);
+		llvm::Value *generateLdc(instructionInfo_t instructionInfo);
+		llvm::Value *generateCall(instructionInfo_t instructionInfo);
+		llvm::Value *generateJmp(instructionInfo_t instructionInfo);
+		llvm::Value *generateRet(instructionInfo_t instructionInfo);
+		llvm::Value *generateStregs(instructionInfo_t instructionInfo);
+		llvm::Value *generateLdregs(instructionInfo_t instructionInfo);
 	};
 }
 
-#endif /* LLCCEP_LLVM_BACKEND_HPP */
+#endif /*LLCCEP_LLVM_BACKEND_HPP */

@@ -12,9 +12,9 @@ LLCCEP_llvm::backend::~backend()
 	/* Auto-call the other destructors */
 }
 
-void LLCCEP_llvm::backend::generate(LLCCEP_llvm::instructionInfo_t instructionInfo)
+llvm::Value *LLCCEP_llvm::backend::generate(LLCCEP_llvm::instructionInfo_t instructionInfo)
 {
-	void (LLCCEP_llvm::backend:: *functions[])(LLCCEP_llvm::instructionInfo_t) = {
+	llvm::Value *(LLCCEP_llvm::backend:: *functions[])(LLCCEP_llvm::instructionInfo_t) = {
 		&LLCCEP_llvm::backend::generateMov,
 		&LLCCEP_llvm::backend::generateMva,
 		&LLCCEP_llvm::backend::generatePush,
@@ -52,4 +52,66 @@ void LLCCEP_llvm::backend::generate(LLCCEP_llvm::instructionInfo_t instructionIn
 	}
 
 	(this->*functions[instructionInfo.opcode])(info);
+}
+
+llvm::Value *LLCCEP_llvm::backend::generateMov(LLCCEP_llvm::instructionInfo_t instructionInfo)
+{
+	llvm::Value *cpy = get(instructionInfo.args[1]);
+	llvm::Value *where = getPtr(instructionInfo.args[0]);
+
+	builder.CreateMemCpy(where, cpy, sizeof(double));
+}
+
+llvm::Value *LLCCEP_llvm::backend::generateMva(LLCCEP_llvm::instructionInfo_t instructionInfo)
+{
+	llvm::Value *cpy = get(instructionInfo.args[1]);
+	llvm::Value *where = get(instructionInfo.args[0]);
+
+	builder.CreateMemCpy(where, cpy, sizeof(double));
+}
+
+llvm::Value *LLCCEP_llvm::backend::generatePush(LLCCEP_llvm::instructionInfo_t instructionInfo)
+{
+	llvm::Function *func = currentModule->getFunction(LLCCEP_llvm::PUSH_INTERNAL_CALLEE);
+	if (!func) {
+		throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
+			"Invalid callee for push"));
+	}
+
+	::std::vector<llvm::Value *> args;
+	args.push_back(getValue(instructionInfo.args[0]));
+
+	return builder.CreateCall(func, args, "calltmp");
+}
+
+llvm::Value *LLCCEP_llvm::backend::generatePop(LLCCEP_llvm::instructionInfo_t instructionInfo)
+{
+	llvm::Function *func = currentModule->getFunction(LLCCEP_llvm::POP_INTERNAL_CALLEE);
+	if (!func) {
+		throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
+			"Invalid callee for pop"));
+	}
+
+	::std::vector<llvm::Value *> args;
+	return builder.CreateCall(func, args, "calltmp");
+}
+
+llvm::Value *LLCCEP_llvm::backend::generateTop(LLCCEP_llvm::instructionInfo_t instructionInfo)
+{
+	llvm::Function *func = currentModule->getFunction(LLCCEP_llvm::TOP_INTERNAL_CALLEE);
+	if (!func) {
+		throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
+			"Invalid callee for top"));
+	}
+
+	::std::vector<llvm::Value *> args;
+	args.push_back(getPtr(instructionInfo.args[0]));
+
+	return builder.CreateCall(func, args, "calltmp");
+}
+
+
+llvm::Value *LLCCEP_llvm::backend::generateAdd(LLCCEP_llvm::instructionInfo_t instructionInfo)
+{
+
 }
