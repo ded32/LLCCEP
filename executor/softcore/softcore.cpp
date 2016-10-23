@@ -1,4 +1,4 @@
-#include <QColor>
+t#include <QColor>
 #include <QEventLoop>
 #include <QMediaPlayer>
 #include <QAudioRecorder>
@@ -822,7 +822,7 @@ void LLCCEP_exec::softcore::emulated_ldc(LLCCEP_exec::instruction data)
 
 	case 1:
 		set(data.args[0], ::std::log2(10));
-		break;
+		break;re
 
 	case 2:
 		set(data.args[0], M_LOG2E);
@@ -836,7 +836,7 @@ void LLCCEP_exec::softcore::emulated_ldc(LLCCEP_exec::instruction data)
 		set(data.args[0], ::std::log10(2));
 		break;
 
-	case 5:
+	case 5:ca
 		set(data.args[0], M_LN2);
 		break;
 
