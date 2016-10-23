@@ -82,7 +82,7 @@ void LLCCEP_exec::softcore::setMm(LLCCEP_exec::memoryManager *newMm)
 	ready |= LLCCEP_exec::softcore::MM_READY;
 }
 
-void LLCCEP_exec::softcore::setCodeReader(LLCCEP_exec::codeReader *newReader)
+void LLCCEP_exec::softcore::setCodeReader(LLCCEP_compilerCore::loaderCore::compilerCoreLoader *ccl)
 {
 	if (ready & LLCCEP_exec::softcore::CR_READY) {
 		throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
@@ -91,14 +91,14 @@ void LLCCEP_exec::softcore::setCodeReader(LLCCEP_exec::codeReader *newReader)
 			this));
 	}
 
-	if (!newReader) {
+	if (!ccl) {
 		throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
 			"An attempt of setting reader pointer to invalid\n"
 			"for softcore [" ptr_pf "]",
 			this));
 	}
 
-	reader = newReader;
+	reader = ccl;
 	ready |= LLCCEP_exec::softcore::CR_READY;
 }
 

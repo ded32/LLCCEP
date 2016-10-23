@@ -16,18 +16,15 @@
 
 int main(int argn, char **argv)
 {
-	/* Initialize QT application */
-	QApplication app(argn, argv);
-
-	/* Handle signals, sent by program by
-	   telling about them to user and
-	   ending the execution */
-	LLCCEP_exec::cAttachSignalsHandler();
-
-	/* Windows, created by the executing program */
-	::std::vector<LLCCEP_exec::window *> windows;
-
 	try {
+		/* Initialize QT application */
+		QApplication app(argn, argv);
+
+		/* Handle signals, sent by program by
+		   telling about them to user and
+		   ending the execution */
+		LLCCEP_exec::cAttachSignalsHandler();
+
 		/* Command-line parameters */
 		commandLineParametersVM clp;
 		/* Parse command-line parameters */
@@ -44,7 +41,7 @@ int main(int argn, char **argv)
 		/* Memeory manager */
 		LLCCEP_exec::memoryManager mm;
 		/* Program reader */
-		LLCCEP_exec::codeReader cr;
+		LLCCEP_compilerCore::loaderCore::compilerCoreLoader ccl;
 
 		/* Read program's common information */
 		cr.initializeInputFile(clp.getInput());
@@ -56,7 +53,7 @@ int main(int argn, char **argv)
 
 		/* Initialize soft-processor data */
 		sc.setMm(&mm);
-		sc.setCodeReader(&cr);
+		sc.setCodeReader(&ccl);
 
 		/* Execute program */
 		sc.executeProgram();

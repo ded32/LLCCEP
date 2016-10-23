@@ -6,9 +6,10 @@
 #include <fstream>
 #include <cstddef>
 
+#include <compilerCore/loaderCore.hpp>
+
 #include "./../mm/mm.hpp"
 #include "./../window/window.hpp"
-#include "./../codeReader/codeReader.hpp"
 
 namespace LLCCEP_exec {
 	/**************************************************
@@ -20,8 +21,8 @@ namespace LLCCEP_exec {
 	 *************************************************/
 	class softcore {
 		enum readyInfo_t: int {
-			MM_READY        = 0x2,
-			CR_READY        = 0x1,
+			MM_READY         = 0x2,
+			CR_READY         = 0x1,
 			EVERYTHING_READY = 0x3
 		};
 
@@ -47,8 +48,8 @@ namespace LLCCEP_exec {
 		/**************************************************
 		 * Attach code reader
 		 *************************************************/
-		void setCodeReader(codeReader *newReader);
-
+		void setCodeReader(LLCCEP_compilerCore::loaderCore::compilerCoreLoader *ccl);
+		
 		/**************************************************
 		 * Execute program with specified
 		 * memory manager and program reader
