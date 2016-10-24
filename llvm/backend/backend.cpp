@@ -290,6 +290,11 @@ void LLCCEP_llvm::backend::generateLdc(instructionInfo_t instructionInfo)
 
 void LLCCEP_llvm::backend::generateCmp(instructionInfo_t instructionInfo)
 {
+
+}
+
+void LLCCEP_llvm::backend::generateCall(instructionInfo_t instructionInfo)
+{
 	llvm::Value *cond = get(instructionInfo.args[0]); /* Always value */
 	llvm::Value *cmpFlag = getCompare();
 
@@ -299,7 +304,16 @@ void LLCCEP_llvm::backend::generateCmp(instructionInfo_t instructionInfo)
 	/* Now, condition is 64-bit integer, as cmpFlag */
 
 	builder.CreateAnd(cond, cmpFlag, LLCCEP_llvm::TMP_INTERNAL_VAR);
+	builder.CreateLoad(cond, LLCCEP_llvm::TMP_INTERNAL_VAR);
 
+	auto bb0 = getInstructionBB(instructionInfo.args[1], LLCCEP_llvm::TMP_INTERNAL_VAR);
+	auto bb1 = getInstructionBB(currentInstruction + 1, LLCCEP_llvm::TMP_INTERNAL_VAR);
+	builder.CreateCondBr(cond, bb0, bb1);
+
+	/* TODO: Insert here pushing current instruction id */
 }
 
-void LLCCEP_llvm::backend::generateJmp()
+void LLCCEP_llvm::backend::generateJmp(instructionInfo_t instructionInfo)
+{
+
+}
