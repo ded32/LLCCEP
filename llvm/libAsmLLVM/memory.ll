@@ -49,30 +49,30 @@ declare void @exit(i32)
 declare noalias i8* @realloc(i8* nocapture, i64)
 
 define noalias %struct.memory_info* @memory_init() {
-  %1 = tail call i8* @calloc(i64 1, i64 16)
-  %2 = icmp eq i8* %1, null
-  br i1 %2, label %3, label %9
+	%1 = tail call i8* @calloc(i64 1, i64 16)
+	%2 = icmp eq i8* %1, null
+	br i1 %2, label %3, label %9
 
-  %4 = load %struct.__sFILE*, %struct.__sFILE** @__stderrp, align 8, !tbaa !2
-  %5 = tail call i32* @__error()
-  %6 = load i32, i32* %5, align 4, !tbaa !6
-  %7 = tail call i8* @"\01_strerror"(i32 %6)
-  %8 = tail call i32 (%struct.__sFILE*, i8*, ...) @fprintf(%struct.__sFILE* %4, i8* nonnull getelementptr inbounds ([48 x i8], [48 x i8]* @.str, i64 0, i64 0), i8* %7)
-  tail call void @exit(i32 1)
-  unreachable
+	%4 = load %struct.__sFILE*, %struct.__sFILE** @__stderrp, align 8, !tbaa !2
+	%5 = tail call i32* @__error()
+	%6 = load i32, i32* %5, align 4, !tbaa !6
+	%7 = tail call i8* @"\01_strerror"(i32 %6)
+	%8 = tail call i32 (%struct.__sFILE*, i8*, ...) @fprintf(%struct.__sFILE* %4, i8* nonnull getelementptr inbounds ([48 x i8], [48 x i8]* @.str, i64 0, i64 0), i8* %7)
+	tail call void @exit(i32 1)
+	unreachable
 
-  %10 = bitcast i8* %1 to %struct.memory_info*
-  ret %struct.memory_info* %10
+	%10 = bitcast i8* %1 to %struct.memory_info*
+	ret %struct.memory_info* %10
 }
 
 define void @memory_write(%struct.memory_info*, i64, double) {
-  %4 = icmp eq %struct.memory_info* %0, null
-  br i1 %4, label %5, label %8
+	%4 = icmp eq %struct.memory_info* %0, null
+	br i1 %4, label %5, label %8
 
-  %6 = load %struct.__sFILE*, %struct.__sFILE** @__stderrp, align 8, !tbaa !2
-  %7 = tail call i64 @fwrite(i8* nonnull getelementptr inbounds ([35 x i8], [35 x i8]* @.str.1, i64 0, i64 0), i64 34, i64 1, %struct.__sFILE* %6)
-  tail call void @exit(i32 1)
-  unreachable
+	%6 = load %struct.__sFILE*, %struct.__sFILE** @__stderrp, align 8, !tbaa !2
+	%7 = tail call i64 @fwrite(i8* nonnull getelementptr inbounds ([35 x i8], [35 x i8]* @.str.1, i64 0, i64 0), i64 34, i64 1, %struct.__sFILE* %6)
+	tail call void @exit(i32 1)
+	unreachable
 
   %9 = getelementptr inbounds %struct.memory_info, %struct.memory_info* %0, i64 0, i32 1
   %10 = load i64, i64* %9, align 8, !tbaa !8
