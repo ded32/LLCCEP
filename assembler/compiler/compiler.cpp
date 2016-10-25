@@ -27,23 +27,15 @@ void LLCCEP_ASM::compiler::compile(::std::vector<::std::string> in, ::std::strin
 	LLCCEP_ASM::codeGenerator codegen;
 	size_t pc = 0;
 
-	::std::vector<::std::ifstream> inputs;
 	::std::ofstream output(out);
-	if (output.fail()) {
-		throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
-			"Can't open '%s' as output: %s",
-			out.c_str(), ::std::strerror(errno)));
-	}
+	CHECK_FILE(output, out);
 
-	for (const auto &i: in) {
-		inputs.push_back(::std::ifstream{i});
-
-		if (inputs[inputs.size() - 1].fail()) {
-			throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
-				"Can't open '%s' as input: %s",
-				i.c_str(), ::std::strerror(errno)));
+	auto generateCode = [&codegen, &output](::std::vector<LLCCEP_ASM::lexem> lexems) {
+		if (lexems.size()) {
+			auto opData = codegen.prepareOperation(lexems);
+			codegen.dumpOperationBitset(output, opData);
 		}
-	}
+	};
 
 	for (unsigned pass = 0; pass < 2; pass++) { 
 		if (pass) {
@@ -51,21 +43,17 @@ void LLCCEP_ASM::compiler::compile(::std::vector<::std::string> in, ::std::strin
 			dump_bytes(output, to_bytes(link.getMainAddress()));
 		}
 
-		for (size_t i = 0; i < inputs.size(); i++) {
-			LLCCEP_ASM::lexer lex;
-			lex.setProcessingPath(in[i]);
-			lex.setProcessingFile(&inputs[i]);
+		for (const auto &i: in) {
+			::std::ifstream input{i};
+			CHECK_FILE(input, i);
 
-			while (!inputs[i].eof()) { 
+			LLCCEP_ASM::lexer lex;
+			lex.setProcessingPath(i);
+			lex.setProcessingFile(&input);
+	
+			while (!input.eof()) { 
 				::std::vector<LLCCEP_ASM::lexem> lexems; 
 				lex.getNextLine(lexems); 
-
-				auto generateCode = [&codegen, &lexems, &output] {
-					if (lexems.size()) {
-						LLCCEP_ASM::codeGenerator::op opData = codegen.prepareOperation(lexems);
-						codegen.dumpOperationBitset(output, opData);
-					}
-				};
 
 				if (pass) {
 					::std::vector<LLCCEP_ASM::lexem> newLexems;
@@ -82,7 +70,7 @@ void LLCCEP_ASM::compiler::compile(::std::vector<::std::string> in, ::std::strin
 						for (const auto &i: newLexems) {
 							if (i.type == LLCCEP_ASM::LEX_T_NEWLINE) {
 								link.substituteWithAddresses(lexems);
-								generateCode();
+								generateCode(lexems);
 								lexems.clear();
 							} else {
 								lexems.push_back(i);
@@ -90,7 +78,7 @@ void LLCCEP_ASM::compiler::compile(::std::vector<::std::string> in, ::std::strin
 						}
 
 						link.substituteWithAddresses(lexems);
-						generateCode();	
+						generateCode(lexems);	
 					}
 				} else {
 					if (prep.preprocessorCode(lexems))
@@ -102,8 +90,6 @@ void LLCCEP_ASM::compiler::compile(::std::vector<::std::string> in, ::std::strin
 						pc++;
 				}
 			}
-
-			reopen_file(inputs[i], in[i]);
 		}
 	}
 

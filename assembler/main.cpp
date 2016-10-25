@@ -26,9 +26,9 @@ int main(int argn, char **argv)
 		input = clp.getInput();
 		compiler.compile(input, output);
 	} catch (::LLCCEP::runtime_exception &exc) {
-		QUITE_ERROR(yes, "%s\n", exc.msg());
+		QUITE_ERROR(yes, "%s", exc.msg());
 	} catch (...) {
-		QUITE_ERROR(yes, "Unknown error!\n");
+		QUITE_ERROR(yes, "Unknown error!");
 	}
 
 	return 0;

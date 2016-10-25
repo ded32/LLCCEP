@@ -97,13 +97,13 @@ namespace LLCCEP {
 {
 	::std::string res;
 
-#if defined(__linux__) || defined(_WIN32)
+#if defined(_WIN32)
 	size_t len = strerrorlen_s(errid) + 1;
 	char *buffer = new char[len];
 
 	strerror_s(buffer, len, errid);
 	res = ::std::string(buffer);
-#elif defined(__MACH__)
+#elif defined(__MACH__) || defined(__linux__)
 	res = strerror(errid);
 #else
 #error Unknown OS
