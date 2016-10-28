@@ -133,24 +133,6 @@ void LLCCEP_llvm::backend::generateXor(LLCCEP_llvm::instructionInfo_t instructio
 
 void LLCCEP_llvm::backend::generateOff(LLCCEP_llvm::instructionInfo_t instructionInfo)
 {
-	llvm::Value *v0 = get(instructionInfo.args[1]);
-	llvm::Value *v1 = get(instructionInfo.args[2]);
-	llvm::Value *res = getPtr(instructionInfo.args[0]);
-
-	builder.CreateFPToUI(v0, llvm::Type::getInt64Ty(), TEMP_INTERNAL_VAR);
-	builder.CreateLoad(v0, TEMP_INTERNAL_VAR);
-
-	builder.CreateFPToUI(v1, llvm::Type::getInt64Ty(), TEMP_INTERNAL_VAR);
-	builder.CreateLoad(v1, TEMP_INTERNAL_VAR);
-
-	builder.CreateICmpSGE(v1, createConstantValue(0), TEMP_INTERNAL_VAR);
-	builder.CreateLoad(res, TEMP_INTERNAL_VAR);
-	builder.CreateShl(v0, v1, TEMP_INTERNAL_VAR);
-	builder.CreateLoad(v0, TEMP_INTERNAL_VAR);
-	builder.CreateShr(v0, v1, TEMP_INTERNAL_VAR);
-	builder.CreateLoad(v1, TEMP_INTERNAL_VAR);
-	builder.CreateSelect(res, v0, v1, TEMP_INTERNAL_VAR);
-	builder.CreateLoad(res, TEMP_INTERNAL_VAR);
 }
 
 void LLCCEP_llvm::backend::generateNop(LLCCEP_llvm::instructionInfo_t instructionInfo)

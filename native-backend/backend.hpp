@@ -24,6 +24,13 @@ namespace LLCCEP {
 	const ::std::string PUSH_INTERNAL_CALLEE = "__internal_push";
 	const ::std::string POP_INTERNAL_CALLEE = "__internal_pop";
 	const ::std::string TOP_INTERNAL_CALLEE = "__internal_top";
+	const ::std::string POW_INTERNAL_CALLEE = "llvm.pow.f64";
+	const ::std::string SIN_INTERNAL_CALLEE = "sin";
+	const ::std::string COS_INTERNAL_CALLEE = "cos";
+	const ::std::string SQRT_INTERNAL_CALLEE = "sqrt";
+	const ::std::string PTAN_INTERNAL_CALLEE = "tan";
+	const ::std::string PATAN_INTERNAL_CALLEE = "patan";
+	const ::std::string LDC_INTERNAL_CALLEE = "getConstantToLoad";
 
 	typedef llvm::ObjectLinkingLayer<> objLinkLayer;
 	typedef llvm::IRCompileLayer<objLinkLayer> compileLayer;

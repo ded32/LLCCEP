@@ -168,3 +168,161 @@ void LLCCEP::nativeBackend::generate##op##(LLCCEP::instructionInfo_t info) \
 SYNTHESE_LOGIC(And);
 SYNTHESE_LOGIC(Or);
 SYNTHESE_LOGIC(Xor);
+
+#undef SYNTHESE_LOGIC
+
+void LLCCEP::nativeBackend::generateOff(LLCCEP::instructionInfo_t info)
+{
+	llvm::Value *o[] = {get(info.args[1]),
+	                    get(info.args[2])};
+	llvm::Value *res = getPtr(info.args[0]);
+
+	for (unsigned i = 0; i < 2; i++) {
+		builder.CreateFPToUI(o[i], llvm::Type::getInt64Ty(), 
+		                     LLCCEP::TEMP_INTERNAL_VAR);
+		builder.CreateLoad(o[i], LLCCEP::TEMP_INTERNAL_VAR);
+	}
+
+	builder.CreateICmpSGE(o[1], createConstantValue(0), 
+	                      LLCCEP::TEMP_INTERNAL_VAR);
+	builder.CreateLoad(res, LLCCEP::TEMP_INTERNAL_VAR);
+	builder.CreateShl(o[0], o[1], LLCCEP::TEMP_INTERNAL_VAR);
+	builder.CreateLoad(o[0], LLCCEP::TEMP_INTERNAL_VAR);
+	builder.CreateShr(o[0], o[1], LLCCEP::TEMP_INTERNAL_VAR);
+	builder.CreateLoad(o[1], LLCCEP::TEMP_INTERNAL_VAR);
+	builder.CreateSelect(res, o[0], o[1], LLCCEP::TEMP_INTERNAL_VAR);
+	builder.CreateLoad(res, LLCCEP::TEMP_INTERNAL_VAR);
+}
+
+void LLCCEP::nativeBackend::generateNop(LLCCEP::instructionInfo_t info)
+{
+	/* To reach just greater speed */
+}
+
+void LLCCEP::nativeBackend::generateSwi(LLCCEP::instructionInfo_t info)
+{
+	auto callee = getModuleFunction(LLCCEP::SWI_INTERNAL_CALLEE);
+	LLCCEP::nativeBackend::functionArguments args;
+
+	args.push_back(get(info.args[0]));
+	builder.CreateCall(callee, args);
+}
+
+void LLCCEP::nativeBackend::generateCmp(LLCCEP::instructionInfo_t info)
+{
+	auto callee  = getModuleFunction(LLCCEP_llvm::CMP_INTERNAL_CALLEE);
+	LLCCEP::nativeBackend::functionArguments args;
+
+	args.push_back(get(info.args[0]));
+	args.push_back(get(info.args[1]));
+	builder.CreateCall(callee, args);
+}
+
+#define SYNTHESE_INC_DEC(op, act) \
+void LLCCEP::nativeBackend::generate##op##(LLCCEP::instructionInfo_t info) \
+{ \
+	llvm::Value *res = getPtr(info.args[0]); \
+	llvm::Value *o = get(info.args[0]); \
+	\
+	builder.Create##act##(o, getConstantValue(1.0f), \
+	                      LLCCEP::TEMP_INTERNAL_VAR); \
+	builder.CreateLoad(res, LLCCEP::TEMP_INTERNAL_VAR); \
+}
+
+SYNTHESE_INC_DEC(inc, Add);
+SYNTHESE_INC_DEC(dec, Sub);
+
+#undef SYNTHESE_INC_DEC
+
+#define SYNTHESE_MATH(op, name) \
+void LLCCEP::nativeBackend::generate##op##(LLCCEP::instructionInfo_t info) \
+{ \
+	llvm::Value *res = getPtr(info.args[0]); \
+	llvm::Value *o = get(info.args[1]); \
+	auto callee = getModuleFunction(##name##_INTERNAL_CALLEE); \
+	LLCCEP::nativeBackend::functionArguments args; \
+	\
+	args.push_back(o);\
+	builder.CreateCall(callee, args, LLCCEP::TEMP_INTERNAL_VAR); \
+	builder.CreateLoad(res, LLCCEP::TEMP_INTERNAL_VAR); \
+}
+
+SYNTHESE_MATH(Sqrt, SQRT);
+SYNTHESE_MATH(Sin, SIN);
+SYNTHESE_MATH(Cos, COS);
+SYNTHESE_MATH(Ptan, PTAN);
+SYNTHESE_MATH(Patan, PATAN);
+SYNTHESE_MATH(Ldc, LDC);
+
+#undef SYNTHESE_MATH
+
+void LLCCEP::nativeBackend::generateCall(LLCCEP::instructionInfo_t info)
+{
+	llvm::Value *condition = get(info.args[0]);
+	llvm::Value *pos = get(info.args[1]);
+	llvm::Value *tmp = createTempValue();
+
+	auto callee = getModuleFunction(LLCCEP::CMP_VAL_INTERNAL_CALLEE);
+	LLCCEP::nativeBackend::functionArguments args;
+
+	builder.CreateCall(callee, args, LLCCEP::TEMP_INTERNAL_VAR);
+	builder.CreateLoad(tmp, LLCCEP::TEMP_INTERNAL_VAR);
+
+	builder.CreateFPToUI(pos, llvm::Type::getInt64Ty(), 
+	                     LLCCEP::TEMP_INTERNAL_VAR);
+	builder.CreateLoad(condition, LLCCEP::TEMP_INTERNAL_VAR);
+	builder.CreateAnd(condition, pos, LLCCEP::TEMP_INTERNAL_VAR);
+	builder.CreateLoad(condition, LLCCEP::TEMP_INTERNAL_VAR);
+
+	builder.CreateCondBr(condition, getInstruction(pos),
+	                     getInstruction(currentInstruction + 1));
+}
+
+void LLCCEP::nativeBackend::generateJmp(LLCCEP::instructionInfo_t info)
+{
+	llvm::Value *condition = get(info.args[0]);
+	llvm::Value *pos = get(info.args[1]);
+	llvm::Value *tmp = createTempValue();
+
+	auto callee = getModuleFunction(LLCCEP::CMP_VAL_INTERNAL_CALLEE);
+	LLCCEP::nativeBackend::functionArguments args;
+
+	builder.CreateCall(callee, args, LLCCEP::TEMP_INTERNAL_VAR);
+	builder.CreateLoad(tmp, LLCCEP::TEMP_INTERNAL_VAR);
+
+	builder.CreateFPToUI(pos, llvm::Type::getInt64Ty(), 
+	                     LLCCEP::TEMP_INTERNAL_VAR);
+	builder.CreateLoad(condition, LLCCEP::TEMP_INTERNAL_VAR);
+	builder.CreateAnd(condition, pos, LLCCEP::TEMP_INTERNAL_VAR);
+	builder.CreateLoad(condition, LLCCEP::TEMP_INTERNAL_VAR);
+
+	builder.CreateCondBr(condition, getInstruction(pos),
+	                     getInstruction(currentInstruction + 1));
+
+}
+
+void LLCCEP::nativeBackend::generateRet(LLCCEP::instructionInfo_t info)
+{
+	llvm::Value *res = createTempValue();
+	auto callee = getModuleFunction(LLCCEP::GET_CALL_STACK_INTERNAL_CALLEE);
+	LLCCEP::nativeBackend::functionArguments args;
+
+	builder.CreateCall(callee, args, LLCCEP::TEMP_INTERNAL_VAR);
+	builder.CreateLoad(res, LLCCEP::TEMP_INTERNAL_VAR);
+
+	callee = getModuleFunction(LLCCEP::STACK_TOP_INTERNAL_CALLEE);
+	args.push_back(res);
+	builder.CreateCall(callee, args, LLCCEP::TEMP_INTERNAL_VAR);
+
+	callee = getModuleFunction(LLCCEP::STACK_POP_INTERNAL_CALLEE);
+	args.clear();
+	builder.CreateCall(callee, args, LLCCEP::TEMP_INTERNAL_VAR);
+
+	builder.CreateBr(getInstruction(res));
+}
+
+void LLCCEP::nativeBackend::generateStregs(LLCCEP::instructionInfo_t info)
+{ }
+
+void LLCCEP::nativeBackend::generateLdregs(LLCCEP::instructionInfo_t info)
+{ }
