@@ -1,0 +1,1 @@
+double regs[32] = {};
