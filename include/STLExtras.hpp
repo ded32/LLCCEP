@@ -45,8 +45,8 @@ typename ::std::vector<TYPE>::iterator vec_find(::std::vector<TYPE> &vec, const 
 	return find(vec.begin(), vec.end(), srch);
 }
 
-template<typename char_t>
-size_t get_length(::std::basic_ifstream<char_t> &fd)
+template<typename char_t, typename traits>
+size_t get_length(::std::basic_istream<char_t, traits> &fd)
 {
 	if (fd.fail()) {
 		throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
@@ -64,19 +64,13 @@ size_t get_length(::std::basic_ifstream<char_t> &fd)
 }
 
 template<typename TYPE>
-void reopen_file(TYPE *f, std::string path)
-{
-	if (!f) {
-		throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
-			"Invalid file pointer given!\n"
-			"Can't reopen it!"));
-	}
+void reopen_file(TYPE &f, std::string path)
+{	
+	f.close();
+	f.clear();
 
-	f->close();
-	f->clear();
-
-	f->open(path);	
-	if (f->fail()) {
+	f.open(path);	
+	if (f.fail()) {
 		throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
 					"Error!\n"
 					"File '%s' reopening failed: %s",

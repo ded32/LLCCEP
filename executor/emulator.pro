@@ -8,19 +8,18 @@ QMAKE_CXXFLAGS_RELEASE += -flto -Ofast \
                           -march=native \
                           -funroll-loops \
 
-SOURCES = codeReader/codeReader.cpp \
-          window/window.cpp \
+SOURCES = window/window.cpp \
           window/renderer/renderer.cpp \
           softcore/softcore.cpp \
           mm/mm.cpp \
           signal/signal.cpp \
           ../lib/STDExtras.cpp \
           ../lib/command-line.cpp \
-          main.cpp \
+	  ../lib/codeReader.cpp \
+	  main.cpp \
           messageBox/messageBox.cpp
 
-HEADERS = codeReader/codeReader.hpp \
-          window/window.hpp \
+HEADERS = window/window.hpp \
           window/renderer/renderer.hpp \
           softcore/softcore.hpp \
           softcore/fp.hpp \

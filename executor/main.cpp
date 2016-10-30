@@ -2,29 +2,31 @@
 
 #include <string>
 #include <iostream>
-
 #include <cstring>
 
 #include <STDExtras.hpp>
 #include <command-line.hpp>
+#include <codeReader.hpp>
 
 #include "messageBox/messageBox.hpp"
-#include "codeReader/codeReader.hpp"
 #include "softcore/softcore.hpp"
 #include "mm/mm.hpp"
 #include "signal/signal.hpp"
 
 int main(int argn, char **argv)
 {
+	/* Initialize QT application */
+	QApplication app(argn, argv);
+
+	/* Handle signals, sent by program by
+	   telling about them to user and
+	   ending the execution */
+	LLCCEP_exec::cAttachSignalsHandler();
+
+	/* Windows, created by the executing program */
+	::std::vector<LLCCEP_exec::window *> windows;
+
 	try {
-		/* Initialize QT application */
-		QApplication app(argn, argv);
-
-		/* Handle signals, sent by program by
-		   telling about them to user and
-		   ending the execution */
-		LLCCEP_exec::cAttachSignalsHandler();
-
 		/* Command-line parameters */
 		commandLineParametersVM clp;
 		/* Parse command-line parameters */
@@ -41,10 +43,12 @@ int main(int argn, char **argv)
 		/* Memeory manager */
 		LLCCEP_exec::memoryManager mm;
 		/* Program reader */
-		LLCCEP_compilerCore::loaderCore::compilerCoreLoader ccl;
+		LLCCEP::codeReader cr;
+		::std::ifstream in;
+		OPEN_FILE(in, clp.getInput());
 
 		/* Read program's common information */
-		cr.initializeInputFile(clp.getInput());
+		cr.initializeInputFile(dynamic_cast<::std::istream *>(&in));
 		cr.readProgramHeader();
 
 		/* Allocate memory, how much is
@@ -53,14 +57,17 @@ int main(int argn, char **argv)
 
 		/* Initialize soft-processor data */
 		sc.setMm(&mm);
-		sc.setCodeReader(&ccl);
+		sc.setCodeReader(&cr);
 
 		/* Execute program */
 		sc.executeProgram();
 
+		/* Release memory */
 		mm.freeElements();
-		cr.closeInput();
-	} catch (::LLCCEP::runtime_exception &exc) {
+
+		/* Close input */
+		in.close();
+	} catch (LLCCEP::runtime_exception &exc) {
 		/* Spawn message box in case of
 		   internal exception */
 		LLCCEP_exec::messageBox("Program was interrupted by an exception",

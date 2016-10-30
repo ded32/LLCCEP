@@ -1,4 +1,4 @@
-t#include <QColor>
+#include <QColor>
 #include <QEventLoop>
 #include <QMediaPlayer>
 #include <QAudioRecorder>
@@ -15,13 +15,13 @@ t#include <QColor>
 #include <STLExtras.hpp>
 #include <os-specific.hpp>
 #include <convert.hpp>
+#include <codeReader.hpp>
 
 #include "softcore.hpp"
 #include "fp.hpp"
 
 #include "./../mm/mm.hpp"
 #include "./../window/window.hpp"
-#include "./../codeReader/codeReader.hpp"
 #include "./../../common/def/def_inst.hpp"
 #include "./../../assembler/lexer/lexer.hpp"
 
@@ -82,7 +82,7 @@ void LLCCEP_exec::softcore::setMm(LLCCEP_exec::memoryManager *newMm)
 	ready |= LLCCEP_exec::softcore::MM_READY;
 }
 
-void LLCCEP_exec::softcore::setCodeReader(LLCCEP_compilerCore::loaderCore::compilerCoreLoader *ccl)
+void LLCCEP_exec::softcore::setCodeReader(LLCCEP::codeReader *newReader)
 {
 	if (ready & LLCCEP_exec::softcore::CR_READY) {
 		throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
@@ -91,14 +91,14 @@ void LLCCEP_exec::softcore::setCodeReader(LLCCEP_compilerCore::loaderCore::compi
 			this));
 	}
 
-	if (!ccl) {
+	if (!newReader) {
 		throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
 			"An attempt of setting reader pointer to invalid\n"
 			"for softcore [" ptr_pf "]",
 			this));
 	}
 
-	reader = ccl;
+	reader = newReader;
 	ready |= LLCCEP_exec::softcore::CR_READY;
 }
 
@@ -134,7 +134,7 @@ bool LLCCEP_exec::softcore::OK() const
 	return (cmp & 0b1000) && mm && reader && (ready & LLCCEP_exec::softcore::EVERYTHING_READY);
 }
 
-double LLCCEP_exec::softcore::get(LLCCEP_exec::arg data)
+double LLCCEP_exec::softcore::get(LLCCEP::arg data)
 {
 	switch (data.type) {
 	case LLCCEP_ASM::LEX_T_REG:
@@ -171,7 +171,7 @@ double LLCCEP_exec::softcore::get(LLCCEP_exec::arg data)
 	return 0;
 }
 
-void LLCCEP_exec::softcore::set(LLCCEP_exec::arg data, double val)
+void LLCCEP_exec::softcore::set(LLCCEP::arg data, double val)
 {
 	switch (data.type) {
 	case LLCCEP_ASM::LEX_T_REG:
@@ -204,7 +204,7 @@ void LLCCEP_exec::softcore::set(LLCCEP_exec::arg data, double val)
 
 void LLCCEP_exec::softcore::executeNextInstruction()
 {
-	void (LLCCEP_exec::softcore::*funcs[])(LLCCEP_exec::instruction) = {
+	void (LLCCEP_exec::softcore::*funcs[])(LLCCEP::instruction) = {
 		&LLCCEP_exec::softcore::emulated_mov,
 		&LLCCEP_exec::softcore::emulated_mva,
 		&LLCCEP_exec::softcore::emulated_push,
@@ -236,7 +236,7 @@ void LLCCEP_exec::softcore::executeNextInstruction()
 		&LLCCEP_exec::softcore::emulated_ldregs
 	};
 
-	LLCCEP_exec::instruction inst{};
+	LLCCEP::instruction inst{};
 	if (pc >= reader->getProgramData().size) {
 		quit = true;
 		return;
@@ -252,22 +252,22 @@ void LLCCEP_exec::softcore::executeNextInstruction()
 	pc++;
 }
 
-void LLCCEP_exec::softcore::emulated_mov(LLCCEP_exec::instruction data)
+void LLCCEP_exec::softcore::emulated_mov(LLCCEP::instruction data)
 {
 	set(data.args[0], get(data.args[1]));
 }
 
-void LLCCEP_exec::softcore::emulated_mva(LLCCEP_exec::instruction data)
+void LLCCEP_exec::softcore::emulated_mva(LLCCEP::instruction data)
 {	
 	(*mm)[get(data.args[0])] = get(data.args[1]);
 }
 
-void LLCCEP_exec::softcore::emulated_push(LLCCEP_exec::instruction data)
+void LLCCEP_exec::softcore::emulated_push(LLCCEP::instruction data)
 {	
 	stk.push(get(data.args[0]));
 }
 
-void LLCCEP_exec::softcore::emulated_pop(LLCCEP_exec::instruction data)
+void LLCCEP_exec::softcore::emulated_pop(LLCCEP::instruction data)
 {
 	static_cast<void>(data);
 
@@ -280,7 +280,7 @@ void LLCCEP_exec::softcore::emulated_pop(LLCCEP_exec::instruction data)
 	stk.pop();
 }
 
-void LLCCEP_exec::softcore::emulated_top(LLCCEP_exec::instruction data)
+void LLCCEP_exec::softcore::emulated_top(LLCCEP::instruction data)
 {	
 	if (!stk.size()) {
 		throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
@@ -291,48 +291,48 @@ void LLCCEP_exec::softcore::emulated_top(LLCCEP_exec::instruction data)
 	set(data.args[0], stk.top());
 }
 
-void LLCCEP_exec::softcore::emulated_add(LLCCEP_exec::instruction data)
+void LLCCEP_exec::softcore::emulated_add(LLCCEP::instruction data)
 {	
 	set(data.args[0], get(data.args[1]) + get(data.args[2]));
 }
 
-void LLCCEP_exec::softcore::emulated_sub(LLCCEP_exec::instruction data)
+void LLCCEP_exec::softcore::emulated_sub(LLCCEP::instruction data)
 {	
 	set(data.args[0], get(data.args[1]) + get(data.args[2]));
 }
 
-void LLCCEP_exec::softcore::emulated_mul(LLCCEP_exec::instruction data)
+void LLCCEP_exec::softcore::emulated_mul(LLCCEP::instruction data)
 {	
 	set(data.args[0], get(data.args[1]) * get(data.args[2]));
 }
 
-void LLCCEP_exec::softcore::emulated_div(LLCCEP_exec::instruction data)
+void LLCCEP_exec::softcore::emulated_div(LLCCEP::instruction data)
 {	
 	set(data.args[0], get(data.args[1]) / get(data.args[2]));
 }
 
-void LLCCEP_exec::softcore::emulated_and(LLCCEP_exec::instruction data)
+void LLCCEP_exec::softcore::emulated_and(LLCCEP::instruction data)
 {
 	set(data.args[0],
 	    static_cast<long long>(get(data.args[1])) &
 	    static_cast<long long>(get(data.args[2])));
 }
 
-void LLCCEP_exec::softcore::emulated_or(LLCCEP_exec::instruction data)
+void LLCCEP_exec::softcore::emulated_or(LLCCEP::instruction data)
 {
 	set(data.args[0],
 	    static_cast<long long>(get(data.args[1])) |
 	    static_cast<long long>(get(data.args[2])));
 }
 
-void LLCCEP_exec::softcore::emulated_xor(LLCCEP_exec::instruction data)
+void LLCCEP_exec::softcore::emulated_xor(LLCCEP::instruction data)
 {
 	set(data.args[0],
 	    static_cast<long long>(get(data.args[1])) ^
 	    static_cast<long long>(get(data.args[2])));
 }
 
-void LLCCEP_exec::softcore::emulated_off(LLCCEP_exec::instruction data)
+void LLCCEP_exec::softcore::emulated_off(LLCCEP::instruction data)
 {	
 	int direction = ((get(data.args[0]) >= 0)?(1):(-1));
 	set(data.args[0],
@@ -343,12 +343,12 @@ void LLCCEP_exec::softcore::emulated_off(LLCCEP_exec::instruction data)
 	      static_cast<long long>(get(data.args[2])))));
 }
 
-void LLCCEP_exec::softcore::emulated_nop(LLCCEP_exec::instruction data)
+void LLCCEP_exec::softcore::emulated_nop(LLCCEP::instruction data)
 {
 	static_cast<void>(data);
 }
 
-void LLCCEP_exec::softcore::emulated_swi(LLCCEP_exec::instruction data)
+void LLCCEP_exec::softcore::emulated_swi(LLCCEP::instruction data)
 {
 	auto getFmtString = [](char c) -> ::std::string {
 		switch (c) {
@@ -765,7 +765,7 @@ void LLCCEP_exec::softcore::emulated_swi(LLCCEP_exec::instruction data)
 	}
 }
 
-void LLCCEP_exec::softcore::emulated_cmp(LLCCEP_exec::instruction data)
+void LLCCEP_exec::softcore::emulated_cmp(LLCCEP::instruction data)
 {
 	double n0 = get(data.args[0]), n1 = get(data.args[1]);
 	cmp = 0b1000;
@@ -778,42 +778,42 @@ void LLCCEP_exec::softcore::emulated_cmp(LLCCEP_exec::instruction data)
 		cmp |= 0b0100;
 }
 
-void LLCCEP_exec::softcore::emulated_inc(LLCCEP_exec::instruction data)
+void LLCCEP_exec::softcore::emulated_inc(LLCCEP::instruction data)
 {
 	set(data.args[0], get(data.args[0]) + 1);
 }
 
-void LLCCEP_exec::softcore::emulated_dec(LLCCEP_exec::instruction data)
+void LLCCEP_exec::softcore::emulated_dec(LLCCEP::instruction data)
 {
 	set(data.args[0], get(data.args[0]) - 1);
 }
 
-void LLCCEP_exec::softcore::emulated_sqrt(LLCCEP_exec::instruction data)
+void LLCCEP_exec::softcore::emulated_sqrt(LLCCEP::instruction data)
 {
 	set(data.args[0], ::std::sqrt(get(data.args[1])));
 }
 
-void LLCCEP_exec::softcore::emulated_sin(LLCCEP_exec::instruction data)
+void LLCCEP_exec::softcore::emulated_sin(LLCCEP::instruction data)
 {
 	set(data.args[0], ::std::sin(get(data.args[1])));
 }
 
-void LLCCEP_exec::softcore::emulated_cos(LLCCEP_exec::instruction data)
+void LLCCEP_exec::softcore::emulated_cos(LLCCEP::instruction data)
 {
 	set(data.args[0], ::std::cos(get(data.args[1])));
 }
 
-void LLCCEP_exec::softcore::emulated_ptan(LLCCEP_exec::instruction data)
+void LLCCEP_exec::softcore::emulated_ptan(LLCCEP::instruction data)
 {
 	set(data.args[0], ::std::tan(get(data.args[1])));
 }
 
-void LLCCEP_exec::softcore::emulated_patan(LLCCEP_exec::instruction data)
+void LLCCEP_exec::softcore::emulated_patan(LLCCEP::instruction data)
 {
 	set(data.args[0], ::std::atan(get(data.args[1])));
 }
 
-void LLCCEP_exec::softcore::emulated_ldc(LLCCEP_exec::instruction data)
+void LLCCEP_exec::softcore::emulated_ldc(LLCCEP::instruction data)
 {
 	switch (static_cast<long long>(get(data.args[1]))) {
 	case 0:
@@ -822,7 +822,7 @@ void LLCCEP_exec::softcore::emulated_ldc(LLCCEP_exec::instruction data)
 
 	case 1:
 		set(data.args[0], ::std::log2(10));
-		break;re
+		break;
 
 	case 2:
 		set(data.args[0], M_LOG2E);
@@ -836,7 +836,7 @@ void LLCCEP_exec::softcore::emulated_ldc(LLCCEP_exec::instruction data)
 		set(data.args[0], ::std::log10(2));
 		break;
 
-	case 5:ca
+	case 5:
 		set(data.args[0], M_LN2);
 		break;
 
@@ -849,7 +849,7 @@ void LLCCEP_exec::softcore::emulated_ldc(LLCCEP_exec::instruction data)
 	}
 }
 
-void LLCCEP_exec::softcore::emulated_call(LLCCEP_exec::instruction data)
+void LLCCEP_exec::softcore::emulated_call(LLCCEP::instruction data)
 {
 	if (static_cast<size_t>(get(data.args[0])) & cmp) {
 		call.push(pc);
@@ -857,13 +857,13 @@ void LLCCEP_exec::softcore::emulated_call(LLCCEP_exec::instruction data)
 	}
 }
 
-void LLCCEP_exec::softcore::emulated_jmp(LLCCEP_exec::instruction data)
+void LLCCEP_exec::softcore::emulated_jmp(LLCCEP::instruction data)
 {
 	if (static_cast<size_t>(get(data.args[0])) & cmp)
 		pc = get(data.args[1]) - 1;
 }
 
-void LLCCEP_exec::softcore::emulated_ret(LLCCEP_exec::instruction data)
+void LLCCEP_exec::softcore::emulated_ret(LLCCEP::instruction data)
 {	
 	(void)data;
 
@@ -876,7 +876,7 @@ void LLCCEP_exec::softcore::emulated_ret(LLCCEP_exec::instruction data)
 	call.pop();
 }
 
-void LLCCEP_exec::softcore::emulated_stregs(LLCCEP_exec::instruction data)
+void LLCCEP_exec::softcore::emulated_stregs(LLCCEP::instruction data)
 {
 	static_cast<void>(data);
 
@@ -890,7 +890,7 @@ void LLCCEP_exec::softcore::emulated_stregs(LLCCEP_exec::instruction data)
 	registersStore.push_back(newRegs);
 }
 
-void LLCCEP_exec::softcore::emulated_ldregs(LLCCEP_exec::instruction data)
+void LLCCEP_exec::softcore::emulated_ldregs(LLCCEP::instruction data)
 {
 	static_cast<void>(data);
 

@@ -4,8 +4,12 @@
 #include <cstddef>
 #include <string>
 
+#include <STDExtras.hpp>
+
 namespace LLCCEP_exec {
 	class memoryManager {
+		UNCOPIABLE_CLASS(memoryManager)
+
 	public:
 		memoryManager();
 		~memoryManager();
@@ -17,16 +21,19 @@ namespace LLCCEP_exec {
 		void writeString(size_t offset, ::std::string str);
 
 		size_t getMemSize() const;
-		void *getMemBeginning() const;
+		void *getMemBeginning();
 
-		double operator[](size_t id) const;
 		double &operator[](size_t id);
 
 		bool OK() const;
 
 	private:
-		double *_mem;
-		size_t _sz;
+		double &at(size_t id);
+		double *addr(size_t id);
+
+		double *mem;
+		size_t actualSz;
+		size_t maxSz;
 	};
 }
 

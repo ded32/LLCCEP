@@ -11,6 +11,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <stddef.h>
+#include <cerrno>
 #include <climits>
 #include <stdexcept>
 #include <cstdint>
@@ -62,12 +63,20 @@
 #define CONSTRUCT_MSG(fmt, ...) \
 CONSTRUCT_MSG_nodelete(fmt, ##__VA_ARGS__), true
 
-#define CHECK_FILE(fd, path) \
-if (!(fd)) { \
-	throw RUNTIME_EXCEPTION(CONSTRUCT_MSG( \
-		"Can't open '%s' file: %s", \
-		path.c_str(), ::std::extras::strerror_safe(errno).c_str())); \
+#define OPEN_FILE(where, path) \
+{ \
+	where.open(path); \
+	if (where.fail()) { \
+		throw RUNTIME_EXCEPTION(CONSTRUCT_MSG( \
+			"Can't open '%s': %s", \
+			path.c_str(), ::std::extras::strerror_safe(errno).c_str())); \
+	} \
 }
+
+#define UNCOPIABLE_CLASS(name) \
+private: \
+	name(const name &); \
+	name &operator=(const name &);
 
 namespace LLCCEP {
 	class runtime_exception: public ::std::runtime_error {

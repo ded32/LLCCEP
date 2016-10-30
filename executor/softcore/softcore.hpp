@@ -4,9 +4,8 @@
 #include <vector>
 #include <stack>
 #include <fstream>
-#include <cstddef>
 
-#include <compilerCore/loaderCore.hpp>
+#include <codeReader.hpp>
 
 #include "./../mm/mm.hpp"
 #include "./../window/window.hpp"
@@ -48,8 +47,8 @@ namespace LLCCEP_exec {
 		/**************************************************
 		 * Attach code reader
 		 *************************************************/
-		void setCodeReader(LLCCEP_compilerCore::loaderCore::compilerCoreLoader *ccl);
-		
+		void setCodeReader(LLCCEP::codeReader *newReader);
+
 		/**************************************************
 		 * Execute program with specified
 		 * memory manager and program reader
@@ -62,39 +61,39 @@ namespace LLCCEP_exec {
 		bool OK() const;
 
 	protected:
-		double get(arg data);
-		void set(arg data, double val);
+		double get(LLCCEP::arg data);
+		void set(LLCCEP::arg data, double val);
 
 		void executeNextInstruction();
-		void emulated_mov(LLCCEP_exec::instruction data);
-		void emulated_mva(LLCCEP_exec::instruction data);
-		void emulated_push(LLCCEP_exec::instruction data);
-		void emulated_pop(LLCCEP_exec::instruction data);
-		void emulated_top(LLCCEP_exec::instruction data);
-		void emulated_add(LLCCEP_exec::instruction data);
-		void emulated_sub(LLCCEP_exec::instruction data);
-		void emulated_mul(LLCCEP_exec::instruction data);
-		void emulated_div(LLCCEP_exec::instruction data);
-		void emulated_and(LLCCEP_exec::instruction data);
-		void emulated_or(LLCCEP_exec::instruction data);
-		void emulated_xor(LLCCEP_exec::instruction data);
-		void emulated_off(LLCCEP_exec::instruction data);
-		void emulated_nop(LLCCEP_exec::instruction data);
-		void emulated_swi(LLCCEP_exec::instruction data);
-		void emulated_cmp(LLCCEP_exec::instruction data);
-		void emulated_inc(LLCCEP_exec::instruction data);
-		void emulated_dec(LLCCEP_exec::instruction data);
-		void emulated_sqrt(LLCCEP_exec::instruction data);
-		void emulated_sin(LLCCEP_exec::instruction data);
-		void emulated_cos(LLCCEP_exec::instruction data);
-		void emulated_ptan(LLCCEP_exec::instruction data);
-		void emulated_patan(LLCCEP_exec::instruction data);
-		void emulated_ldc(LLCCEP_exec::instruction data);
-		void emulated_call(LLCCEP_exec::instruction data);
-		void emulated_jmp(LLCCEP_exec::instruction data);
-		void emulated_ret(LLCCEP_exec::instruction data);
-		void emulated_stregs(LLCCEP_exec::instruction data);
-		void emulated_ldregs(LLCCEP_exec::instruction data);
+		void emulated_mov(LLCCEP::instruction data);
+		void emulated_mva(LLCCEP::instruction data);
+		void emulated_push(LLCCEP::instruction data);
+		void emulated_pop(LLCCEP::instruction data);
+		void emulated_top(LLCCEP::instruction data);
+		void emulated_add(LLCCEP::instruction data);
+		void emulated_sub(LLCCEP::instruction data);
+		void emulated_mul(LLCCEP::instruction data);
+		void emulated_div(LLCCEP::instruction data);
+		void emulated_and(LLCCEP::instruction data);
+		void emulated_or(LLCCEP::instruction data);
+		void emulated_xor(LLCCEP::instruction data);
+		void emulated_off(LLCCEP::instruction data);
+		void emulated_nop(LLCCEP::instruction data);
+		void emulated_swi(LLCCEP::instruction data);
+		void emulated_cmp(LLCCEP::instruction data);
+		void emulated_inc(LLCCEP::instruction data);
+		void emulated_dec(LLCCEP::instruction data);
+		void emulated_sqrt(LLCCEP::instruction data);
+		void emulated_sin(LLCCEP::instruction data);
+		void emulated_cos(LLCCEP::instruction data);
+		void emulated_ptan(LLCCEP::instruction data);
+		void emulated_patan(LLCCEP::instruction data);
+		void emulated_ldc(LLCCEP::instruction data);
+		void emulated_call(LLCCEP::instruction data);
+		void emulated_jmp(LLCCEP::instruction data);
+		void emulated_ret(LLCCEP::instruction data);
+		void emulated_stregs(LLCCEP::instruction data);
+		void emulated_ldregs(LLCCEP::instruction data);
 
 		/**************************************************
 		 * Memory manager pointer,
@@ -108,7 +107,7 @@ namespace LLCCEP_exec {
 		 * insutruction from input file one-by-one
 		 * and executing them
 		 *************************************************/
-		codeReader *reader;
+		LLCCEP::codeReader *reader;
 
 		/**************************************************
 		 * Binded QT application.
