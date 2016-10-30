@@ -27,8 +27,8 @@ void LLCCEP_ASM::compiler::compile(::std::vector<::std::string> in, ::std::strin
 	LLCCEP_ASM::codeGenerator codegen;
 	size_t pc = 0;
 
-	::std::ofstream output(out);
-	CHECK_FILE(output, out);
+	::std::ofstream output;
+	OPEN_FILE(output, out);
 
 	auto generateCode = [&codegen, &output](::std::vector<LLCCEP_ASM::lexem> lexems) {
 		if (lexems.size()) {
@@ -44,8 +44,8 @@ void LLCCEP_ASM::compiler::compile(::std::vector<::std::string> in, ::std::strin
 		}
 
 		for (const auto &i: in) {
-			::std::ifstream input{i};
-			CHECK_FILE(input, i);
+			::std::ifstream input;
+			OPEN_FILE(input, i);
 
 			LLCCEP_ASM::lexer lex;
 			lex.setProcessingPath(i);

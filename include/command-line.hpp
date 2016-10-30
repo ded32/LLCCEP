@@ -34,6 +34,7 @@ namespace LLCCEP_tools {
 		void setMaxFreeParams(size_t max);
 		void setHelpText(::std::string help);
 		void parse(int argn, char **argv);
+		void showHelp();
 
 		std::string getParam(::std::string name);
 		std::vector<std::string> getFreeParams();

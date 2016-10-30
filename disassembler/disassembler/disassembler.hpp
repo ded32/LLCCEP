@@ -10,8 +10,9 @@
 namespace LLCCEP_DisASM {
 	class disassembler {
 		UNCOPIABLE_CLASS(disassembler)
-	
-		::std::vector<LLCCEP::instruction> instructions;
+
+		LLCCEP::codeReader reader;
+		size_t size;
 		size_t mainID;
 	
 	public:

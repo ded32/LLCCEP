@@ -20,6 +20,7 @@ int main(int argn, char **argv)
 
 		clp.parse(argn, argv);
 
+
 		if (clp.getOutput().length())
 			output = clp.getOutput();
 

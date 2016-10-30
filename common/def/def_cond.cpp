@@ -1,8 +1,8 @@
+#include <string>
 #include <map>
-#include <cstdint>
 #include <STDExtras.hpp>
 
-#include "def_inst.hpp"
+#include "def_cond.hpp"
 
 ::std::string LLCCEP_ASM::get_condition_mnemonic(uint8_t bin)
 {
@@ -18,9 +18,8 @@
 
 	if (_CONDS.find(bin) == _CONDS.end()) {
 		throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
-			"Can't resolve condition %b!\n", bin
-		));
+			"Can't resolve condition %x!", bin));
 	}
 
-	return _CONDS[bin];
+	return _CONDS.at(bin);
 }

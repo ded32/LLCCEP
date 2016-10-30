@@ -11,8 +11,10 @@ int main(int argn, char **argv)
 {
 	try {
 		LLCCEP_tools::commandLineParametersParser clpp;
+		clpp.addFlag(LLCCEP_tools::commandLineFlag{{"-h", "--help"},
+		                                           "help", false});
 		clpp.addFlag(LLCCEP_tools::commandLineFlag{{"-o", "--output"},
-					                    "output", true});
+					                   "output", true});
 		clpp.setHelpText("LLCCEP disassembler parameters:\n"
 		                 "-o/--output | output file path\n"
 				 "-h/--help   | does help(this text) needs "
@@ -22,7 +24,13 @@ int main(int argn, char **argv)
 				 "But there should be only one input");
 		clpp.setMaxFreeParams(1);
 		clpp.parse(argn, argv);
-		
+
+		if (!clpp.getFreeParams().size() ||
+		    clpp.getParam("help").length()) {
+			clpp.showHelp();
+			return 0;
+		}
+
 		LLCCEP_DisASM::disassembler disASM;
 
 		::std::ifstream in;

@@ -1,8 +1,8 @@
 #ifndef COMMON_DEF_COND_HPP
 #define COMMON_DEF_COND_HPP
 
+#include <string>
 #include <map>
-#include <cstdint>
 
 namespace LLCCEP_ASM {
 	static const int CONDS_NUM = 7;

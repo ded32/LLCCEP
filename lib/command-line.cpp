@@ -84,7 +84,7 @@ void LLCCEP_tools::commandLineParametersParser::parse(int argn, char **argv)
 
 			if (follow && i == argn - 1) {
 				throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
-					"'%s' requires a parameter after",
+					"Sudden end after '%s'",
 					argv[i]));
 			} else if (follow) {
 				param->following = argv[++i];
@@ -94,11 +94,16 @@ void LLCCEP_tools::commandLineParametersParser::parse(int argn, char **argv)
 		} else if (freeParams.size() > maxFreeParams && 
 		           maxFreeParams != -1) {
 			throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
-				"Too many free params"));
+				"Too many free parameters"));
 		} else {
 			freeParams.push_back(argv[i]);
 		}
 	}
+}
+
+void LLCCEP_tools::commandLineParametersParser::showHelp()
+{
+	::std::cerr << helpText << ::std::endl;
 }
 
 ::std::string LLCCEP_tools::commandLineParametersParser::getParam(
