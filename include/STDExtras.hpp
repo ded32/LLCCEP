@@ -18,6 +18,8 @@
 #include <sstream>
 #include <vector>
 
+#include <os-specific.hpp>
+
 #if defined(__linux__)
 #include <linux/limits.h>
 #endif // linux
@@ -105,20 +107,38 @@ namespace std {
 #define RUNTIME_EXCEPTION(...) ::LLCCEP::runtime_exception(__FILE__, __LINE__,\
                                                            __PRETTY_FUNCTION__, ##__VA_ARGS__);
 
+#ifdef DEBUG
 #define DEFAULT_HANDLING \
-catch (::std::exception &exc) {\
-	FATAL_ERROR(yes, "default catch block", "runtime error"\
-	            " message: %s", exc.what());\
-} catch (::std::string &str) {\
-	FATAL_ERROR(yes, "default catch block", "caught string"\
-	           " content: %s", str.c_str());\
-} catch (int64_t &id) {\
-	FATAL_ERROR(yes, "default catch block", "caught "\
-	            "exception data: %zd", id);\
-} catch (...) {\
-	FATAL_ERROR(yes, "default catch block", "unknown "\
- 	            "exception type");\
+catch (::LLCCEP::runtime_exception &exc) { \
+	FATAL_ERROR(yes, "default catch block", "runtime exception" \
+	            " message: %s", exc.what()); \
+catch (::std::exception &exc) { \
+	FATAL_ERROR(yes, "default catch block", "runtime error" \
+	            " message: %s", exc.what()); \
+} catch (::std::string &str) { \
+	FATAL_ERROR(yes, "default catch block", "caught string" \
+	           " content: %s", str.c_str()); \
+} catch (int64_t &id) { \
+	FATAL_ERROR(yes, "default catch block", "caught " \
+	            "exception data: %zd", id); \
+} catch (...) { \
+	FATAL_ERROR(yes, "default catch block", "unknown " \
+ 	            "exception type"); \
 }
+#else
+#define DEFAULT_HANDLING \
+catch (LLCCEP::runtime_exception &exc) { \
+	QUITE_ERROR(yes, "%s", exc.msg()); \
+} catch (::std::exception &exc) { \
+	QUITE_ERROR(yes, "%s", exc.what()); \
+} catch (::std::string &str) { \
+	QUITE_ERROR(yes, "Got error message: %s", str.c_str()); \
+} catch (int64_t &id) { \
+	QUITE_ERROR(yes, "Got error: " int64_t_pf, id); \
+} catch (...) { \
+	QUITE_ERROR(yes, "Unknown exception occured"); \
+}
+#endif /* DEBUG */
 
 #define DEFAULT_CHECK_BLOCK(cond, object_ptr, state) \
 { \

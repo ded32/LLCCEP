@@ -11,6 +11,39 @@ namespace LLCCEP_command_line {
 	bool isOutput(const char * const str);
 }
 
+namespace LLCCEP_tools {
+	struct commandLineFlag {
+		std::vector<std::string> possibleMnemonics;
+		std::string name;
+		bool followed;
+		std::string following;
+	};
+
+	class commandLineParametersParser {
+		std::vector<commandLineFlag> flags;
+		std::string helpText;
+
+		std::vector<std::string> freeParams;
+		size_t maxFreeParams;
+
+	public:
+		commandLineParametersParser();
+		~commandLineParametersParser();
+
+		void addFlag(commandLineFlag clf);
+		void setMaxFreeParams(size_t max);
+		void setHelpText(::std::string help);
+		void parse(int argn, char **argv);
+
+		std::string getParam(::std::string name);
+		std::vector<std::string> getFreeParams();
+
+	private:
+		auto isParam(std::string mnem) -> decltype(flags.begin());
+		bool followed(std::string mnem);
+	};
+}
+
 class commandLineParametersVM {
 public:
 	commandLineParametersVM();

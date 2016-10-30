@@ -4,6 +4,7 @@
 #include <iostream>
 
 #include <STDExtras.hpp>
+#include <STLExtras.hpp>
 #include <command-line.hpp>
 #include <convert.hpp>
 
@@ -23,6 +24,128 @@ bool LLCCEP_command_line::isOutput(const char * const str)
 {
 	return !::std::strcmp(str, "-o") ||
 	       !::std::strcmp(str, "--output");
+}
+
+LLCCEP_tools::commandLineParametersParser::commandLineParametersParser():
+	flags(),
+	helpText(),
+	freeParams()
+{ }
+
+LLCCEP_tools::commandLineParametersParser::~commandLineParametersParser()
+{ }
+
+void LLCCEP_tools::commandLineParametersParser::addFlag(
+	LLCCEP_tools::commandLineFlag clf)
+{
+	auto checkMnemonicsOK = [this, &clf] {
+		for (const auto &i: clf.possibleMnemonics) {
+			for (const auto &j: flags) {
+				for (const auto &k: j.possibleMnemonics) {
+					if (i == k) {
+						throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
+							"Redeclaring '%s' parameter mnemonic",
+							k.c_str()));
+					}
+				}
+			}
+		}
+	};
+
+	for (const auto &i: flags) {
+		if (i.name == clf.name) {
+			throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
+				"Attempt of re-adding '%s' param",
+				clf.name.c_str()));
+		}
+	}
+
+	checkMnemonicsOK();
+	flags.push_back(clf);
+}
+
+void LLCCEP_tools::commandLineParametersParser::setMaxFreeParams(size_t max)
+{
+	maxFreeParams = max;
+}
+
+void LLCCEP_tools::commandLineParametersParser::setHelpText(::std::string str)
+{
+	helpText = str;
+}
+
+void LLCCEP_tools::commandLineParametersParser::parse(int argn, char **argv)
+{
+	for (int i = 1; i < argn; i++) {
+		auto param = isParam(argv[i]);
+
+		if (param != flags.end()) {
+			bool follow = followed(argv[i]);
+
+			if (follow && i == argn - 1) {
+				throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
+					"'%s' requires a parameter after",
+					argv[i]));
+			} else if (follow) {
+				param->following = argv[++i];
+			} else if (!follow) {
+				param->following = "1";
+			}
+		} else if (freeParams.size() > maxFreeParams && 
+		           maxFreeParams != -1) {
+			throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
+				"Too many free params"));
+		} else {
+			freeParams.push_back(argv[i]);
+		}
+	}
+}
+
+::std::string LLCCEP_tools::commandLineParametersParser::getParam(
+	::std::string name)
+{
+	auto find = [this, name] {
+		for (auto i = flags.begin(); i < flags.end(); i++)
+			if (i->name == name)
+				return i;
+
+		return flags.end();
+	};
+
+	if (find() == flags.end()) {
+		throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
+			"No such flag '%s'", name.c_str()));
+	}
+
+	return find()->following;
+}
+
+::std::vector<::std::string> LLCCEP_tools::commandLineParametersParser::getFreeParams()
+{
+	return freeParams;
+}
+
+auto LLCCEP_tools::commandLineParametersParser::isParam(::std::string mnem) -> decltype(LLCCEP_tools::commandLineParametersParser::flags.begin())
+{
+	for (auto i = flags.begin(); i < flags.end(); i++) {
+		auto find = vec_find(i->possibleMnemonics, mnem);
+		if (find != i->possibleMnemonics.end())
+			return i;
+	}
+
+	return flags.end();
+}
+
+bool LLCCEP_tools::commandLineParametersParser::followed(::std::string mnem)
+{
+	auto param = isParam(mnem);
+	if (param == flags.end()) {
+		throw RUNTIME_EXCEPTION(CONSTRUCT_MSG(
+			"Not param '%s'",
+			mnem.c_str()));
+	}
+
+	return param->followed;
 }
 
 commandLineParametersVM::commandLineParametersVM():
